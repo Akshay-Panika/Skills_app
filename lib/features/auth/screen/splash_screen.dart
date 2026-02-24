@@ -34,7 +34,7 @@ class _SplashScreenState extends State<SplashScreen> {
             // FlutterLogo(size: 100),
             Icon(
               Icons.school,
-              size: 130,
+              size: 90,
               color: Colors.blueAccent,
               // color: Colors.lightBlueAccent,
             )

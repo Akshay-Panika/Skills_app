@@ -15,6 +15,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
 
+  bool  _isPaid = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,15 +34,17 @@ class _HomeScreenState extends State<HomeScreen> {
         slivers: [
 
           SliverToBoxAdapter(
-            child: Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.all(8),
-                  child: Row(
+            child: Padding(
+              padding: EdgeInsets.all(8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
                     children:  [
-                      SizedBox(width: 16),
-                      Icon(Icons.school, color: Colors.blueAccent, size: 30),
-                      SizedBox(width: 16),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Icon(Icons.school, color: Colors.blueAccent, size: 30),
+                      ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -64,9 +68,25 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
-                ),
 
-              ],
+                  Transform.scale(
+                    scale: 0.9,
+                    child: Switch(
+                      value: _isPaid,
+                      activeThumbColor: Colors.white30,
+                      activeTrackColor: Colors.blueAccent,
+                      inactiveTrackColor: Colors.white,
+                      inactiveThumbColor: Colors.blueAccent,
+                      trackOutlineColor: MaterialStateProperty.all(Colors.grey.withOpacity(0.16)),
+                      onChanged: (value) {
+                        setState(() {
+                          _isPaid = value;
+                        });
+                      },
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
           SliverToBoxAdapter(child: SizedBox(height: 10,),),
@@ -113,13 +133,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     /// FAVORITE
                     IconButton(
                       onPressed: () {},
-                      icon: const Icon(Icons.favorite_border, color: Colors.red,),
+                      icon: const Icon(Icons.bookmark, color: Colors.blueAccent,),
                     ),
 
                     /// NOTIFICATION
                     IconButton(
                       onPressed: () {},
-                      icon: const Icon(Icons.notifications_active_outlined,color: Colors.blueAccent,),
+                      icon: const Icon(Icons.notifications,color: Colors.blueAccent,),
                     ),
                   ],
                 ),
@@ -299,6 +319,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     'Recent Viewed Services',
                     style: TextStyle(
                       fontSize: 16,
+                      color: Colors.blueAccent,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -341,6 +362,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             top: Radius.circular(14),
                                           ),
                                         ),
+                                        child: Center(child: Icon(Icons.image_not_supported_outlined, color: Colors.white,size: 40,)),
                                       ),
                                     ),
                                 
@@ -401,7 +423,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     )
                                   ],
                                 ),
-                                IconButton(onPressed: () => null, icon: Icon(Icons.favorite_border, color: Colors.red,))
+                                IconButton(onPressed: () => null, icon: Icon(Icons.bookmark_border, color: Colors.blueAccent,))
                               ],
                             ),
                           ),
@@ -425,6 +447,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     'Fresh Recommendation Services',
                     style: TextStyle(
                       fontSize: 16,
+                      color: Colors.blueAccent,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -468,6 +491,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           top: Radius.circular(14),
                                         ),
                                       ),
+                                      child: Center(child: Icon(Icons.image_not_supported_outlined, color: Colors.white,size: 40,)),
                                     ),
                                   ),
 
@@ -528,7 +552,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   )
                                 ],
                               ),
-                              IconButton(onPressed: () => null, icon: Icon(Icons.favorite_border, color: Colors.red,))
+                              IconButton(onPressed: () => null, icon: Icon(Icons.bookmark_border, color: Colors.blueAccent,))
 
                             ],
                           ),

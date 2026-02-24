@@ -136,7 +136,7 @@ class _AuthScreenState extends State<AuthScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Container(
-        color: Colors.lightBlueAccent.withOpacity(0.16),
+        color: Colors.grey.withOpacity(0.16),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -144,7 +144,7 @@ class _AuthScreenState extends State<AuthScreen> {
               child: Center(
                 child: Icon(
                   Icons.verified_user_outlined,
-                  size: 110,
+                  size: 80,
                   color: Colors.blueAccent.withOpacity(.7),
                 ),
               ),

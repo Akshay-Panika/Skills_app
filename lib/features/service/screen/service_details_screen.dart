@@ -8,21 +8,21 @@ class ServiceDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffF7F8FA),
+      backgroundColor: Colors.white,
       body: CustomScrollView(
         slivers: [
           /// IMAGE SECTION
           SliverAppBar(
             expandedHeight: 300,
             pinned: true,
-            backgroundColor: Colors.blueAccent,
+            backgroundColor:Colors.transparent,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
+                  color: Colors.grey.withOpacity(0.16),
                 ),
                 child: const Center(
-                  child: Icon(Icons.image, size: 100, color: Colors.grey),
+                  child: Icon(Icons.image_not_supported_outlined, size: 100, color: Colors.white),
                 ),
               ),
             ),
@@ -151,7 +151,7 @@ class ServiceDetailsScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              ElevatedButton(onPressed: () => null, child: Icon(Icons.favorite_border,color: Colors.white,),
+              ElevatedButton(onPressed: () => null, child: Icon(Icons.bookmark_border,color: Colors.white,),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blueAccent,
                   shape: RoundedRectangleBorder(
