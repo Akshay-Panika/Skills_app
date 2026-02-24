@@ -113,13 +113,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     /// FAVORITE
                     IconButton(
                       onPressed: () {},
-                      icon: const Icon(Icons.favorite_border),
+                      icon: const Icon(Icons.favorite_border, color: Colors.red,),
                     ),
 
                     /// NOTIFICATION
                     IconButton(
                       onPressed: () {},
-                      icon: const Icon(Icons.notifications_active_outlined),
+                      icon: const Icon(Icons.notifications_active_outlined,color: Colors.blueAccent,),
                     ),
                   ],
                 ),
@@ -324,66 +324,45 @@ class _HomeScreenState extends State<HomeScreen> {
                                 width: .5,
                               ),
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            child: Stack(
+                              alignment: AlignmentGeometry.topRight,
                               children: [
-
-
-                                Expanded(
-                                  child: Container(
-
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey.withOpacity(0.16),
-                                      borderRadius: const BorderRadius.vertical(
-                                        top: Radius.circular(14),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                
+                                
+                                    Expanded(
+                                      child: Container(
+                                
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.withOpacity(0.16),
+                                          borderRadius: const BorderRadius.vertical(
+                                            top: Radius.circular(14),
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ),
-
-                                Padding(
-                                  padding: const EdgeInsets.all(12),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-
-                                      /// name + desc
-                                      const Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                
+                                    Padding(
+                                      padding: const EdgeInsets.all(12),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text(
-                                            "Service Name",
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                          SizedBox(height: 4),
-                                          Text(
-                                            "Short description",
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-
-                                      /// price
-                                      const Column(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: [
-                                          Text(
-                                            "₹500",
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          SizedBox(height: 4),
-                                          Row(
+                                
+                                          /// name + desc
+                                          const Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              Icon(Icons.location_on,size: 12,color: Colors.lightBlueAccent,),
                                               Text(
-                                                "5 km",
+                                                "Service Name",
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                              SizedBox(height: 4),
+                                              Text(
+                                                "Short description",
                                                 style: TextStyle(
                                                   fontSize: 12,
                                                   color: Colors.grey,
@@ -391,11 +370,38 @@ class _HomeScreenState extends State<HomeScreen> {
                                               ),
                                             ],
                                           ),
+                                
+                                          /// price
+                                          const Column(
+                                            crossAxisAlignment: CrossAxisAlignment.end,
+                                            children: [
+                                              Text(
+                                                "₹500",
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              SizedBox(height: 4),
+                                              Row(
+                                                children: [
+                                                  Icon(Icons.location_on,size: 12,color: Colors.lightBlueAccent,),
+                                                  Text(
+                                                    "5 km",
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
                                         ],
                                       ),
-                                    ],
-                                  ),
-                                )
+                                    )
+                                  ],
+                                ),
+                                IconButton(onPressed: () => null, icon: Icon(Icons.favorite_border, color: Colors.red,))
                               ],
                             ),
                           ),
@@ -447,64 +453,43 @@ class _HomeScreenState extends State<HomeScreen> {
                               width: .5,
                             ),
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          child: Stack(
+                            alignment: Alignment.topRight,
                             children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
 
-                              Expanded(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.withOpacity(0.16),
-                                    borderRadius: const BorderRadius.vertical(
-                                      top: Radius.circular(14),
+                                  Expanded(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.withOpacity(0.16),
+                                        borderRadius: const BorderRadius.vertical(
+                                          top: Radius.circular(14),
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ),
 
-                              Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-
-                                    /// name + desc
-                                    const Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                  Padding(
+                                    padding: const EdgeInsets.all(12),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text(
-                                          "Service Name",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        SizedBox(height: 4),
-                                        Text(
-                                          "Short description",
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
 
-                                    /// price
-                                    const Column(
-                                      crossAxisAlignment: CrossAxisAlignment.end,
-                                      children: [
-                                        Text(
-                                          "₹500",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        SizedBox(height: 4),
-                                        Row(
+                                        /// name + desc
+                                        const Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Icon(Icons.location_on,size: 12,color: Colors.lightBlueAccent,),
                                             Text(
-                                              "5 km",
+                                              "Service Name",
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                            SizedBox(height: 4),
+                                            Text(
+                                              "Short description",
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 color: Colors.grey,
@@ -512,11 +497,39 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ),
                                           ],
                                         ),
+
+                                        /// price
+                                        const Column(
+                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          children: [
+                                            Text(
+                                              "₹500",
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            SizedBox(height: 4),
+                                            Row(
+                                              children: [
+                                                Icon(Icons.location_on,size: 12,color: Colors.lightBlueAccent,),
+                                                Text(
+                                                  "5 km",
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.grey,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       ],
                                     ),
-                                  ],
-                                ),
-                              )
+                                  )
+                                ],
+                              ),
+                              IconButton(onPressed: () => null, icon: Icon(Icons.favorite_border, color: Colors.red,))
+
                             ],
                           ),
                         ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../account/screen/account_screen.dart';
+import '../../account/screen/basic_info_screen.dart';
 import '../../ads/screen/ads_screen.dart';
 import '../../chat/screen/chat_screen.dart';
 import '../../home/screen/home_screen.dart';
@@ -44,7 +45,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _screens[_currentIndex],
+      body: Stack(
+        alignment: Alignment.bottomRight,
+        children: [
+          _screens[_currentIndex],
+          InkWell(
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => BasicInfoScreen(),)),
+            child: Container(
+              width: 60,height: 60,
+              margin: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.blueAccent),
+              ),
+              child: Icon(Icons.person,color: Colors.blueAccent,),
+            ),
+          )
+        ],
+      ),
 
       floatingActionButton:InkWell(
         onTap:  () {

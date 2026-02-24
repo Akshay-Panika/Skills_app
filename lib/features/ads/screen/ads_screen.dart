@@ -15,7 +15,7 @@ class AdsScreen extends StatelessWidget {
           title: const Text("My Ads"),
           centerTitle: false,
           actions: [
-            IconButton(onPressed: () {}, icon: const Icon(Icons.search)),
+            IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
           ],
           bottom: const TabBar(
             labelColor: Colors.black,

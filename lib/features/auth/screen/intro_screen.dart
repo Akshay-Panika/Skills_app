@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:skills_app/features/dashboard/screen/dashboard_screen.dart';
 
+import 'auth_screen.dart';
+
 class IntroScreen extends StatefulWidget {
   const IntroScreen({super.key});
 
@@ -33,7 +35,7 @@ class _IntroScreenState extends State<IntroScreen> {
   void _goToDashboard() {
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const DashboardScreen()),
+      MaterialPageRoute(builder: (_) => const AuthScreen()),
     );
   }
 
@@ -47,12 +49,13 @@ class _IntroScreenState extends State<IntroScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.blueAccent, Colors.lightBlueAccent],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+        decoration:  BoxDecoration(
+          color: Colors.lightBlueAccent.withOpacity(0.16)
+          // gradient: LinearGradient(
+          //   colors: [Colors.blueAccent, Colors.lightBlueAccent],
+          //   begin: Alignment.topLeft,
+          //   end: Alignment.bottomRight,
+          // ),
         ),
         child: SafeArea(
           child: Column(
@@ -65,7 +68,7 @@ class _IntroScreenState extends State<IntroScreen> {
                   onPressed: _goToDashboard,
                   child: const Text(
                     "Skip",
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.blueAccent),
                   ),
                 ),
               ),
@@ -86,7 +89,7 @@ class _IntroScreenState extends State<IntroScreen> {
                           Icon(
                             pages[index]["icon"],
                             size: 130,
-                            color: Colors.white,
+                            color: Colors.blueAccent,
                           ),
                           const SizedBox(height: 40),
                           Text(
@@ -95,7 +98,7 @@ class _IntroScreenState extends State<IntroScreen> {
                             style: const TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: Colors.blueAccent,
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -104,7 +107,7 @@ class _IntroScreenState extends State<IntroScreen> {
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               fontSize: 16,
-                              color: Colors.white70,
+                              color: Colors.blueAccent,
                             ),
                           ),
                         ],
@@ -125,7 +128,7 @@ class _IntroScreenState extends State<IntroScreen> {
                     width: currentIndex == index ? 22 : 8,
                     height: 8,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Colors.lightBlueAccent,
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),

@@ -45,10 +45,16 @@ class ServiceDetailsScreen extends StatelessWidget {
                               fontWeight: FontWeight.bold, fontSize: 18),
                         ),
                       ),
-                      Text(
-                        "₹1500",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 18),
+                      Row(
+                        spacing: 5,
+                        children: [
+                          Icon(Icons.circle,size: 14,color: Colors.green,),
+                          Text(
+                            "Unpaid",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500, fontSize: 12,color: Colors.green),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -93,9 +99,9 @@ class ServiceDetailsScreen extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        const CircleAvatar(
+                         CircleAvatar(
                           radius: 25,
-                          backgroundColor: Colors.blueAccent,
+                          backgroundColor: Colors.grey.withOpacity(0.16),
                           child: Icon(Icons.person, color: Colors.white),
                         ),
                         const SizedBox(width: 12),
@@ -107,7 +113,7 @@ class ServiceDetailsScreen extends StatelessWidget {
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold)),
                               SizedBox(height: 4),
-                              Text("Member since Jan 2023",
+                              Text("I am a flutter developer at 1.4+ years",
                                   style: TextStyle(
                                       color: Colors.grey, fontSize: 12)),
                             ],
@@ -137,7 +143,7 @@ class ServiceDetailsScreen extends StatelessWidget {
                 child: ElevatedButton.icon(
                   onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatingScreen(),)),
                   icon: const Icon(Icons.chat,color: Colors.white,),
-                  label: const Text("Chat with Seller", style: TextStyle(color: Colors.white),),
+                  label: const Text("Chat With Mentor", style: TextStyle(color: Colors.white),),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
                     shape: RoundedRectangleBorder(
@@ -145,7 +151,7 @@ class ServiceDetailsScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              ElevatedButton(onPressed: () => null, child: Icon(Icons.call_outlined,color: Colors.white,),
+              ElevatedButton(onPressed: () => null, child: Icon(Icons.favorite_border,color: Colors.white,),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blueAccent,
                   shape: RoundedRectangleBorder(
