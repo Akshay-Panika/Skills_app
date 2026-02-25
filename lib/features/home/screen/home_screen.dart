@@ -69,22 +69,20 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
 
-                  Transform.scale(
-                    scale: 0.9,
-                    child: Switch(
-                      value: _isPaid,
-                      activeThumbColor: Colors.white30,
-                      activeTrackColor: Colors.blueAccent,
-                      inactiveTrackColor: Colors.white,
-                      inactiveThumbColor: Colors.blueAccent,
-                      trackOutlineColor: MaterialStateProperty.all(Colors.grey.withOpacity(0.16)),
-                      onChanged: (value) {
-                        setState(() {
-                          _isPaid = value;
-                        });
-                      },
-                    ),
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.bookmark, color: Colors.blueAccent,),
+                      ),
+
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.notifications,color: Colors.blueAccent,),
+                      ),
+                    ],
                   )
+
                 ],
               ),
             ),
@@ -128,19 +126,51 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
 
-                    const SizedBox(width: 6),
+                    const SizedBox(width:12),
 
-                    /// FAVORITE
-                    IconButton(
-                      onPressed: () {},
-                      icon: const Icon(Icons.bookmark, color: Colors.blueAccent,),
-                    ),
+                    Transform.scale(
+                      scale: 0.8,
+                      child: Switch(
+                        value: _isPaid,
 
-                    /// NOTIFICATION
-                    IconButton(
-                      onPressed: () {},
-                      icon: const Icon(Icons.notifications,color: Colors.blueAccent,),
-                    ),
+                        /// 👇 ₹ ICON BOTH STATES
+                        thumbIcon: MaterialStateProperty.resolveWith<Icon?>(
+                              (states) {
+                            if (states.contains(MaterialState.selected)) {
+                              /// ON → PAID (Bold ₹)
+                              return const Icon(
+                                Icons.currency_rupee,
+                                size: 16,
+                                color: Colors.white,
+                              );
+                            }
+
+                            /// OFF → UNPAID (Outlined ₹)
+                            return const Icon(
+                              Icons.currency_rupee_outlined,
+                              size: 16,
+                              color: Colors.white,
+                            );
+                          },
+                        ),
+
+                        activeThumbColor: Colors.green,
+                        activeTrackColor: Colors.green.withOpacity(0.4),
+                        inactiveTrackColor: Colors.grey.shade200,
+                        inactiveThumbColor: Colors.grey,
+
+                        trackOutlineColor: MaterialStateProperty.all(
+                          Colors.grey.withOpacity(0.2),
+                        ),
+
+                        onChanged: (value) {
+                          setState(() {
+                            _isPaid = value;
+                          });
+                        },
+                      ),
+                    )
+
                   ],
                 ),
               ),
