@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:skills_app/features/dashboard/screen/dashboard_screen.dart';
-
+import 'package:lottie/lottie.dart';
 import 'auth_screen.dart';
 
 class IntroScreen extends StatefulWidget {
@@ -17,18 +17,21 @@ class _IntroScreenState extends State<IntroScreen> {
   final List<Map<String, dynamic>> pages = [
     {
       "title": "Share Your Skills",
-      "desc": "Help others by sharing what you know",
-      "icon": Icons.volunteer_activism,
+      "desc":
+      "Help others by sharing what you know and make a real difference in people’s lives. Teach your talents, guide beginners step-by-step, and inspire your community with practical knowledge. Build meaningful connections, gain recognition for your expertise, and grow your confidence while empowering others to succeed.",
+      "icon": 'assets/intro/Share.json',
     },
     {
       "title": "Learn New Skills",
-      "desc": "Discover and learn from people around you",
-      "icon": Icons.menu_book,
+      "desc":
+      "Discover and learn from people around you in a simple and engaging way. Explore new abilities, gain real-world knowledge, and improve yourself every day. Connect with mentors, ask questions, and keep growing so you stay prepared for future opportunities and challenges.",
+      "icon": 'assets/intro/Education.json',
     },
     {
       "title": "Grow Your Future",
-      "desc": "Build confidence and create new opportunities",
-      "icon": Icons.trending_up,
+      "desc":
+      "Build confidence and create new opportunities that shape your journey ahead. Expand your network, unlock your true potential, and move closer to your goals. With continuous learning and strong connections, you can create a brighter, more successful future for yourself.",
+      "icon": 'assets/intro/Growth.json',
     },
   ];
 
@@ -65,23 +68,21 @@ class _IntroScreenState extends State<IntroScreen> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(flex: 2,
+                      SizedBox(height: 50,),
+                      Expanded(
                         child: Container(
                           width: double.infinity,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
-                            color: Colors.grey.withOpacity(0.16)
+                            color: Colors.white
                           ),
-                          child: Icon(
-                            pages[index]["icon"],
-                            size: 300,
-                            color: Colors.white30,
-                          ),
+                          child: Lottie.asset(pages[index]["icon"]),
                         ),
                       ),
                       Expanded(child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Column(
+                          spacing: 10,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
@@ -90,15 +91,15 @@ class _IntroScreenState extends State<IntroScreen> {
                               style: const TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.blueAccent,
+                                color: Colors.black,
                               ),
                             ),
                             Text(
                               pages[index]["desc"],
-                              textAlign: TextAlign.center,
+                              textAlign: TextAlign.start,
                               style: const TextStyle(
                                 fontSize: 16,
-                                color: Colors.blueAccent,
+                                color: Colors.grey,
                               ),
                             ),
                           ],
