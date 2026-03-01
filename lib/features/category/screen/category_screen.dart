@@ -1,15 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../home/data/categories_data.dart';
-import '../../service/screen/service_details_screen.dart';
-
-final dummyServices = List.generate(
-  20,
-      (index) => {
-    "title": "Service $index",
-    "price": "${(index + 1) * 100}₹",
-    "distance": "${(index + 1) * 2} km",
-  },
-);
+import '../../service/screen/service_screen.dart';
 
 class CategoryScreen extends StatefulWidget {
   const CategoryScreen({super.key});
@@ -20,6 +11,21 @@ class CategoryScreen extends StatefulWidget {
 
 class _CategoryScreenState extends State<CategoryScreen> {
   int selectedCategoryIndex = 0;
+  int bannerIndex = 0;
+
+  final List<String> banners = [
+    "https://dummyimage.com/600x200/1976d2/ffffff&text=Banner+1",
+    "https://dummyimage.com/600x200/42a5f5/ffffff&text=Banner+2",
+  ];
+
+  final List<Map<String, dynamic>> hobbies = [
+    {"icon": Icons.menu_book, "title": "Books"},
+    {"icon": Icons.fitness_center, "title": "Gym & Fitness"},
+    {"icon": Icons.music_note, "title": "Musical Instruments"},
+    {"icon": Icons.sports_soccer, "title": "Sports Equipment"},
+    {"icon": Icons.palette, "title": "Other Hobbies"},
+    {"icon": Icons.arrow_forward_ios, "title": "View All"},
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -27,23 +33,19 @@ class _CategoryScreenState extends State<CategoryScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text("Categories"),
-        titleTextStyle: TextStyle(fontSize: 18,fontWeight: FontWeight.w500,color: Colors.black),
+        titleTextStyle: const TextStyle(
+            fontSize: 18, fontWeight: FontWeight.w500, color: Colors.black),
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
-        elevation: 0,
+        // elevation: 0,
         scrolledUnderElevation: 0,
         shadowColor: Colors.transparent,
-        // toolbarHeight: 0,
-        actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.search)),
-          IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
-        ],
       ),
       body: Row(
         children: [
-          /// LEFT CATEGORY LIST
+          /// 🔹 LEFT CATEGORY LIST
           Container(
-            width: 110,
+            width: 100,
             color: Colors.grey.shade100,
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(vertical: 12),
@@ -51,39 +53,41 @@ class _CategoryScreenState extends State<CategoryScreen> {
               itemBuilder: (context, index) {
                 final cat = categoriesData[index];
                 final isSelected = index == selectedCategoryIndex;
-                return AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? Colors.blueAccent.withOpacity(0.2)
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: InkWell(
-                    onTap: () {
-                      setState(() {
-                        selectedCategoryIndex = index;
-                      });
-                    },
-                    borderRadius: BorderRadius.circular(8),
-                    splashColor: Colors.blueAccent.withOpacity(0.2),
+
+                return GestureDetector(
+                  onTap: () {
+                    setState(() => selectedCategoryIndex = index);
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 10),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? Colors.blue.shade50
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(cat["icon"] as IconData,
-                            color: isSelected ? Colors.blueAccent : Colors.grey,
-                            size: 28),
-                        const SizedBox(height: 10),
+                        SizedBox(
+                          height: 60,
+                          child: Icon(
+                            cat["icon"] as IconData,
+                            size: 28,
+                            color: isSelected ? Colors.blue : Colors.grey.shade600,
+                          ),
+                        ),
+
+                        const SizedBox(height: 6),
+
                         Text(
                           cat["title"] as String,
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                              color: isSelected ? Colors.blueAccent : Colors.grey),
-                        ),
+                            fontSize: 11,
+                            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                            color: isSelected ? Colors.blue : Colors.grey.shade700,
+                          ),
+                        )
                       ],
                     ),
                   ),
@@ -92,112 +96,72 @@ class _CategoryScreenState extends State<CategoryScreen> {
             ),
           ),
 
-          /// RIGHT SERVICES GRID
+          /// 🔹 RIGHT CONTENT
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: GridView.builder(
-                itemCount: dummyServices.length,
-                gridDelegate:
-                const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 1,
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  childAspectRatio: 1.5,
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    children: const [
+                      Text("Books, Sports & Hobbies",
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w600)),
+                      SizedBox(width: 8),
+                      Expanded(
+                          child: Divider(
+                            thickness: 1,
+                          )),
+                    ],
+                  ),
                 ),
-                itemBuilder: (context, index) {
-                  final service = dummyServices[index];
-                  return InkWell(
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder:  (context) => ServiceDetailsScreen(),)),
-                    child: Container(
-                      width: 260,
-                      margin: const EdgeInsets.only(right: 14),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: Colors.grey.withOpacity(.3),
-                          width: .5,
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
 
+                const SizedBox(height: 10),
 
-                          Expanded(
-                            child: Container(
-
-                              decoration: BoxDecoration(
-                                color: Colors.grey.withOpacity(0.16),
-                                borderRadius: const BorderRadius.vertical(
-                                  top: Radius.circular(14),
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-
-                                /// name + desc
-                                const Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Service Name",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    SizedBox(height: 4),
-                                    Text(
-                                      "Short description",
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-
-                                /// price
-                                const Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      "₹500",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    SizedBox(height: 4),
-                                    Row(
-                                      children: [
-                                        Icon(Icons.location_on,size: 12,color: Colors.lightBlueAccent,),
-                                        Text(
-                                          "5 km",
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
+                Expanded(
+                  child: GridView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: hobbies.length,
+                    gridDelegate:
+                    const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      mainAxisSpacing: 18,
+                      crossAxisSpacing: 18,
+                      childAspectRatio: 0.7,
                     ),
-                  );
-                },
-              ),
+                    itemBuilder: (_, index) {
+                      final item = hobbies[index];
+                      return InkWell(
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => ServiceScreen(),));
+                        },
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              height: 64,
+                              width: 64,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade100,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(item["icon"] as IconData, size: 28),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              item["title"] as String,
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                )
+              ],
             ),
           ),
         ],

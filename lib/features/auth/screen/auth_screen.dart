@@ -138,121 +138,110 @@ class _AuthScreenState extends State<AuthScreen> {
       backgroundColor: Colors.white,
       body: Container(
         color: Colors.white,
+        padding: EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              child: Padding(
-                padding: EdgeInsets.all(50),
-                child: Lottie.asset('assets/intro/Welcome.json',),
-              ),
+              child: Lottie.asset('assets/intro/Welcome.json',),
             ),
 
             Expanded(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(22),
-                    topRight: Radius.circular(22),
-                  ),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
 
-                    buildAnimatedProgress(),
-                    const SizedBox(height: 30),
-              
-                    Text(
-                      isOtpSent
-                          ? 'Enter verification code'
-                          : 'Verify your phone',
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w700, fontSize: 20),
-                    ),
-              
-                    const SizedBox(height: 6),
-              
-                    Text(
-                      isOtpSent
-                          ? 'Code sent to +91 ${phoneController.text}'
-                          : 'We’ll send a 6-digit code to confirm your number.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.grey.shade600),
-                    ),
-              
-                    const SizedBox(height: 24),
-                    buildAnimatedInput(),
-              
-                    if (isOtpSent) ...[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Didn’t receive code? Resend in 00:$resendSeconds",
-                            style: TextStyle(
-                                color: Colors.grey.shade600, fontSize: 13),
-                          ),
-                          TextButton(
-                            onPressed: () =>
-                                setState(() => isOtpSent = false),
-                            child: const Text("Change number"),
-                          ),
-                        ],
+                  buildAnimatedProgress(),
+
+
+                  Column(
+                    spacing: 5,
+                    children: [
+                      Text(
+                        isOtpSent
+                            ? 'Enter verification code'
+                            : 'Verify your phone',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w700, fontSize: 20),
+                      ),
+                      Text(
+                        isOtpSent
+                            ? 'Code sent to +91 ${phoneController.text}'
+                            : 'We’ll send a 6-digit code to confirm your number.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.grey.shade600),
                       ),
                     ],
-              
-                    const SizedBox(height: 30),
-              
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: isOtpSent ? verifyOtp : verifyPhone,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blueAccent,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: Text(
-                          isOtpSent ? 'Verify OTP' : 'Continue',
-                          style: const TextStyle(
-                              fontWeight: FontWeight.w600, fontSize: 16),
-                        ),
-                      ),
-                    ),
-              
-                    const SizedBox(height: 20),
-              
-                    RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(
-                        style:
-                        TextStyle(color: Colors.grey.shade600, fontSize: 12),
-                        children: [
-                          const TextSpan(
-                            text: "By continuing, you agree to our ",
-                          ),
-                          TextSpan(
-                            text: "Terms & Privacy Policy",
-                            style: const TextStyle(
-                                color: Colors.blueAccent,
-                                fontWeight: FontWeight.w600),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {},
-                          ),
-                        ],
-                      ),
-                    ),
-              
+                  ),
 
+
+                  buildAnimatedInput(),
+
+                  if (isOtpSent) ...[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Didn’t receive code? Resend in 00:$resendSeconds",
+                          style: TextStyle(
+                              color: Colors.grey.shade600, fontSize: 13),
+                        ),
+                        TextButton(
+                          onPressed: () =>
+                              setState(() => isOtpSent = false),
+                          child: const Text("Change number"),
+                        ),
+                      ],
+                    ),
                   ],
-                ),
+
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: isOtpSent ? verifyOtp : verifyPhone,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueAccent,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        isOtpSent ? 'Verify OTP' : 'Continue',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w600, fontSize: 16),
+                      ),
+                    ),
+                  ),
+
+
+                  RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                      style:
+                      TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                      children: [
+                        const TextSpan(
+                          text: "By continuing, you agree to our ",
+                        ),
+                        TextSpan(
+                          text: "Terms & Privacy Policy",
+                          style: const TextStyle(
+                              color: Colors.blueAccent,
+                              fontWeight: FontWeight.w600),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {},
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 10,),
+
+
+                ],
               ),
             ),
           ],
