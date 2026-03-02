@@ -61,10 +61,19 @@ class _AddServiceScreenState extends State<AddServiceScreen>
     return InputDecoration(
       hintText: hint,
       filled: true,
-      fillColor: Colors.grey.shade100,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      fillColor: Colors.white,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.grey.shade300),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.grey.shade300),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.grey.shade400),
       ),
     );
   }
@@ -94,7 +103,7 @@ class _AddServiceScreenState extends State<AddServiceScreen>
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 400),
                     curve: Curves.easeOut,
-                    padding: const EdgeInsets.all(14),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(18),
@@ -102,9 +111,9 @@ class _AddServiceScreenState extends State<AddServiceScreen>
                     child: Container(
                       height: 160,
                       decoration: BoxDecoration(
-                        color: Colors.grey.withOpacity(.08),
+                        color: Colors.grey.shade50,
                         borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: Colors.grey),
+                        border: Border.all(color: Colors.grey.shade300),
                       ),
                       child: const Center(
                         child: Column(
@@ -264,4 +273,5 @@ class _AddServiceScreenState extends State<AddServiceScreen>
       ),
     );
   }
+
 }
