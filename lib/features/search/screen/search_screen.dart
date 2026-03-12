@@ -51,7 +51,7 @@ class SearchScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Color(0xffF7F8FA),
       body: Column(
         children: [
           _buildHeader(context),

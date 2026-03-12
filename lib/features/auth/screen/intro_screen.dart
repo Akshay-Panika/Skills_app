@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skills_app/features/dashboard/screen/dashboard_screen.dart';
 import 'package:lottie/lottie.dart';
 import 'auth_screen.dart';
@@ -35,7 +36,11 @@ class _IntroScreenState extends State<IntroScreen> {
     },
   ];
 
-  void _goToDashboard() {
+  void _goToDashboard() async {
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('intro_seen', true);
+
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (_) => const AuthScreen()),
@@ -61,8 +66,7 @@ class _IntroScreenState extends State<IntroScreen> {
               child: PageView.builder(
                 controller: _controller,
                 itemCount: pages.length,
-                onPageChanged: (index) =>
-                    setState(() => currentIndex = index),
+                onPageChanged: (index) => setState(() => currentIndex = index),
                 itemBuilder: (context, index) {
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.start,

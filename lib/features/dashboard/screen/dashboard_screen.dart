@@ -45,6 +45,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xffF7F8FA),
       body: Stack(
         alignment: Alignment.bottomRight,
         children: [

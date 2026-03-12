@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:skills_app/core/widget/flutter_toast_widget.dart';
+import 'package:skills_app/features/auth/screen/auth_screen.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
@@ -11,7 +15,6 @@ class AccountScreen extends StatelessWidget {
         toolbarHeight: 0,
         backgroundColor: Colors.white,
       ),
-
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -19,6 +22,7 @@ class AccountScreen extends StatelessWidget {
           Stack(
             children: [
               Container(
+                height: 200,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -31,18 +35,14 @@ class AccountScreen extends StatelessWidget {
                   ],
                 ),
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    /// AVATAR
                     CircleAvatar(
                       radius: 32,
-                      backgroundColor: Colors.blueAccent.withOpacity(.15),
-                      child: const Icon(Icons.person,
-                          size: 32, color: Colors.blueAccent),
+                      backgroundColor: Colors.grey.withOpacity(.15),
+                      child: const Icon(Icons.image_not_supported_outlined, size: 32, color: Colors.grey),
                     ),
-              
                     const SizedBox(width: 14),
-              
-                    /// USER INFO
                     const Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,92 +51,83 @@ class AccountScreen extends StatelessWidget {
                               style: TextStyle(
                                   fontWeight: FontWeight.w600, fontSize: 16)),
                           SizedBox(height: 4),
-                          Text("+91 98765 43210",
+                          Text("89892 07770",
                               style: TextStyle(color: Colors.grey)),
                         ],
                       ),
                     ),
-                    
                   ],
                 ),
               ),
               Positioned(
-                  right: 0,top: 0,
-                  child:   IconButton(
-                onPressed: () {},
-                icon: Icon(Icons.more_vert, color: Colors.black,),
-              ))
+                right: 0,
+                top: 0,
+                child: IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.more_vert, color: Colors.black),
+                ),
+              ),
             ],
           ),
 
           const SizedBox(height: 18),
 
-          /// STATS
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 14),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _StatItem(title: "Ads", value: "12"),
-                _Divider(),
-                _StatItem(title: "Favorites", value: "8"),
-                _Divider(),
-                _StatItem(title: "Views", value: "230"),
-              ],
-            ),
-          ),
+          /// YOUR INFORMATION TITLE
+          const Text("Your Information",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
 
-          const SizedBox(height: 18),
+          const SizedBox(height: 10),
 
-          /// MENU LIST
+          /// MENU LIST (OLX Style)
+          const _MenuTile(icon: Icons.person_outline, title: "Profile"),
           const _MenuTile(icon: Icons.campaign_outlined, title: "My Ads"),
-          const _MenuTile(icon: Icons.favorite_border, title: "Favorites"),
-          const _MenuTile(icon: Icons.payment_outlined, title: "Payments"),
-          const _MenuTile(icon: Icons.settings_outlined, title: "Settings"),
-          const _MenuTile(icon: Icons.help_outline, title: "Help & Support"),
-          const _MenuTile(icon: Icons.login_outlined, title: "Sign Out"),
-
+          const _MenuTile(icon: Icons.favorite_border, title: "Wishlist"),
+          const _MenuTile(icon: Icons.chat_bubble_outline, title: "Help & Support"),
+          const _MenuTile(icon: Icons.card_giftcard, title: "Rewards"),
+          _MenuTile(
+            icon: Icons.logout,
+            title: "Sign Out",
+            onTap: () {
+              _showSignOutDialog(context);
+            },
+          ),
         ],
       ),
     );
   }
-}
 
-/// ================= STAT ITEM =================
-class _StatItem extends StatelessWidget {
-  final String title;
-  final String value;
-
-  const _StatItem({required this.title, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(value,
-            style: const TextStyle(
-                fontWeight: FontWeight.bold, fontSize: 16)),
-        const SizedBox(height: 4),
-        Text(title, style: TextStyle(color: Colors.grey.shade600)),
-      ],
-    );
-  }
-}
-
-/// DIVIDER
-class _Divider extends StatelessWidget {
-  const _Divider();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 1,
-      height: 32,
-      color: Colors.grey.shade300,
+  void _showSignOutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Colors.white,
+        title: const Text("Sign Out"),
+        content: const Text("Are you sure you want to sign out?"),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop(); // Close dialog
+            },
+            child:  Text("Cancel", style: TextStyle(color: Colors.red),),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
+            onPressed: () async{
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              await prefs.remove('intro_seen');
+              Navigator.pushReplacement(context, MaterialPageRoute(builder:(context) =>  AuthScreen(),));
+              FlutterToastWidget.showCustomToast(
+                context: context,
+                message: "Signed out successfully",
+                icon: Icons.check_circle,
+                backgroundColor: Colors.green,
+                textColor: Colors.white,
+              );
+            },
+            child:  Text("Sign Out", style: TextStyle(color: Colors.blueAccent),),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -145,8 +136,10 @@ class _Divider extends StatelessWidget {
 class _MenuTile extends StatelessWidget {
   final IconData icon;
   final String title;
+  final String? subtitle;
+  final VoidCallback? onTap;
 
-  const _MenuTile({required this.icon, required this.title});
+  const _MenuTile({required this.icon, required this.title, this.subtitle, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -159,8 +152,9 @@ class _MenuTile extends StatelessWidget {
       child: ListTile(
         leading: Icon(icon, color: Colors.black87),
         title: Text(title),
+        subtitle: subtitle != null ? Text(subtitle!) : null,
         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-        onTap: () {},
+        onTap: onTap,
       ),
     );
   }

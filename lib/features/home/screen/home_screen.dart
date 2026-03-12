@@ -20,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Color(0xffF7F8FA),
       appBar: AppBar(
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
@@ -34,7 +34,8 @@ class _HomeScreenState extends State<HomeScreen> {
         slivers: [
 
           SliverToBoxAdapter(
-            child: Padding(
+            child: Container(
+              color: Colors.white,
               padding: EdgeInsets.all(8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -87,92 +88,88 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          SliverToBoxAdapter(child: SizedBox(height: 10,),),
           SliverPersistentHeader(
             pinned: true,
             delegate: _SliverSearchBarDelegate(
               height: 56,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Row(
-                  children: [
+              child: Row(
+                children: [
 
-                    /// SEARCH BAR
-                    Expanded(
-                      child: InkWell(
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SearchScreen(),)),
-                        child: Container(
-                          height: 40,
-                          padding: const EdgeInsets.symmetric(horizontal: 14),
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade50,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: Colors.grey.withOpacity(.3),
-                              width: .5,
+                  /// SEARCH BAR
+                  Expanded(
+                    child: InkWell(
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SearchScreen(),)),
+                      child: Container(
+                        height: 40,
+                        padding: const EdgeInsets.symmetric(horizontal: 14),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade50,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: Colors.grey.withOpacity(.3),
+                            width: .5,
+                          ),
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(Icons.search, color: Colors.grey),
+                            SizedBox(width: 10),
+                            Text(
+                              "Search skills…",
+                              style: TextStyle(color: Colors.grey),
                             ),
-                          ),
-                          child: const Row(
-                            children: [
-                              Icon(Icons.search, color: Colors.grey),
-                              SizedBox(width: 10),
-                              Text(
-                                "Search skills…",
-                                style: TextStyle(color: Colors.grey),
-                              ),
-                            ],
-                          ),
+                          ],
                         ),
                       ),
                     ),
+                  ),
 
-                    const SizedBox(width:12),
+                  const SizedBox(width:12),
 
-                    Transform.scale(
-                      scale: 0.8,
-                      child: Switch(
-                        value: _isPaid,
+                  Transform.scale(
+                    scale: 0.8,
+                    child: Switch(
+                      value: _isPaid,
 
-                        /// 👇 ₹ ICON BOTH STATES
-                        thumbIcon: MaterialStateProperty.resolveWith<Icon?>(
-                              (states) {
-                            if (states.contains(MaterialState.selected)) {
-                              /// ON → PAID (Bold ₹)
-                              return const Icon(
-                                Icons.currency_rupee,
-                                size: 16,
-                                color: Colors.white,
-                              );
-                            }
-
-                            /// OFF → UNPAID (Outlined ₹)
+                      /// 👇 ₹ ICON BOTH STATES
+                      thumbIcon: MaterialStateProperty.resolveWith<Icon?>(
+                            (states) {
+                          if (states.contains(MaterialState.selected)) {
+                            /// ON → PAID (Bold ₹)
                             return const Icon(
-                              Icons.currency_rupee_outlined,
+                              Icons.currency_rupee,
                               size: 16,
                               color: Colors.white,
                             );
-                          },
-                        ),
+                          }
 
-                        activeThumbColor: Colors.green,
-                        activeTrackColor: Colors.green.withOpacity(0.4),
-                        inactiveTrackColor: Colors.grey.shade200,
-                        inactiveThumbColor: Colors.grey,
-
-                        trackOutlineColor: MaterialStateProperty.all(
-                          Colors.grey.withOpacity(0.2),
-                        ),
-
-                        onChanged: (value) {
-                          setState(() {
-                            _isPaid = value;
-                          });
+                          /// OFF → UNPAID (Outlined ₹)
+                          return const Icon(
+                            Icons.currency_rupee_outlined,
+                            size: 16,
+                            color: Colors.white,
+                          );
                         },
                       ),
-                    )
 
-                  ],
-                ),
+                      activeThumbColor: Colors.green,
+                      activeTrackColor: Colors.green.withOpacity(0.4),
+                      inactiveTrackColor: Colors.grey.shade200,
+                      inactiveThumbColor: Colors.grey,
+
+                      trackOutlineColor: MaterialStateProperty.all(
+                        Colors.grey.withOpacity(0.2),
+                      ),
+
+                      onChanged: (value) {
+                        setState(() {
+                          _isPaid = value;
+                        });
+                      },
+                    ),
+                  )
+
+                ],
               ),
             ),
           ),
@@ -199,7 +196,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: SizedBox(
               height: 215,
               child: GridView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
                 scrollDirection: Axis.horizontal,
                 itemCount: categoriesData.length,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -220,7 +217,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           height: 65,
                           width: double.infinity,
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
+                            color: Colors.white,
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Icon(
@@ -251,7 +248,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
           SliverToBoxAdapter(
             child: Container(
-              margin: const EdgeInsets.all(16),
+              margin: const EdgeInsets.symmetric(horizontal: 10),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.lightBlueAccent.withOpacity(0.1),
@@ -615,6 +612,7 @@ class _SliverSearchBarDelegate extends SliverPersistentHeaderDelegate {
       height: height,
       child: Container(
         color: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
         child: child,
       ),
     );

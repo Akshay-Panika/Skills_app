@@ -7,7 +7,7 @@ class ServiceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Color(0xffF7F8FA),
       appBar: AppBar(
         title: const Text("Service"),
         titleTextStyle: const TextStyle(
