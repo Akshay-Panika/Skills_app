@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skills_app/core/widget/flutter_toast_widget.dart';
 import 'package:skills_app/features/auth/screen/auth_screen.dart';
 
+import '../controller/user_profile_controller.dart';
+import '../model/user_profile_model.dart';
+
 class AccountScreen extends StatelessWidget {
-  const AccountScreen({super.key});
+  AccountScreen({super.key});
+
+  final UserProfileController controller = Get.put(UserProfileController());
 
   @override
   Widget build(BuildContext context) {
+    controller.fetchUserProfile(1);
     return Scaffold(
       backgroundColor: const Color(0xffF7F8FA),
       appBar: AppBar(
@@ -19,56 +28,168 @@ class AccountScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         children: [
           /// PROFILE CARD
-          Stack(
-            children: [
-              Container(
-                height: 200,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(.05),
-                      blurRadius: 8,
-                    )
-                  ],
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CircleAvatar(
-                      radius: 32,
-                      backgroundColor: Colors.grey.withOpacity(.15),
-                      child: const Icon(Icons.image_not_supported_outlined, size: 32, color: Colors.grey),
+          Obx((){
+            if (controller.isLoading.value) {
+              return  Stack(
+                children: [
+                  Container(
+                    height: 200,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(.05),
+                          blurRadius: 8,
+                        )
+                      ],
                     ),
-                    const SizedBox(width: 14),
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Akshay Panika",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600, fontSize: 16)),
-                          SizedBox(height: 4),
-                          Text("89892 07770",
-                              style: TextStyle(color: Colors.grey)),
-                        ],
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CircleAvatar(
+                          radius: 32,
+                          backgroundColor: Colors.grey.withOpacity(.15),
+                          child: const Icon(Icons.image_not_supported_outlined, size: 32, color: Colors.grey),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Guest Id",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600, fontSize: 16)),
+                              SizedBox(height: 4),
+                              Text("89892 07770",
+                                  style: TextStyle(color: Colors.grey)),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: IconButton(
+                      onPressed: () {},
+                      icon: const Icon(Icons.more_vert, color: Colors.black),
+                    ),
+                  ),
+                ],
+              );
+            }
+
+            final UserProfileModel? profile = controller.userProfile.value;
+
+            // Null state
+            if (profile == null) {
+              return  Stack(
+                children: [
+                  Container(
+                    height: 200,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(.05),
+                          blurRadius: 8,
+                        )
+                      ],
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CircleAvatar(
+                          radius: 32,
+                          backgroundColor: Colors.grey.withOpacity(.15),
+                          child: const Icon(Icons.image_not_supported_outlined, size: 32, color: Colors.grey),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Guest Id",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600, fontSize: 16)),
+                              SizedBox(height: 4),
+                              Text("89892 07770",
+                                  style: TextStyle(color: Colors.grey)),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: IconButton(
+                      onPressed: () {},
+                      icon: const Icon(Icons.more_vert, color: Colors.black),
+                    ),
+                  ),
+                ],
+              );
+            }
+
+            return  Stack(
+              children: [
+                Container(
+                  height: 200,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(.05),
+                        blurRadius: 8,
+                      )
+                    ],
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CircleAvatar(
+                        radius: 32,
+                        backgroundColor: Colors.grey.withOpacity(.15),
+                        child: const Icon(Icons.image_not_supported_outlined, size: 32, color: Colors.grey),
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 14),
+                       Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(profile.userName,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w600, fontSize: 16)),
+                            SizedBox(height: 4),
+                            Text("89892 07770",
+                                style: TextStyle(color: Colors.grey)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              Positioned(
-                right: 0,
-                top: 0,
-                child: IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.more_vert, color: Colors.black),
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.more_vert, color: Colors.black),
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            );
+          }),
+
 
           const SizedBox(height: 18),
 
@@ -114,15 +235,9 @@ class AccountScreen extends StatelessWidget {
             style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
             onPressed: () async{
               SharedPreferences prefs = await SharedPreferences.getInstance();
-              await prefs.remove('intro_seen');
-              Navigator.pushReplacement(context, MaterialPageRoute(builder:(context) =>  AuthScreen(),));
-              FlutterToastWidget.showCustomToast(
-                context: context,
-                message: "Signed out successfully",
-                icon: Icons.check_circle,
-                backgroundColor: Colors.green,
-                textColor: Colors.white,
-              );
+              await prefs.clear();
+              Get.off(() => AuthScreen());
+              FlutterToastWidget.success("Signed out successfully");
             },
             child:  Text("Sign Out", style: TextStyle(color: Colors.blueAccent),),
           ),

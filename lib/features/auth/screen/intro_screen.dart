@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skills_app/features/dashboard/screen/dashboard_screen.dart';
 import 'package:lottie/lottie.dart';
@@ -40,11 +42,7 @@ class _IntroScreenState extends State<IntroScreen> {
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('intro_seen', true);
-
-    if (!mounted) return;
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const AuthScreen()),
-    );
+    Get.off(() => AuthScreen());
   }
 
   @override
