@@ -181,7 +181,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => ServiceScreen(),
+                                  builder: (context) => ServiceScreen(
+                                    subcategoryId: sub.id.toString(),
+                                  ),
                                 ));
                           },
                           child: Column(

@@ -6,6 +6,9 @@ import 'package:get/get_instance/src/extension_instance.dart';
 import '../../category/controller/category_controller.dart';
 import '../../category/screen/category_screen.dart';
 import '../../search/screen/search_screen.dart';
+import '../../service/controller/service_list_controller.dart';
+import '../../service/model/service_list_model.dart';
+import '../../service/repository/service_list_repository.dart';
 import '../../service/screen/service_details_screen.dart';
 import '../data/categories_data.dart';
 import 'package:share_plus/share_plus.dart';
@@ -19,7 +22,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final CategoryController controller = Get.put(CategoryController());
+  late final ServiceListController serviceListController;
 
+  @override
+  void initState() {
+    super.initState();
+    serviceListController = Get.put(ServiceListController(repository: ServiceListRepository()));
+  }
   bool  _isPaid = false;
 
   @override
@@ -378,108 +387,135 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   SizedBox(
                     height: 200,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: 5,
-                      itemBuilder: (context, index) {
-                        return InkWell(
-                          onTap: () => Navigator.push(context, MaterialPageRoute(builder:  (context) => ServiceDetailsScreen(),)),
-                          child: Container(
-                            width: 260,
-                            margin: const EdgeInsets.only(right: 14),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(
-                                color: Colors.grey.shade100,
-                                width: .5,
+                    child: Obx(() {
+                      if (serviceListController.isLoading.value) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (serviceListController.services.isEmpty) {
+                        return const Center(child: Text("No recent services"));
+                      }
+                      return ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: serviceListController.services.length,
+                        itemBuilder: (context, index) {
+                          final service = serviceListController.services[index];
+                          return InkWell(
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ServiceDetailsScreen(
+                                  services: serviceListController.services,
+                                  serviceId: service.id.toString(),),
                               ),
                             ),
-                            child: Stack(
-                              alignment: AlignmentGeometry.topRight,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                
-                                
-                                    Expanded(
-                                      child: Container(
-                                
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey.shade100,
+                            child: Container(
+                              width: 260,
+                              margin: const EdgeInsets.only(right: 14),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: Colors.grey.shade100,
+                                  width: .5,
+                                ),
+                              ),
+                              child: Stack(
+                                alignment: Alignment.topRight,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        child: service.serviceImage.isNotEmpty
+                                            ? ClipRRect(
                                           borderRadius: const BorderRadius.vertical(
-                                            top: Radius.circular(14),
+                                              top: Radius.circular(14)),
+                                          child: Image.network(
+                                            service.serviceImage,
+                                            fit: BoxFit.cover,
+                                            width: double.infinity,
+                                            errorBuilder: (c, e, st) => const Center(
+                                              child: Icon(Icons.image_not_supported_outlined,
+                                                  color: Colors.grey),
+                                            ),
                                           ),
+                                        )
+                                            : Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey.shade100,
+                                            borderRadius: const BorderRadius.vertical(
+                                                top: Radius.circular(14)),
+                                          ),
+                                          child: const Center(
+                                              child: Icon(Icons.image_not_supported_outlined,
+                                                  color: Colors.grey)),
                                         ),
-                                        child: Center(child: Icon(Icons.image_not_supported_outlined, color: Colors.white,size: 40,)),
                                       ),
-                                    ),
-                                
-                                    Padding(
-                                      padding: const EdgeInsets.all(12),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                
-                                          /// name + desc
-                                          const Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                "Service Name",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
-                                              SizedBox(height: 4),
-                                              Text(
-                                                "Short description",
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                
-                                          /// price
-                                          const Column(
-                                            crossAxisAlignment: CrossAxisAlignment.end,
-                                            children: [
-                                              Text(
-                                                "₹500",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              SizedBox(height: 4),
-                                              Row(
+                                      Padding(
+                                        padding: const EdgeInsets.all(12),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
-                                                  Icon(Icons.location_on,size: 12,color: Colors.lightBlueAccent,),
                                                   Text(
-                                                    "5 km",
-                                                    style: TextStyle(
-                                                      fontSize: 12,
-                                                      color: Colors.grey,
-                                                    ),
+                                                    service.serviceName,
+                                                    style: const TextStyle(
+                                                        fontWeight: FontWeight.w600),
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Text(
+                                                    service.serviceDescription,
+                                                    style: const TextStyle(
+                                                        fontSize: 12, color: Colors.grey),
                                                   ),
                                                 ],
                                               ),
-                                            ],
-                                          ),
-                                        ],
+                                            ),
+                                            Column(
+                                              crossAxisAlignment: CrossAxisAlignment.end,
+                                              children: [
+                                                Text(
+                                                  service.serviceAmount != null
+                                                      ? "₹${service.serviceAmount}"
+                                                      : "Free",
+                                                  style: const TextStyle(
+                                                      fontWeight: FontWeight.bold),
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Row(
+                                                  children: const [
+                                                    Icon(Icons.location_on,
+                                                        size: 12, color: Colors.lightBlueAccent),
+                                                    Text(
+                                                      "5 km",
+                                                      style: TextStyle(
+                                                          fontSize: 12, color: Colors.grey),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    )
-                                  ],
-                                ),
-                                IconButton(onPressed: () => null, icon: Icon(Icons.bookmark_border, color: Colors.blueAccent,))
-                              ],
+                                    ],
+                                  ),
+                                  IconButton(
+                                    onPressed: () {},
+                                    icon: const Icon(Icons.bookmark_border,
+                                        color: Colors.blueAccent),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                    ),
+                          );
+                        },
+                      );
+                    }),
                   ),
                 ],
               ),
@@ -488,128 +524,43 @@ class _HomeScreenState extends State<HomeScreen> {
 
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
                   const Text(
-                    'Fresh Recommendation Services',
+                    'Fresh Recommended Services',
                     style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.blueAccent,
-                      fontWeight: FontWeight.bold,
-                    ),
+                        fontSize: 16,
+                        color: Colors.blueAccent,
+                        fontWeight: FontWeight.bold),
                   ),
-
                   const SizedBox(height: 12),
+                  Obx(() {
+                    if (serviceListController.isLoading.value) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (serviceListController.services.isEmpty) {
+                      return const Center(child: Text("No services available"));
+                    }
 
-                  GridView.builder(
-                    itemCount: 6,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 1,
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
-                      mainAxisExtent: 200,
-                    ),
-                    itemBuilder: (context, index) {
-                      return InkWell(
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder:  (context) => ServiceDetailsScreen(),)),
-                        child: Container(
-                          decoration: BoxDecoration(
-                           color: Colors.white,
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(
-                              color: Colors.grey.shade100,
-                              width: .5,
-                            ),
-                          ),
-                          child: Stack(
-                            alignment: Alignment.topRight,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-
-                                  Expanded(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.shade100,
-                                        borderRadius: const BorderRadius.vertical(
-                                          top: Radius.circular(14),
-                                        ),
-                                      ),
-                                      child: Center(child: Icon(Icons.image_not_supported_outlined, color: Colors.white,size: 40,)),
-                                    ),
-                                  ),
-
-                                  Padding(
-                                    padding: const EdgeInsets.all(12),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-
-                                        /// name + desc
-                                        const Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              "Service Name",
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                            SizedBox(height: 4),
-                                            Text(
-                                              "Short description",
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-
-                                        /// price
-                                        const Column(
-                                          crossAxisAlignment: CrossAxisAlignment.end,
-                                          children: [
-                                            Text(
-                                              "₹500",
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            SizedBox(height: 4),
-                                            Row(
-                                              children: [
-                                                Icon(Icons.location_on,size: 12,color: Colors.lightBlueAccent,),
-                                                Text(
-                                                  "5 km",
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.grey,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              ),
-                              IconButton(onPressed: () => null, icon: Icon(Icons.bookmark_border, color: Colors.blueAccent,))
-
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                    return GridView.builder(
+                      itemCount: serviceListController.services.length,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate:
+                      const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 1,
+                        mainAxisSpacing: 12,
+                        crossAxisSpacing: 12,
+                        mainAxisExtent: 200,
+                      ),
+                      itemBuilder: (context, index) {
+                        final service = serviceListController.services[index];
+                        return ServiceCard(service: service);
+                      },
+                    );
+                  }),
                 ],
               ),
             ),
@@ -621,7 +572,112 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+class ServiceCard extends StatelessWidget {
+  final ServiceListModel service;
+  const ServiceCard({super.key, required this.service});
 
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ServiceDetailsScreen(
+            services: Get.find<ServiceListController>().services,
+            serviceId: service.id.toString(),),
+        ),
+      ),
+      child: Container(
+        width: 260,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Colors.grey.shade100, width: .5),
+        ),
+        child: Stack(
+          alignment: Alignment.topRight,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: service.serviceImage.isNotEmpty
+                      ? ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(14)),
+                    child: Image.network(
+                      service.serviceImage,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      errorBuilder: (c, e, st) => const Center(
+                          child: Icon(Icons.image_not_supported_outlined,
+                              color: Colors.grey)),
+                    ),
+                  )
+                      : Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(14)),
+                    ),
+                    child: const Center(
+                        child: Icon(Icons.image_not_supported_outlined,
+                            color: Colors.grey)),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Name + Description
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(service.serviceName,
+                              style: const TextStyle(fontWeight: FontWeight.w600)),
+                          const SizedBox(height: 4),
+                          Text(service.serviceDescription,
+                              style: const TextStyle(
+                                  fontSize: 12, color: Colors.grey)),
+                        ],
+                      ),
+                      // Price
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                              service.serviceAmount != null
+                                  ? "₹${service.serviceAmount}"
+                                  : "Free",
+                              style: const TextStyle(fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: const [
+                              Icon(Icons.location_on,
+                                  size: 12, color: Colors.lightBlueAccent),
+                              Text(
+                                "5 km",
+                                style: TextStyle(fontSize: 12, color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.bookmark_border, color: Colors.blueAccent)),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class _SliverSearchBarDelegate extends SliverPersistentHeaderDelegate {
   final Widget child;

@@ -1,28 +1,57 @@
 import 'package:flutter/material.dart';
-
-import '../../chat/screen/chating_screen.dart';
+import 'package:skills_app/features/chat/screen/chating_screen.dart';
+import '../model/service_list_model.dart';
 
 class ServiceDetailsScreen extends StatelessWidget {
-  const ServiceDetailsScreen({super.key});
+  final String serviceId;
+  final List<ServiceListModel> services;
+
+  const ServiceDetailsScreen({
+    super.key,
+    required this.serviceId,
+    required this.services,
+  });
 
   @override
   Widget build(BuildContext context) {
+    // 🔹 Filter service by ID
+    final service = services.firstWhere(
+          (s) => s.id.toString() == serviceId,
+      orElse: () => ServiceListModel(
+        id: 0,
+        serviceName: "Service Not Found",
+        serviceDescription: "",
+        serviceImage: "",
+        serviceAmount: "0",
+        serviceStatus: false,
+        user: 0,
+        category: 0,
+        subcategory: 0,
+      ),
+    );
+
     return Scaffold(
-      backgroundColor: Color(0xffF7F8FA),
+      backgroundColor: const Color(0xffF7F8FA),
       body: CustomScrollView(
         slivers: [
           /// IMAGE SECTION
           SliverAppBar(
             expandedHeight: 300,
             pinned: true,
-            backgroundColor:Colors.transparent,
+            backgroundColor: Colors.transparent,
             flexibleSpace: FlexibleSpaceBar(
-              background: Container(
+              background: service.serviceImage.isNotEmpty
+                  ? Image.network(
+                service.serviceImage,
+                fit: BoxFit.cover,
+              )
+                  : Container(
                 decoration: BoxDecoration(
                   color: Colors.grey.withOpacity(0.16),
                 ),
                 child: const Center(
-                  child: Icon(Icons.image_not_supported_outlined, size: 100, color: Colors.white),
+                  child: Icon(Icons.image_not_supported_outlined,
+                      size: 100, color: Colors.white),
                 ),
               ),
             ),
@@ -37,22 +66,30 @@ class ServiceDetailsScreen extends StatelessWidget {
                   /// SERVICE TITLE & PRICE
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
+                    children: [
                       Expanded(
                         child: Text(
-                          "Flutter App Development",
-                          style: TextStyle(
+                          service.serviceName,
+                          style: const TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 18),
                         ),
                       ),
                       Row(
-                        spacing: 5,
                         children: [
-                          Icon(Icons.circle,size: 14,color: Colors.green,),
+                          Icon(Icons.circle,
+                              size: 14,
+                              color: service.serviceStatus
+                                  ? Colors.green
+                                  : Colors.red),
+                          const SizedBox(width: 4),
                           Text(
-                            "Unpaid",
+                            service.serviceStatus ? "Paid" : "Unpaid",
                             style: TextStyle(
-                                fontWeight: FontWeight.w500, fontSize: 12,color: Colors.green),
+                                fontWeight: FontWeight.w500,
+                                fontSize: 12,
+                                color: service.serviceStatus
+                                    ? Colors.green
+                                    : Colors.red),
                           ),
                         ],
                       ),
@@ -83,9 +120,9 @@ class ServiceDetailsScreen extends StatelessWidget {
                     TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   const SizedBox(height: 6),
-                  const Text(
-                    "I provide high-quality Flutter app development services for your business and personal projects. Fully responsive and production ready.",
-                    style: TextStyle(color: Colors.grey, fontSize: 14),
+                  Text(
+                    service.serviceDescription,
+                    style: const TextStyle(color: Colors.grey, fontSize: 14),
                   ),
 
                   const SizedBox(height: 20),
@@ -99,10 +136,10 @@ class ServiceDetailsScreen extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                         CircleAvatar(
+                        CircleAvatar(
                           radius: 25,
                           backgroundColor: Colors.grey.withOpacity(0.16),
-                          child: Icon(Icons.person, color: Colors.white),
+                          child: const Icon(Icons.person, color: Colors.white),
                         ),
                         const SizedBox(width: 12),
                         const Expanded(
@@ -133,17 +170,22 @@ class ServiceDetailsScreen extends StatelessWidget {
 
       /// CHAT BUTTON
       bottomNavigationBar: Padding(
-        padding:  EdgeInsets.only(left: 16.0,right: 16,bottom: 30),
+        padding: const EdgeInsets.only(left: 16.0, right: 16, bottom: 30),
         child: SizedBox(
           height: 50,
           child: Row(
-            spacing: 10,
             children: [
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatingScreen(),)),
-                  icon: const Icon(Icons.chat,color: Colors.white,),
-                  label: const Text("Chat With Mentor", style: TextStyle(color: Colors.white),),
+                  onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ChatingScreen())),
+                  icon: const Icon(Icons.chat, color: Colors.white),
+                  label: const Text(
+                    "Chat With Mentor",
+                    style: TextStyle(color: Colors.white),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
                     shape: RoundedRectangleBorder(
@@ -151,12 +193,16 @@ class ServiceDetailsScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              ElevatedButton(onPressed: () => null, child: Icon(Icons.bookmark_border,color: Colors.white,),
+              const SizedBox(width: 10),
+              ElevatedButton(
+                onPressed: () {},
+                child: const Icon(Icons.bookmark_border, color: Colors.white),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blueAccent,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
-                ),)
+                ),
+              )
             ],
           ),
         ),
