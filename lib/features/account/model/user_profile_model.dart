@@ -1,5 +1,5 @@
 class UserProfileModel {
-  final int id;
+  final int? id;
   final String userPhone;
   final String userName;
   final String userEmail;
@@ -8,7 +8,7 @@ class UserProfileModel {
   final int user;
 
   UserProfileModel({
-    required this.id,
+    this.id,
     required this.userPhone,
     required this.userName,
     required this.userEmail,

@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_instance/src/extension_instance.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skills_app/core/widget/flutter_toast_widget.dart';
 import 'package:skills_app/features/auth/screen/auth_screen.dart';
-
 import '../controller/user_profile_controller.dart';
 import '../model/user_profile_model.dart';
 
@@ -58,12 +54,9 @@ class AccountScreen extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("Guest Id",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w600, fontSize: 16)),
+                              Text("Guest Id",style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
                               SizedBox(height: 4),
-                              Text("89892 07770",
-                                  style: TextStyle(color: Colors.grey)),
+                              Text("8989207770",style: TextStyle(color: Colors.grey)),
                             ],
                           ),
                         ),
@@ -170,7 +163,7 @@ class AccountScreen extends StatelessWidget {
                                 style: TextStyle(
                                     fontWeight: FontWeight.w600, fontSize: 16)),
                             SizedBox(height: 4),
-                            Text("89892 07770",
+                            Text(profile.userPhone,
                                 style: TextStyle(color: Colors.grey)),
                           ],
                         ),

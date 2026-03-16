@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
+import '../../category/controller/category_controller.dart';
 import '../../category/screen/category_screen.dart';
 import '../../search/screen/search_screen.dart';
 import '../../service/screen/service_details_screen.dart';
@@ -14,6 +18,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final CategoryController controller = Get.put(CategoryController());
 
   bool  _isPaid = false;
 
@@ -195,56 +200,74 @@ class _HomeScreenState extends State<HomeScreen> {
           SliverToBoxAdapter(
             child: SizedBox(
               height: 215,
-              child: GridView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                scrollDirection: Axis.horizontal,
-                itemCount: categoriesData.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 14,
-                  crossAxisSpacing: 14,
-                  mainAxisExtent:65
-                ),
-                itemBuilder: (context, index) {
-                  final item = categoriesData[index];
+              child: Obx((){
+                if(controller.isLoading.value){
+                  return const Center(child: CircularProgressIndicator());
+                }
+                return  GridView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  scrollDirection: Axis.horizontal,
+                  itemCount: controller.categoryList.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 14,
+                      crossAxisSpacing: 14,
+                      mainAxisExtent:65
+                  ),
+                  itemBuilder: (context, index) {
+                    final category = controller.categoryList[index];
 
-                  return Column(
-                    spacing: 10,
-                    children: [
-                      InkWell(
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => CategoryScreen(),)),
-                        child: Container(
-                          height: 65,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Icon(
-                            item["icon"] as IconData,
-                            color: Colors.blueAccent,
+                    return Column(
+                      spacing: 10,
+                      children: [
+                        InkWell(
+                          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => CategoryScreen(categoryId: category.id.toString(),),)),
+                          child: Container(
+                            height: 65,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.network(
+                                category.categoryImage ?? "",
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return const Center(
+                                    child: Icon(
+                                      Icons.image_not_supported_outlined,
+                                      color: Colors.grey,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                      Text(
-                        item["title"].toString(),
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        softWrap: true,
-                        overflow: TextOverflow.ellipsis,
-                        style:  TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 10,
-                            height: 1.2,
-                            color: Colors.grey.shade700
-                        ),
-                      )
-                    ],
-                  );
-                },
-              ),
+                        Text(
+                          category.categoryName ?? "",
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          softWrap: true,
+                          overflow: TextOverflow.ellipsis,
+                          style:  TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 10,
+                              height: 1.2,
+                              color: Colors.grey.shade700
+                          ),
+                        )
+                      ],
+                    );
+                  },
+                );
+              }),
             ),
           ),
+
+          const SliverToBoxAdapter(child: SizedBox(height: 10)),
 
           SliverToBoxAdapter(
             child: Container(

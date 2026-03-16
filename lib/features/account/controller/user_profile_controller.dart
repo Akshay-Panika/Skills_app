@@ -16,4 +16,19 @@ class UserProfileController extends GetxController {
       isLoading.value = false;
     }
   }
+
+  Future<void> updateProfile(int profileId, UserProfileModel model) async {
+    try {
+      isLoading.value = true;
+
+      final updated =
+      await UserProfileRepository.updateUserProfile(profileId, model);
+
+      if (updated != null) {
+        userProfile.value = updated;
+      }
+    } finally {
+      isLoading.value = false;
+    }
+  }
 }

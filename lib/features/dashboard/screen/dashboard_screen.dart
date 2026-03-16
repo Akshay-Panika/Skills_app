@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 
+import '../../account/controller/user_profile_controller.dart';
 import '../../account/screen/account_screen.dart';
 import '../../account/screen/basic_info_screen.dart';
 import '../../ads/screen/ads_screen.dart';
+import '../../auth/helper/auth_preferences.dart';
 import '../../chat/screen/chat_screen.dart';
 import '../../home/screen/home_screen.dart';
 import '../../service/screen/add_service_screen.dart';
@@ -15,6 +20,7 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  final UserProfileController controller = Get.put(UserProfileController());
   int _currentIndex = 0;
 
   final _screens = [
@@ -43,6 +49,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    loadProfile();
+  }
+
+  void loadProfile() async {
+    final userId = await AuthPreferences.getUserId();
+
+    if (userId != null) {
+      controller.fetchUserProfile(userId);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xffF7F8FA),
@@ -50,19 +70,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
         alignment: Alignment.bottomRight,
         children: [
           _screens[_currentIndex],
-          InkWell(
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => BasicInfoScreen(),)),
-            child: Container(
-              width: 60,height: 60,
-              margin: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.blueAccent),
-              ),
-              child: Icon(Icons.person,color: Colors.blueAccent,),
-            ),
-          )
+
+          Obx(() {
+
+            final profile = controller.userProfile.value;
+
+            if (profile == null || profile.userName.isEmpty) {
+              return InkWell(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => BasicInfoScreen()),
+                ),
+                child: Container(
+                  width: 60,
+                  height: 60,
+                  margin: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.blueAccent),
+                  ),
+                  child: Icon(Icons.person, color: Colors.blueAccent),
+                ),
+              );
+            }
+
+            return SizedBox(); // hide button
+          })
         ],
       ),
 
