@@ -11,7 +11,7 @@ class ServiceScreen extends StatelessWidget {
 
   // Initialize controller
   final ServiceListController controller = Get.put(
-    ServiceListController(repository: ServiceListRepository()),
+    ServiceListController(ServiceListRepository()),
   );
 
   @override

@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:skills_app/features/chat/screen/chating_screen.dart';
+import '../../account/controller/user_profile_controller.dart';
+import '../../account/model/user_profile_model.dart';
 import '../model/service_list_model.dart';
 
-class ServiceDetailsScreen extends StatelessWidget {
+class ServiceDetailsScreen extends StatefulWidget {
   final String serviceId;
   final List<ServiceListModel> services;
 
@@ -13,10 +19,19 @@ class ServiceDetailsScreen extends StatelessWidget {
   });
 
   @override
+  State<ServiceDetailsScreen> createState() => _ServiceDetailsScreenState();
+}
+
+class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
+
+  final UserProfileController controller = Get.put(UserProfileController());
+
+
+  @override
   Widget build(BuildContext context) {
-    // 🔹 Filter service by ID
-    final service = services.firstWhere(
-          (s) => s.id.toString() == serviceId,
+
+    final service = widget.services.firstWhere(
+          (s) => s.id.toString() == widget.serviceId,
       orElse: () => ServiceListModel(
         id: 0,
         serviceName: "Service Not Found",
@@ -29,6 +44,8 @@ class ServiceDetailsScreen extends StatelessWidget {
         subcategory: 0,
       ),
     );
+
+    controller.fetchUserProfile(service.user);
 
     return Scaffold(
       backgroundColor: const Color(0xffF7F8FA),
@@ -76,21 +93,11 @@ class ServiceDetailsScreen extends StatelessWidget {
                       ),
                       Row(
                         children: [
-                          Icon(Icons.circle,
-                              size: 14,
-                              color: service.serviceStatus
-                                  ? Colors.green
-                                  : Colors.red),
-                          const SizedBox(width: 4),
                           Text(
-                            service.serviceStatus ? "Paid" : "Unpaid",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12,
-                                color: service.serviceStatus
-                                    ? Colors.green
-                                    : Colors.red),
-                          ),
+                              service.serviceAmount != null
+                                  ? "₹${service.serviceAmount}"
+                                  : "Free",
+                              style: const TextStyle(fontWeight: FontWeight.bold)),
                         ],
                       ),
                     ],
@@ -114,51 +121,119 @@ class ServiceDetailsScreen extends StatelessWidget {
                   const SizedBox(height: 18),
 
                   /// DESCRIPTION
-                  const Text(
-                    "Description",
-                    style:
-                    TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    service.serviceDescription,
-                    style: const TextStyle(color: Colors.grey, fontSize: 14),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Description",
+                        style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        service.serviceDescription,
+                        style: const TextStyle(color: Colors.grey, fontSize: 14),
+                      ),
+                    ],
                   ),
 
-                  const SizedBox(height: 20),
 
-                  /// SELLER INFO
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    height: 250,
+                    margin: EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 25,
-                          backgroundColor: Colors.grey.withOpacity(0.16),
-                          child: const Icon(Icons.person, color: Colors.white),
-                        ),
-                        const SizedBox(width: 12),
-                        const Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Akshay Panika",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold)),
-                              SizedBox(height: 4),
-                              Text("I am a flutter developer at 1.4+ years",
-                                  style: TextStyle(
-                                      color: Colors.grey, fontSize: 12)),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                    child: Center(child: FaIcon(FontAwesomeIcons.mapLocation, color: Colors.green,size: 30,)),
                   ),
+
+
+                  /// SELLER INFO
+                  Obx((){
+                    if (controller.isLoading.value) {
+                      return  Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CircleAvatar(
+                              radius: 25,
+                              backgroundColor: Colors.grey.withOpacity(0.16),
+                              child: const Icon(Icons.person, color: Colors.white),
+                            ),
+                            const SizedBox(width: 12),
+                            Text("SD Seller",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                      );
+                    }
+
+                    final UserProfileModel? profile = controller.userProfile.value;
+
+                    // Null state
+                    if (profile == null) {
+                      return  Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CircleAvatar(
+                              radius: 25,
+                              backgroundColor: Colors.grey.withOpacity(0.16),
+                              child: const Icon(Icons.person, color: Colors.white),
+                            ),
+                            const SizedBox(width: 12),
+                            Text("SD Seller",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                      );
+                    }
+
+                    return  Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 25,
+                            backgroundColor: Colors.grey.withOpacity(0.16),
+                            child: const Icon(Icons.person, color: Colors.white),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("${profile.userName}",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold)),
+                                SizedBox(height: 4),
+                                Text("${profile.userBio}",
+                                    style: TextStyle(
+                                        color: Colors.grey, fontSize: 12)),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
 
                   const SizedBox(height: 30),
                 ],

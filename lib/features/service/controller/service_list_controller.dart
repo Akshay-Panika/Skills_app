@@ -1,5 +1,5 @@
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-
 import '../model/service_list_model.dart';
 import '../repository/service_list_repository.dart';
 
@@ -10,7 +10,8 @@ class ServiceListController extends GetxController {
 
   final ServiceListRepository repository;
 
-  ServiceListController({required this.repository});
+  ServiceListController([ServiceListRepository? repo])
+      : repository = repo ?? ServiceListRepository();
 
   @override
   void onInit() {
@@ -25,7 +26,7 @@ class ServiceListController extends GetxController {
       services.value = response.services;
       count.value = response.count;
     } catch (e) {
-      Get.snackbar('Error', e.toString());
+      debugPrint('Service Error ${e.toString()}');
     } finally {
       isLoading.value = false;
     }

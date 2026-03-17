@@ -3,17 +3,37 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skills_app/core/widget/flutter_toast_widget.dart';
 import 'package:skills_app/features/auth/screen/auth_screen.dart';
+import '../../auth/helper/auth_preferences.dart';
 import '../controller/user_profile_controller.dart';
 import '../model/user_profile_model.dart';
+import 'basic_info_screen.dart';
 
-class AccountScreen extends StatelessWidget {
+class AccountScreen extends StatefulWidget {
   AccountScreen({super.key});
 
+  @override
+  State<AccountScreen> createState() => _AccountScreenState();
+}
+
+class _AccountScreenState extends State<AccountScreen> {
   final UserProfileController controller = Get.put(UserProfileController());
+  @override
+  void initState() {
+    super.initState();
+    _loadUserProfile();
+  }
+
+  Future<void> _loadUserProfile() async {
+    final userId = await AuthPreferences.getUserId();
+    if (userId != null) {
+      controller.fetchUserProfile(userId);
+    } else {
+      FlutterToastWidget.error("User not logged in");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    controller.fetchUserProfile(1);
     return Scaffold(
       backgroundColor: const Color(0xffF7F8FA),
       appBar: AppBar(
@@ -193,7 +213,7 @@ class AccountScreen extends StatelessWidget {
           const SizedBox(height: 10),
 
           /// MENU LIST (OLX Style)
-          const _MenuTile(icon: Icons.person_outline, title: "Profile"),
+           _MenuTile(icon: Icons.person_outline, title: "Profile",onTap: () =>  Get.to(() => BasicInfoScreen()),),
           const _MenuTile(icon: Icons.campaign_outlined, title: "My Ads"),
           const _MenuTile(icon: Icons.favorite_border, title: "Wishlist"),
           const _MenuTile(icon: Icons.chat_bubble_outline, title: "Help & Support"),
