@@ -15,7 +15,7 @@ import '../../auth/helper/auth_preferences.dart';
 import '../../chat/screen/chat_screen.dart';
 import '../../home/controller/home_screen_controller.dart';
 import '../../home/screen/home_screen.dart';
-import '../../service/screen/add_service_screen.dart';
+import '../../ads/screen/create_add_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -114,7 +114,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                     child: IconButton(
                       onPressed: () {
-                        Get.to(() => AddServiceScreen());
+                        Get.to(() => CreateAddScreen());
                       },
                       icon: const FaIcon(FontAwesomeIcons.plus, color: Colors.white),
                     ),

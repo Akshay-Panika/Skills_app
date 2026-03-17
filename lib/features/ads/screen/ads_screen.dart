@@ -1,7 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 
-class AdsScreen extends StatelessWidget {
+import '../controller/service_list_by_user_controller.dart';
+import '../repository/service_list_byuser_repository.dart';
+
+class AdsScreen extends StatefulWidget {
   const AdsScreen({super.key});
+
+  @override
+  State<AdsScreen> createState() => _AdsScreenState();
+}
+
+class _AdsScreenState extends State<AdsScreen> {
+
+  final controller = Get.put(
+    ServiceListByUserController(
+      repository: ServiceListByUserRepository(),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -21,48 +40,101 @@ class AdsScreen extends StatelessWidget {
             labelColor: Colors.black,
             indicatorColor: Colors.blueAccent,
             tabs: [
-              Tab(text: "Active"),
-              Tab(text: "Inactive"),
+              Tab(text: "Sell"),
+              Tab(text: "Buy"),
             ],
           ),
         ),
 
         body: TabBarView(
           children: [
-            /// ACTIVE ADS
-            ListView(
-              padding: const EdgeInsets.all(12),
-              children: const [
-                AdCard(
-                  title: "iPhone 13 Pro Max",
-                  price: "₹ 85,000",
-                  location: "Pune, Maharashtra",
-                  views: "120 views",
-                  status: "Active",
-                ),
-                AdCard(
-                  title: "Flutter App Development Service",
-                  price: "₹ 1,500",
-                  location: "Remote",
-                  views: "45 views",
-                  status: "Active",
-                ),
-              ],
-            ),
 
-            /// INACTIVE ADS
-            ListView(
-              padding: const EdgeInsets.all(12),
-              children: const [
-                AdCard(
-                  title: "Office Chair",
-                  price: "₹ 2,000",
-                  location: "Mumbai",
-                  views: "30 views",
-                  status: "Inactive",
-                ),
-              ],
-            ),
+            Obx(() {
+              if (controller.isLoading.value) {
+                return Align(
+                    alignment: Alignment.topCenter,
+                    child: LinearProgressIndicator(color: Colors.blueAccent,minHeight: 2,));
+              }
+
+              if (controller.serviceList.isEmpty) {
+                return  Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.inbox_outlined,
+                        size: 70,
+                        color: Colors.grey.shade400,
+                      ),
+                      const SizedBox(height: 12),
+                      const Text(
+                        "No Bookings Yet",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        "Your bookings will appear here",
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              return ListView.builder(
+                padding: const EdgeInsets.all(12),
+                itemCount: controller.serviceList.length,
+                itemBuilder: (context, index) {
+                  final service = controller.serviceList[index];
+
+                  return AdCard(
+                    title: service.serviceName,
+                    price: service.serviceAmount != null
+                        ? "₹ ${service.serviceAmount}"
+                        : "Free",
+                    location: "India",
+                    views: "0 views",
+                    image: service.serviceImage,
+                    status: service.serviceStatus ? "Active" : "Inactive",
+                  );
+                },
+              );
+            }),
+
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.inbox_outlined,
+                    size: 70,
+                    color: Colors.grey.shade400,
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    "No Bookings Yet",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    "Your bookings will appear here",
+                    style: TextStyle(
+                      color: Colors.grey.shade600,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            )
           ],
         ),
 
@@ -71,13 +143,13 @@ class AdsScreen extends StatelessWidget {
   }
 }
 
-/// ================= AD CARD =================
 class AdCard extends StatelessWidget {
   final String title;
   final String price;
   final String location;
   final String views;
   final String status;
+  final String image;
 
   const AdCard({
     super.key,
@@ -86,6 +158,7 @@ class AdCard extends StatelessWidget {
     required this.location,
     required this.views,
     required this.status,
+    required this.image,
   });
 
   @override
@@ -118,8 +191,8 @@ class AdCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   color: Colors.grey.withOpacity(0.16),
+                  image: DecorationImage(image: NetworkImage(image), fit: BoxFit.cover)
                 ),
-                child: const Icon(Icons.image_not_supported_outlined, color: Colors.white),
               ),
 
               const SizedBox(width: 12),
