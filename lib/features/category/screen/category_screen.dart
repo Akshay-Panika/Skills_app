@@ -17,8 +17,7 @@ class CategoryScreen extends StatefulWidget {
 
 class _CategoryScreenState extends State<CategoryScreen> {
   final CategoryController categoryController = Get.put(CategoryController());
-  final SubCategoryController subController =
-  Get.put(SubCategoryController(repository: SubCategoryRepository()));
+  final SubCategoryController subController = Get.put(SubCategoryController(repository: SubCategoryRepository()));
 
   String? selectedCategoryId;
 

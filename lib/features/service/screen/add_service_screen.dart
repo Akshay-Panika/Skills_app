@@ -1,4 +1,14 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+
+import '../../category/controller/category_controller.dart';
+import '../../subcategory/controller/subategory_controller.dart';
+import '../../subcategory/repository/subcategory_repository.dart';
 
 class AddServiceScreen extends StatefulWidget {
   const AddServiceScreen({super.key});
@@ -11,11 +21,18 @@ class _AddServiceScreenState extends State<AddServiceScreen>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
 
+  final CategoryController categoryController = Get.put(CategoryController());
+  final SubCategoryController subController =
+  Get.put(SubCategoryController(repository: SubCategoryRepository()));
+
+  File? selectedImage;
+  String? selectedCategoryId;
+  String? selectedSubcategoryId;
+
   final titleController = TextEditingController();
   final descController = TextEditingController();
   final priceController = TextEditingController();
 
-  String selectedCategory = "Programming";
   bool isPaid = false;
 
   late AnimationController _controller;
@@ -46,6 +63,20 @@ class _AddServiceScreenState extends State<AddServiceScreen>
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
     _controller.forward();
+
+    categoryController.categoryList();
+  }
+
+  Future<void> pickImage() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+    );
+
+    if (result != null && result.files.single.path != null) {
+      setState(() {
+        selectedImage = File(result.files.single.path!);
+      });
+    }
   }
 
   @override
@@ -100,29 +131,41 @@ class _AddServiceScreenState extends State<AddServiceScreen>
               child: Column(
                 children: [
                   /// IMAGE PICKER
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 400),
-                    curve: Curves.easeOut,
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    child: Container(
-                      height: 160,
+                  GestureDetector(
+                    onTap: pickImage,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 400),
+                      curve: Curves.easeOut,
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade50,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: Colors.grey.shade300),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(18),
                       ),
-                      child: const Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.add_a_photo_outlined, size: 36),
-                            SizedBox(height: 6),
-                            Text("Upload Service Image"),
-                          ],
+                      child: Container(
+                        height: 160,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade50,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
+                        child: selectedImage != null
+                            ? ClipRRect(
+                          borderRadius: BorderRadius.circular(14),
+                          child: Image.file(
+                            selectedImage!,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                          ),
+                        )
+                            : const Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.add_a_photo_outlined, size: 36),
+                              SizedBox(height: 6),
+                              Text("Upload Service Image"),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -160,21 +203,63 @@ class _AddServiceScreenState extends State<AddServiceScreen>
                     ],
                   ),
 
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 16),
 
                   /// FORM
                   Column(
                     children: [
-                      DropdownButtonFormField(
-                        value: selectedCategory,
-                        items: categories
-                            .map((e) =>
-                            DropdownMenuItem(value: e, child: Text(e)))
-                            .toList(),
-                        onChanged: (value) =>
-                            setState(() => selectedCategory = value.toString()),
-                        decoration: chatDecoration("Category"),
-                      ),
+                      Obx(() {
+                        return Row(
+                          children: [
+
+                            /// CATEGORY DROPDOWN
+                            Expanded(
+                              child: DropdownButtonFormField(
+                                value: selectedCategoryId,
+                                hint: const Text("Category"),
+                                items: categoryController.categoryList.map((cat) {
+                                  return DropdownMenuItem(
+                                    value: cat.id.toString(),
+                                    child: Text(cat.categoryName ?? ""),
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedCategoryId = value.toString();
+                                    selectedSubcategoryId = null;
+                                  });
+
+                                  // 🔥 Subcategory API call
+                                  subController.fetchSubCategories(int.parse(value.toString()));
+                                },
+                                decoration: chatDecoration("Category"),
+                              ),
+                            ),
+
+                            const SizedBox(width: 10),
+
+                            /// SUBCATEGORY DROPDOWN
+                            Expanded(
+                              child: DropdownButtonFormField(
+                                value: selectedSubcategoryId,
+                                hint: const Text("Subcategory"),
+                                items: subController.subCategories.map((sub) {
+                                  return DropdownMenuItem(
+                                    value: sub.id.toString(),
+                                    child: Text(sub.subcategoryName),
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedSubcategoryId = value.toString();
+                                  });
+                                },
+                                decoration: chatDecoration("Subcategory"),
+                              ),
+                            ),
+                          ],
+                        );
+                      }),
 
                       const SizedBox(height: 14),
 
