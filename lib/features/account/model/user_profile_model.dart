@@ -7,6 +7,9 @@ class UserProfileModel {
   final String userBio;
   final int user;
 
+  // ✅ NEW FIELD
+  final String? userImage;
+
   UserProfileModel({
     this.id,
     required this.userPhone,
@@ -15,18 +18,20 @@ class UserProfileModel {
     required this.userGender,
     required this.userBio,
     required this.user,
+    this.userImage, // optional
   });
 
   // JSON → Model
   factory UserProfileModel.fromJson(Map<String, dynamic> json) {
     return UserProfileModel(
       id: json['id'],
-      userPhone: json['user_phone'],
-      userName: json['user_name'],
-      userEmail: json['user_email'],
-      userGender: json['user_gender'],
-      userBio: json['user_bio'],
+      userPhone: json['user_phone'] ?? '',
+      userName: json['user_name'] ?? '',
+      userEmail: json['user_email'] ?? '',
+      userGender: json['user_gender'] ?? '',
+      userBio: json['user_bio'] ?? '',
       user: json['user'],
+      userImage: json['user_image'], // ✅ added
     );
   }
 
@@ -40,6 +45,7 @@ class UserProfileModel {
       'user_gender': userGender,
       'user_bio': userBio,
       'user': user,
+      'user_image': userImage, // ✅ added
     };
   }
 }

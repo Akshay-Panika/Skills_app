@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -23,6 +26,8 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
   final emailController = TextEditingController();
   final bioController = TextEditingController();
 
+  File? selectedImage;
+  String? networkImage;
   String? selectedGender;
   int? userId;
 
@@ -50,7 +55,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
       bioController.text = profile.userBio ?? "";
 
       selectedGender = normalizeGender(profile.userGender);
-
+      networkImage = profile.userImage;
       setState(() {});
     }
   }
@@ -89,7 +94,19 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
       user: userId!,
     );
 
-    controller.updateProfile(userId!, model);
+    controller.updateProfile(userId!, model, imageFile: selectedImage,);
+  }
+
+  void pickImage() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+    );
+
+    if (result != null && result.files.single.path != null) {
+      setState(() {
+        selectedImage = File(result.files.single.path!);
+      });
+    }
   }
 
   @override
@@ -133,10 +150,26 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                       children: [
 
                         Center(
-                          child: CircleAvatar(
-                            radius: 50,
-                            backgroundColor: Colors.blueAccent.withOpacity(0.16),
-                            child: FaIcon(FontAwesomeIcons.solidImage,color: Colors.white,size: 30,),
+                          child: GestureDetector(
+                            onTap: pickImage,
+                            child: CircleAvatar(
+                              radius: 50,
+                              backgroundColor: Colors.grey.shade200,
+
+                              backgroundImage: selectedImage != null
+                                  ? FileImage(selectedImage!)
+                                  : (networkImage != null && networkImage!.isNotEmpty)
+                                  ? NetworkImage(networkImage!) as ImageProvider
+                                  : null,
+
+                              child: (selectedImage == null &&
+                                  (networkImage == null || networkImage!.isEmpty))
+                                  ? const FaIcon(
+                                FontAwesomeIcons.camera,
+                                color: Colors.grey,
+                              )
+                                  : null,
+                            ),
                           ),
                         ),
 

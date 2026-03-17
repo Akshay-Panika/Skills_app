@@ -172,7 +172,16 @@ class _AccountScreenState extends State<AccountScreen> {
                       CircleAvatar(
                         radius: 32,
                         backgroundColor: Colors.grey.withOpacity(.15),
-                        child: const Icon(Icons.image_not_supported_outlined, size: 32, color: Colors.grey),
+                        backgroundImage: profile.userImage != null && profile.userImage!.isNotEmpty
+                            ? NetworkImage(profile.userImage!)
+                            : null,
+                        child: profile.userImage == null || profile.userImage!.isEmpty
+                            ? const Icon(
+                          Icons.image_not_supported_outlined,
+                          size: 32,
+                          color: Colors.grey,
+                        )
+                            : null,
                       ),
                       const SizedBox(width: 14),
                        Expanded(

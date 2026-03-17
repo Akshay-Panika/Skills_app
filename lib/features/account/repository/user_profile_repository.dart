@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:skills_app/core/network/dio_client.dart';
@@ -24,12 +26,36 @@ class UserProfileRepository {
     }
   }
 
+
   static Future<UserProfileModel?> updateUserProfile(
-      int userId, UserProfileModel model) async {
+      int userId,
+      UserProfileModel model, {
+        File? imageFile,
+      }) async {
     try {
+
+      FormData formData = FormData.fromMap({
+        "user_name": model.userName,
+        "user_email": model.userEmail,
+        "user_gender": model.userGender,
+        "user_bio": model.userBio,
+
+        // ✅ IMAGE (only if selected)
+        if (imageFile != null)
+          "user_image": await MultipartFile.fromFile(
+            imageFile.path,
+            filename: imageFile.path.split('/').last,
+          ),
+      });
+
       final response = await DioClient.dio.put(
         "profiles/$userId/",
-        data: model.toJson(),
+        data: formData, // ✅ IMPORTANT
+        options: Options(
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        ),
       );
 
       if (response.statusCode == 200) {
@@ -37,9 +63,29 @@ class UserProfileRepository {
       }
 
       return null;
+
     } on DioException catch (e) {
       debugPrint("Update Error: ${e.message}");
       return null;
     }
   }
+
+  // static Future<UserProfileModel?> updateUserProfile(
+  //     int userId, UserProfileModel model) async {
+  //   try {
+  //     final response = await DioClient.dio.put(
+  //       "profiles/$userId/",
+  //       data: model.toJson(),
+  //     );
+  //
+  //     if (response.statusCode == 200) {
+  //       return UserProfileModel.fromJson(response.data);
+  //     }
+  //
+  //     return null;
+  //   } on DioException catch (e) {
+  //     debugPrint("Update Error: ${e.message}");
+  //     return null;
+  //   }
+  // }
 }

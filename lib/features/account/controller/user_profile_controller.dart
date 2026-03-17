@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:get/get.dart';
 import '../model/user_profile_model.dart';
 import '../repository/user_profile_repository.dart';
@@ -17,12 +19,19 @@ class UserProfileController extends GetxController {
     }
   }
 
-  Future<void> updateProfile(int profileId, UserProfileModel model) async {
+  Future<void> updateProfile(
+      int profileId,
+      UserProfileModel model, {
+        File? imageFile,
+      }) async {
     try {
       isLoading.value = true;
 
-      final updated =
-      await UserProfileRepository.updateUserProfile(profileId, model);
+      final updated = await UserProfileRepository.updateUserProfile(
+        profileId,
+        model,
+        imageFile: imageFile,
+      );
 
       if (updated != null) {
         userProfile.value = updated;
