@@ -13,6 +13,8 @@ class AddServiceByUserRepository {
     required String amount,
     required bool status,
     required String imagePath,
+    required double latitude,
+    required double longitude,
   }) async {
     try {
 
@@ -25,6 +27,8 @@ class AddServiceByUserRepository {
         "service_amount": amount,
         "service_status": status,
         "service_image": await MultipartFile.fromFile(imagePath),
+        "latitude": latitude,
+        "longitude": longitude,
       });
 
       final response = await DioClient.dio.post(

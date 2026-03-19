@@ -1,3 +1,44 @@
+// import 'dart:developer';
+//
+// import 'package:get/get.dart';
+// import '../../auth/helper/auth_preferences.dart';
+// import '../repository/service_list_byuser_repository.dart';
+//
+// class ServiceListByUserController extends GetxController {
+//   final ServiceListByUserRepository repository;
+//
+//   ServiceListByUserController({required this.repository});
+//
+//   var isLoading = false.obs;
+//   var serviceList = <Service>[].obs;
+//   var count = 0.obs;
+//
+//   /// 🔥 auto fetch using shared pref
+//   Future<void> fetchMyServices() async {
+//     try {
+//       isLoading.value = true;
+//
+//       final userId = await AuthPreferences.getUserId();
+//
+//       if (userId == null) {
+//         print("User not logged in");
+//         return;
+//       }
+//
+//       final data = await repository.getServicesByUser(userId);
+//
+//       serviceList.value = data.services.cast<Service>();
+//       count.value = data.count;
+//
+//     } catch (e) {
+//       print("Error: $e");
+//     } finally {
+//       isLoading.value = false;
+//     }
+//   }
+// }
+
+
 import 'dart:developer';
 import 'package:get/get.dart';
 import '../../auth/helper/auth_preferences.dart';
@@ -16,9 +57,10 @@ class ServiceListByUserController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchMyServices(); // 🔥 auto call
+    fetchMyServices();
   }
 
+  /// 🔹 Fetch user services
   Future<void> fetchMyServices() async {
     try {
       isLoading.value = true;
@@ -40,5 +82,18 @@ class ServiceListByUserController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  /// 🔥 DELETE ke baad UI se remove
+  void removeService(int serviceId) {
+    serviceList.removeWhere((s) => s.id == serviceId);
+
+    // optional: count update
+    count.value = serviceList.length;
+  }
+
+  /// 🔁 OPTIONAL: refresh from API (agar fresh data chahiye)
+  Future<void> refreshServices() async {
+    await fetchMyServices();
   }
 }

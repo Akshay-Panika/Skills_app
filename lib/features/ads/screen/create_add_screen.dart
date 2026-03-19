@@ -7,6 +7,7 @@ import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 
 import '../../category/controller/category_controller.dart';
+import '../../location/controller/location_controller.dart';
 import '../../subcategory/controller/subategory_controller.dart';
 import '../../subcategory/repository/subcategory_repository.dart';
 import '../controller/add_service_by_user_controller.dart';
@@ -22,6 +23,8 @@ class CreateAddScreen extends StatefulWidget {
 class _CreateAddScreenState extends State<CreateAddScreen>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
+
+  final LocationController locationController = Get.find<LocationController>();
 
   final CategoryController categoryController = Get.put(CategoryController());
   final SubCategoryController subController = Get.put(
@@ -90,6 +93,7 @@ class _CreateAddScreenState extends State<CreateAddScreen>
   InputDecoration chatDecoration(String hint) {
     return InputDecoration(
       hintText: hint,
+      hintStyle: TextStyle(fontSize: 14),
       filled: true,
       fillColor: Colors.white,
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
@@ -128,6 +132,8 @@ class _CreateAddScreenState extends State<CreateAddScreen>
         amount: isPaid ? priceController.text.trim() : "0",
         status: isPaid,
         imagePath: selectedImage!.path,
+        latitude: locationController.latitude.value,
+        longitude: locationController.longitude.value,
       );
     }
   }
@@ -248,13 +254,13 @@ class _CreateAddScreenState extends State<CreateAddScreen>
                             Expanded(
                               child: DropdownButtonFormField(
                                 value: selectedCategoryId,
-                                hint: const Text("Category"),
+                                hint: const Text("Category",style: TextStyle(fontSize: 14),),
                                 items: categoryController.categoryList.map((
                                   cat,
                                 ) {
                                   return DropdownMenuItem(
                                     value: cat.id.toString(),
-                                    child: Text(cat.categoryName ?? ""),
+                                    child: Text(cat.categoryName ?? "",style: TextStyle(fontSize: 14),),
                                   );
                                 }).toList(),
                                 onChanged: (value) {
@@ -277,11 +283,11 @@ class _CreateAddScreenState extends State<CreateAddScreen>
                             Expanded(
                               child: DropdownButtonFormField(
                                 value: selectedSubcategoryId,
-                                hint: const Text("Subcategory"),
+                                hint: const Text("Subcategory",style: TextStyle(fontSize: 14),),
                                 items: subController.subCategories.map((sub) {
                                   return DropdownMenuItem(
                                     value: sub.id.toString(),
-                                    child: Text(sub.subcategoryName),
+                                    child: Text(sub.subcategoryName, style: TextStyle(fontSize: 14),),
                                   );
                                 }).toList(),
                                 onChanged: (value) {
@@ -300,6 +306,7 @@ class _CreateAddScreenState extends State<CreateAddScreen>
 
                       TextFormField(
                         controller: titleController,
+                        style: TextStyle(fontSize: 14),
                         decoration: chatDecoration("Service title"),
                         validator: (v) =>
                             v!.isEmpty ? "Please enter title" : null,
@@ -311,6 +318,7 @@ class _CreateAddScreenState extends State<CreateAddScreen>
                         controller: descController,
                         minLines: 3,
                         maxLines: null,
+                        style: TextStyle(fontSize: 14),
                         decoration: chatDecoration("Describe your service"),
                       ),
 

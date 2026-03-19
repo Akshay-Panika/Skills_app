@@ -1,4 +1,6 @@
 import 'package:get/get.dart';
+import 'package:skills_app/core/widget/flutter_toast_widget.dart';
+import 'package:skills_app/features/ads/controller/service_list_by_user_controller.dart';
 import '../../auth/helper/auth_preferences.dart';
 import '../../service/controller/service_list_controller.dart';
 import '../repository/add_service_by_user_repository.dart';
@@ -19,6 +21,8 @@ class AddServiceByUserController extends GetxController {
     required String amount,
     required bool status,
     required String imagePath,
+    required double latitude,
+    required double longitude,
   }) async {
     try {
       isLoading.value = true;
@@ -39,14 +43,17 @@ class AddServiceByUserController extends GetxController {
         amount: amount,
         status: status,
         imagePath: imagePath,
+        latitude: latitude,
+        longitude: longitude,
       );
 
-      Get.snackbar("Success", "Service Created Successfully");
+      FlutterToastWidget.success("Service Created Successfully");
       Get.find<ServiceListController>().fetchServiceList();
+      Get.find<ServiceListByUserController>().fetchMyServices();
       print("Created Service ID: ${data.id}");
 
     } catch (e) {
-      Get.snackbar("Error", e.toString());
+      FlutterToastWidget.error("Error ${e.toString()}");
     } finally {
       isLoading.value = false;
     }

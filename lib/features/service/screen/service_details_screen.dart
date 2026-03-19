@@ -11,11 +11,11 @@ import '../model/service_list_model.dart';
 class ServiceDetailsScreen extends StatefulWidget {
   final String serviceId;
   final List<ServiceListModel> services;
-
+  final String distanceText;
   const ServiceDetailsScreen({
     super.key,
     required this.serviceId,
-    required this.services,
+    required this.services, required this.distanceText,
   });
 
   @override
@@ -25,7 +25,6 @@ class ServiceDetailsScreen extends StatefulWidget {
 class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
 
   final UserProfileController controller = Get.put(UserProfileController());
-
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +43,6 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
         subcategory: 0,
       ),
     );
-
     controller.fetchUserProfile(service.user);
 
     return Scaffold(
@@ -107,12 +105,12 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
 
                   /// LOCATION + DISTANCE
                   Row(
-                    children: const [
+                    children:  [
                       Icon(Icons.location_on,
-                          size: 16, color: Colors.lightBlueAccent),
+                          size: 16, color: Colors.green),
                       SizedBox(width: 4),
                       Text(
-                        "5 km away, Pune",
+                        "${widget.distanceText}",
                         style: TextStyle(color: Colors.grey),
                       ),
                     ],

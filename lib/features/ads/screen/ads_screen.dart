@@ -4,6 +4,9 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 
+import '../../../core/widget/flutter_toast_widget.dart';
+import '../../service/controller/service_delete_controller.dart';
+import '../../service/controller/service_list_controller.dart';
 import '../controller/service_list_by_user_controller.dart';
 import '../repository/service_list_byuser_repository.dart';
 
@@ -21,7 +24,7 @@ class _AdsScreenState extends State<AdsScreen> {
       repository: ServiceListByUserRepository(),
     ),
   );
-
+  final deleteController = Get.put(ServiceDeleteController());
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -30,11 +33,13 @@ class _AdsScreenState extends State<AdsScreen> {
         backgroundColor: const Color(0xffF7F8FA),
 
         appBar: AppBar(
+          toolbarHeight: 30,
           backgroundColor: Colors.white,
           title: const Text("My Ads"),
+          titleTextStyle: TextStyle(fontSize: 20,color: Colors.black87, fontWeight: FontWeight.w600),
           centerTitle: false,
           actions: [
-            IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
+            // IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
           ],
           bottom: const TabBar(
             labelColor: Colors.black,
@@ -102,6 +107,8 @@ class _AdsScreenState extends State<AdsScreen> {
                     views: "0 views",
                     image: service.serviceImage,
                     status: service.serviceStatus ? "Active" : "Inactive",
+                    serviceId: service.id,
+                    userId: service.user,
                   );
                 },
               );
@@ -144,6 +151,8 @@ class _AdsScreenState extends State<AdsScreen> {
 }
 
 class AdCard extends StatelessWidget {
+  final int serviceId;
+  final int userId;
   final String title;
   final String price;
   final String location;
@@ -153,6 +162,8 @@ class AdCard extends StatelessWidget {
 
   const AdCard({
     super.key,
+    required this.serviceId,
+    required this.userId,
     required this.title,
     required this.price,
     required this.location,
@@ -165,6 +176,9 @@ class AdCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isActive = status == "Active";
 
+    final deleteController = Get.find<ServiceDeleteController>();
+    final listController = Get.find<ServiceListByUserController>();
+
     return Stack(
       children: [
         Container(
@@ -173,31 +187,22 @@ class AdCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(14),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(.05),
-                blurRadius: 8,
-              )
-            ],
           ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// IMAGE
               Container(
                 width: 110,
                 height: 80,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   color: Colors.grey.withOpacity(0.16),
-                  image: DecorationImage(image: NetworkImage(image), fit: BoxFit.cover)
+                  image: DecorationImage(
+                      image: NetworkImage(image), fit: BoxFit.cover),
                 ),
               ),
 
               const SizedBox(width: 12),
 
-              /// DETAILS
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -211,7 +216,6 @@ class AdCard extends StatelessWidget {
                     Text(price,
                         style: const TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 15)),
-
 
                     const SizedBox(height: 6),
 
@@ -246,18 +250,76 @@ class AdCard extends StatelessWidget {
                   ],
                 ),
               ),
-
-
             ],
           ),
         ),
-        
+
+        /// 🔥 POPUP MENU
         Positioned(
-            right: 0,top: 0,
-            child:  IconButton(
-          onPressed: () {},
-          icon: const Icon(Icons.more_vert),
-        ))
+          right: 0,
+          top: 0,
+          child: PopupMenuButton<String>(
+            onSelected: (value) async {
+              if (value == "delete") {
+
+                /// Confirm dialog
+                bool? confirm = await Get.dialog(
+                  AlertDialog(
+                    title: const Text("Delete Service"),
+                    content: const Text("Are you sure you want to delete?"),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Get.back(result: false),
+                        child: const Text("Cancel"),
+                      ),
+                      TextButton(
+                        onPressed: () => Get.back(result: true),
+                        child: const Text("Delete"),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (confirm == true) {
+                  await deleteController.deleteService(
+                      userId: userId, serviceId: serviceId);
+
+                  if (deleteController.message.value.contains("success")) {
+
+                    /// Remove from UI instantly
+                    listController.removeService(serviceId);
+                    FlutterToastWidget.success(deleteController.message.value);
+                    Get.find<ServiceListController>().fetchServiceList();
+                  } else {
+                    FlutterToastWidget.error("Service not found");
+                  }
+                }
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: "edit",
+                child: Row(
+                  children: [
+                    Icon(Icons.edit, size: 18),
+                    SizedBox(width: 8),
+                    Text("Edit"),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: "delete",
+                child: Row(
+                  children: [
+                    Icon(Icons.delete, size: 18, color: Colors.red),
+                    SizedBox(width: 8),
+                    Text("Delete"),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        )
       ],
     );
   }

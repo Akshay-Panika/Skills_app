@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skills_app/core/widget/flutter_toast_widget.dart';
 import 'package:skills_app/features/auth/screen/auth_screen.dart';
+import '../../ads/screen/ads_screen.dart';
 import '../../auth/helper/auth_preferences.dart';
 import '../controller/user_profile_controller.dart';
 import '../model/user_profile_model.dart';
@@ -76,21 +77,21 @@ class _AccountScreenState extends State<AccountScreen> {
                             children: [
                               Text("Guest Id",style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
                               SizedBox(height: 4),
-                              Text("8989207770",style: TextStyle(color: Colors.grey)),
+                              Text("+91",style: TextStyle(color: Colors.grey)),
                             ],
                           ),
                         ),
                       ],
                     ),
                   ),
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    child: IconButton(
-                      onPressed: () {},
-                      icon: const Icon(Icons.more_vert, color: Colors.black),
-                    ),
-                  ),
+                  // Positioned(
+                  //   right: 0,
+                  //   top: 0,
+                  //   child: IconButton(
+                  //     onPressed: () {},
+                  //     icon: const Icon(Icons.more_vert, color: Colors.black),
+                  //   ),
+                  // ),
                 ],
               );
             }
@@ -131,7 +132,7 @@ class _AccountScreenState extends State<AccountScreen> {
                                   style: TextStyle(
                                       fontWeight: FontWeight.w600, fontSize: 16)),
                               SizedBox(height: 4),
-                              Text("89892 07770",
+                              Text("+91 ",
                                   style: TextStyle(color: Colors.grey)),
                             ],
                           ),
@@ -139,14 +140,14 @@ class _AccountScreenState extends State<AccountScreen> {
                       ],
                     ),
                   ),
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    child: IconButton(
-                      onPressed: () {},
-                      icon: const Icon(Icons.more_vert, color: Colors.black),
-                    ),
-                  ),
+                  // Positioned(
+                  //   right: 0,
+                  //   top: 0,
+                  //   child: IconButton(
+                  //     onPressed: () {},
+                  //     icon: const Icon(Icons.more_vert, color: Colors.black),
+                  //   ),
+                  // ),
                 ],
               );
             }
@@ -200,14 +201,14 @@ class _AccountScreenState extends State<AccountScreen> {
                     ],
                   ),
                 ),
-                Positioned(
-                  right: 0,
-                  top: 0,
-                  child: IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.more_vert, color: Colors.black),
-                  ),
-                ),
+                // Positioned(
+                //   right: 0,
+                //   top: 0,
+                //   child: IconButton(
+                //     onPressed: () {},
+                //     icon: const Icon(Icons.more_vert, color: Colors.black),
+                //   ),
+                // ),
               ],
             );
           }),
@@ -223,7 +224,7 @@ class _AccountScreenState extends State<AccountScreen> {
 
           /// MENU LIST (OLX Style)
            _MenuTile(icon: Icons.person_outline, title: "Profile",onTap: () =>  Get.to(() => BasicInfoScreen()),),
-          const _MenuTile(icon: Icons.campaign_outlined, title: "My Ads"),
+           _MenuTile(icon: Icons.campaign_outlined, title: "My Ads",onTap: () =>  Get.to(() => AdsScreen()),),
           const _MenuTile(icon: Icons.favorite_border, title: "Wishlist"),
           const _MenuTile(icon: Icons.chat_bubble_outline, title: "Help & Support"),
           const _MenuTile(icon: Icons.card_giftcard, title: "Rewards"),

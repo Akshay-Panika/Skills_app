@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
-import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
-
-import '../../account/controller/user_profile_controller.dart';
 import '../../account/screen/account_screen.dart';
-import '../../account/screen/basic_info_screen.dart';
 import '../../ads/screen/ads_screen.dart';
-import '../../auth/helper/auth_preferences.dart';
 import '../../chat/screen/chat_screen.dart';
 import '../../home/controller/home_screen_controller.dart';
 import '../../home/screen/home_screen.dart';
 import '../../ads/screen/create_add_screen.dart';
+import '../../location/controller/location_controller.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -25,6 +20,7 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  final LocationController _locationController = Get.put(LocationController());
   final ScrollStatusController _scrollStatusController = Get.put(ScrollStatusController());
 
   int _currentIndex = 0;
@@ -36,6 +32,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _locationController.fetchLocation();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xffF7F8FA),
@@ -44,8 +46,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         children: [
           _screens[_currentIndex],
           Obx(() {
-            bool isScrollingDown =
-                _scrollStatusController.status.value == "Scrolling Down";
+            bool isScrollingDown = _scrollStatusController.status.value == "Scrolling Down";
 
             return Container(
               height: 80,
@@ -56,7 +57,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: AnimatedSlide(
                       duration: const Duration(milliseconds: 300),
                       offset: isScrollingDown
-                          ? const Offset(0, 1) // hide
+                          ? const Offset(0, 1.5) // hide
                           : const Offset(0, 0), // show
                       child: Container(
                         margin: const EdgeInsets.symmetric(horizontal: 10),

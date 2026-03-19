@@ -80,11 +80,13 @@ class ChatScreen extends StatelessWidget {
       child: Scaffold(
         backgroundColor: const Color(0xffF7F8FA),
         appBar: AppBar(
+          toolbarHeight: 30,
           backgroundColor: Colors.white,
           title: const Text('Chat'),
+          titleTextStyle: TextStyle(fontSize: 20,color: Colors.black87, fontWeight: FontWeight.w600),
           actions: [
             // IconButton(onPressed: () {}, icon: const Icon(Icons.search)),
-            IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
+            // IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
           ],
           bottom: const TabBar(
             indicatorColor: Colors.blueAccent,

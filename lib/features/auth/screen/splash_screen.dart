@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../dashboard/screen/dashboard_screen.dart';
 import '../helper/auth_preferences.dart';
 import 'intro_screen.dart';
-import 'auth_screen.dart'; // ya aapka home/dashboard screen
+import 'auth_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -16,6 +16,8 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+
+
 
   @override
   void initState() {
