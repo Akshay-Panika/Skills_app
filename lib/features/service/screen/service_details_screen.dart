@@ -233,45 +233,67 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                       );
                     }
 
-                    return  Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 32,
-                            backgroundColor: Colors.grey.withOpacity(.15),
-                            backgroundImage: profile.userImage != null && profile.userImage!.isNotEmpty
-                                ? NetworkImage(profile.userImage!)
-                                : null,
-                            child: profile.userImage == null || profile.userImage!.isEmpty
-                                ? const Icon(
-                              Icons.image_not_supported_outlined,
-                              size: 32,
-                              color: Colors.grey,
-                            )
-                                : null,
+                    return  Stack(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(14),
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("${profile.userName}",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold)),
-                                SizedBox(height: 4),
-                                Text("${profile.userBio}",
-                                    style: TextStyle(
-                                        color: Colors.grey, fontSize: 12)),
-                              ],
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 32,
+                                backgroundColor: Colors.grey.withOpacity(.15),
+                                backgroundImage: profile.userImage != null && profile.userImage!.isNotEmpty
+                                    ? NetworkImage(profile.userImage!)
+                                    : null,
+                                child: profile.userImage == null || profile.userImage!.isEmpty
+                                    ? const Icon(
+                                  Icons.image_not_supported_outlined,
+                                  size: 32,
+                                  color: Colors.grey,
+                                )
+                                    : null,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text("${profile.userName}",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                    SizedBox(height: 4),
+                                    Text("${profile.userBio}",
+                                        style: TextStyle(
+                                            color: Colors.grey, fontSize: 12)),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        
+                        Positioned(
+                          right: 10,top: 10,
+                          child:  Row(
+                          children: [
+                            Icon(Icons.star, color: Colors.orange, size: 16),
+                            SizedBox(width: 2),
+                            Text(
+                              "${4.5 ?? 4.5}", // default
+                              style: TextStyle(fontWeight: FontWeight.bold),
                             ),
-                          ),
-                        ],
-                      ),
+                            SizedBox(width: 6),
+                            Text(
+                              "(${20 ?? 20} reviews)",
+                              style: TextStyle(color: Colors.grey, fontSize: 12),
+                            ),
+                          ],
+                        ),)
+                      ],
                     );
                   }),
 

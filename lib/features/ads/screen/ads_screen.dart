@@ -7,6 +7,7 @@ import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import '../../../core/widget/flutter_toast_widget.dart';
 import '../../service/controller/service_delete_controller.dart';
 import '../../service/controller/service_list_controller.dart';
+import '../../service/screen/service_details_screen.dart';
 import '../controller/service_list_by_user_controller.dart';
 import '../repository/service_list_byuser_repository.dart';
 
@@ -176,130 +177,142 @@ class AdCard extends StatelessWidget {
     final deleteController = Get.find<ServiceDeleteController>();
     final listController = Get.find<ServiceListByUserController>();
 
-    return Stack(
-      children: [
-        Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 110,
-                height: 80,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.grey.withOpacity(0.16),
-                  image: DecorationImage(
-                      image: NetworkImage(image), fit: BoxFit.cover),
-                ),
-              ),
-
-              const SizedBox(width: 12),
-
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title,
-                        style: const TextStyle(fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 4),
-
-                    Text(serviceDescription,
-                        style: const TextStyle(
-                            fontSize: 12, color: Colors.grey)),
-                    const SizedBox(height: 6),
-                    Row(
-                      spacing: 10,
-                      children: [
-                        Text(price,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold,)),
-                        Text(views,
-                            style: TextStyle(
-                                color: Colors.grey.shade600, fontSize: 12)),
-
-                        const SizedBox(width: 10),
-
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            ],
+    return InkWell(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ServiceDetailsScreen(
+            services: Get.find<ServiceListController>().services,
+            serviceId: serviceId.toString(),
+            distanceText: serviceDescription,
           ),
         ),
+      ),
+      child: Stack(
+        children: [
+          Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 110,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.grey.withOpacity(0.16),
+                    image: DecorationImage(
+                        image: NetworkImage(image), fit: BoxFit.cover),
+                  ),
+                ),
 
-        /// 🔥 POPUP MENU
-        Positioned(
-          right: 0,
-          top: 0,
-          child: PopupMenuButton<String>(
-            onSelected: (value) async {
-              if (value == "delete") {
+                const SizedBox(width: 12),
 
-                /// Confirm dialog
-                bool? confirm = await Get.dialog(
-                  AlertDialog(
-                    title: const Text("Delete Service"),
-                    content: const Text("Are you sure you want to delete?"),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Get.back(result: false),
-                        child: const Text("Cancel"),
-                      ),
-                      TextButton(
-                        onPressed: () => Get.back(result: true),
-                        child: const Text("Delete"),
-                      ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title,
+                          style: const TextStyle(fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 4),
+
+                      Text(serviceDescription,
+                          style: const TextStyle(
+                              fontSize: 12, color: Colors.grey)),
+                      const SizedBox(height: 6),
+                      Row(
+                        spacing: 10,
+                        children: [
+                          Text(price,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,)),
+                          Text(views,
+                              style: TextStyle(
+                                  color: Colors.grey.shade600, fontSize: 12)),
+
+                          const SizedBox(width: 10),
+
+                        ],
+                      )
                     ],
                   ),
-                );
+                ),
+              ],
+            ),
+          ),
 
-                if (confirm == true) {
-                  await deleteController.deleteService(
-                      userId: userId, serviceId: serviceId);
+          /// 🔥 POPUP MENU
+          Positioned(
+            right: 0,
+            top: 0,
+            child: PopupMenuButton<String>(
+              onSelected: (value) async {
+                if (value == "delete") {
 
-                  if (deleteController.message.value.contains("success")) {
+                  /// Confirm dialog
+                  bool? confirm = await Get.dialog(
+                    AlertDialog(
+                      title: const Text("Delete Service"),
+                      content: const Text("Are you sure you want to delete?"),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Get.back(result: false),
+                          child: const Text("Cancel"),
+                        ),
+                        TextButton(
+                          onPressed: () => Get.back(result: true),
+                          child: const Text("Delete"),
+                        ),
+                      ],
+                    ),
+                  );
 
-                    /// Remove from UI instantly
-                    listController.removeService(serviceId);
-                    FlutterToastWidget.success(deleteController.message.value);
-                    Get.find<ServiceListController>().fetchServiceList();
-                  } else {
-                    FlutterToastWidget.error("Service not found");
+                  if (confirm == true) {
+                    await deleteController.deleteService(
+                        userId: userId, serviceId: serviceId);
+
+                    if (deleteController.message.value.contains("success")) {
+
+                      /// Remove from UI instantly
+                      listController.removeService(serviceId);
+                      FlutterToastWidget.success(deleteController.message.value);
+                      Get.find<ServiceListController>().fetchServiceList();
+                    } else {
+                      FlutterToastWidget.error("Service not found");
+                    }
                   }
                 }
-              }
-            },
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: "edit",
-                child: Row(
-                  children: [
-                    Icon(Icons.edit, size: 18),
-                    SizedBox(width: 8),
-                    Text("Edit"),
-                  ],
+              },
+              itemBuilder: (context) => [
+                const PopupMenuItem(
+                  value: "edit",
+                  child: Row(
+                    children: [
+                      Icon(Icons.edit, size: 18),
+                      SizedBox(width: 8),
+                      Text("Edit"),
+                    ],
+                  ),
                 ),
-              ),
-              const PopupMenuItem(
-                value: "delete",
-                child: Row(
-                  children: [
-                    Icon(Icons.delete, size: 18, color: Colors.red),
-                    SizedBox(width: 8),
-                    Text("Delete"),
-                  ],
+                const PopupMenuItem(
+                  value: "delete",
+                  child: Row(
+                    children: [
+                      Icon(Icons.delete, size: 18, color: Colors.red),
+                      SizedBox(width: 8),
+                      Text("Delete"),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        )
-      ],
+              ],
+            ),
+          )
+        ],
+      ),
     );
   }
 }
