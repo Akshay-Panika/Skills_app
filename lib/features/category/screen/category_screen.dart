@@ -9,7 +9,8 @@ import '../controller/category_controller.dart';
 
 class CategoryScreen extends StatefulWidget {
   final String categoryId;
-  const CategoryScreen({super.key, required this.categoryId});
+  final String category;
+  const CategoryScreen({super.key, required this.categoryId, required this.category});
 
   @override
   State<CategoryScreen> createState() => _CategoryScreenState();
@@ -20,19 +21,22 @@ class _CategoryScreenState extends State<CategoryScreen> {
   final SubCategoryController subController = Get.put(SubCategoryController(repository: SubCategoryRepository()));
 
   String? selectedCategoryId;
+  String? selectedCategory;
 
   @override
   void initState() {
     super.initState();
     selectedCategoryId = widget.categoryId;
+    selectedCategory = widget.category;
 
     // Fetch subcategories for initial category
     subController.fetchSubCategories(int.parse(selectedCategoryId!));
   }
 
-  void onCategoryTap(String categoryId) {
+  void onCategoryTap(String categoryId, String category) {
     setState(() {
       selectedCategoryId = categoryId;
+      selectedCategory = category;
     });
     subController.fetchSubCategories(int.parse(categoryId));
   }
@@ -54,7 +58,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
         children: [
           /// LEFT CATEGORY LIST
           Container(
-            width: 100,
+            width: 90,
             color: Colors.grey.shade100,
             child: Obx(() {
               if (categoryController.isLoading.value) {
@@ -67,9 +71,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   final category = categoryController.categoryList[index];
 
                   return GestureDetector(
-                    onTap: () => onCategoryTap(category.id.toString()),
+                    onTap: () => onCategoryTap(category.id.toString(),category.categoryName.toString()),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 10),
                       decoration: BoxDecoration(
                         color: (selectedCategoryId == category.id.toString())
                             ? Colors.blue.shade50
@@ -122,11 +126,13 @@ class _CategoryScreenState extends State<CategoryScreen> {
           Expanded(
             child: Column(
               children: [
+                SizedBox(height: 10,),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
-                    children: const [
-                      Text("Subcategories",
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children:  [
+                      Text(selectedCategory.toString(),
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w600)),
                       SizedBox(width: 8),
@@ -151,8 +157,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                       );
                     }
 
-                    final List<SubCategory> subcategories =
-                        subController.subCategories;
+                    final List<SubCategory> subcategories = subController.subCategories;
 
                     if (subcategories.isEmpty) {
                       return Padding(
@@ -171,7 +176,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                         crossAxisCount: 3,
                         mainAxisSpacing: 18,
                         crossAxisSpacing: 18,
-                        childAspectRatio: 0.7,
+                        childAspectRatio: 0.8,
                       ),
                       itemBuilder: (_, index) {
                         final sub = subcategories[index];
@@ -192,20 +197,21 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                 height: 64,
                                 width: 64,
                                 decoration: BoxDecoration(
-                                  color: Colors.grey.shade100,
+                                  color: Colors.white,
                                   shape: BoxShape.circle,
                                 ),
-                                child: sub.subcategoryImage.isNotEmpty
-                                    ? Image.network(
-                                  sub.subcategoryImage,
-                                  fit: BoxFit.cover,
-                                  errorBuilder:
-                                      (context, error, stackTrace) {
-                                    return const Icon(
-                                      Icons.image_not_supported_outlined,
-                                      color: Colors.grey,
-                                    );
-                                  },
+                                child: (sub.subcategoryImage != null && sub.subcategoryImage!.isNotEmpty)
+                                    ? ClipOval(
+                                  child: Image.network(
+                                    sub.subcategoryImage!,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return const Icon(
+                                        Icons.image_not_supported_outlined,
+                                        color: Colors.grey,
+                                      );
+                                    },
+                                  ),
                                 )
                                     : const Icon(
                                   Icons.image_not_supported_outlined,

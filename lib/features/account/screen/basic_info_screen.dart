@@ -223,26 +223,56 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                         ),
 
                         const SizedBox(height: 20),
+                        fieldLabel("Phone Number"),
+                        TextFormField(
+                          initialValue: controller.userProfile.value?.userPhone ?? "",
+                          readOnly: true,
+                          decoration: inputDecoration("Phone number").copyWith(
+                            suffixIcon: Icon(Icons.lock, size: 18),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
 
                         /// GENDER
                         fieldLabel("Gender"),
-                        DropdownButtonFormField<String>(
-                          value: genderList.contains(selectedGender)
-                              ? selectedGender
-                              : null,
-                          decoration: inputDecoration("Select gender"),
-                          items: genderList.map((g) {
-                            return DropdownMenuItem(
-                              value: g,
-                              child: Text(g),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: genderList.map((gender) {
+                            return Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Radio<String>(
+                                  value: gender,
+                                  groupValue: selectedGender,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedGender = value;
+                                    });
+                                  },
+                                  activeColor: Colors.blueAccent,
+                                ),
+                                Text(gender),
+                              ],
                             );
                           }).toList(),
-                          onChanged: (v) {
-                            setState(() => selectedGender = v);
-                          },
-                          validator: (v) =>
-                          v == null ? "Please select gender" : null,
                         ),
+                        // DropdownButtonFormField<String>(
+                        //   value: genderList.contains(selectedGender)
+                        //       ? selectedGender
+                        //       : null,
+                        //   decoration: inputDecoration("Select gender"),
+                        //   items: genderList.map((g) {
+                        //     return DropdownMenuItem(
+                        //       value: g,
+                        //       child: Text(g),
+                        //     );
+                        //   }).toList(),
+                        //   onChanged: (v) {
+                        //     setState(() => selectedGender = v);
+                        //   },
+                        //   validator: (v) =>
+                        //   v == null ? "Please select gender" : null,
+                        // ),
 
                         const SizedBox(height: 20),
 

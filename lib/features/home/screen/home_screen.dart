@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
@@ -87,8 +88,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   Row(
                     children:  [
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Icon(Icons.school, color: Colors.blueAccent, size: 30),
+                        padding:  EdgeInsets.symmetric(horizontal: 16.0),
+                        child: FaIcon(FontAwesomeIcons.chalkboardTeacher, color: Colors.blueAccent, size: 30),
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.location_on,size: 10,color: Colors.grey.shade700,),
+                              Icon(Icons.location_on,size: 10,color: Colors.green.shade700,),
                               Text("Location",
                                   style: TextStyle(fontSize: 12, color: Colors.grey.shade700)),
                             ],
@@ -241,10 +242,11 @@ class _HomeScreenState extends State<HomeScreen> {
               return  Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  if(_categoryController.categoryList.isNotEmpty)
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
-                      "Popular Skills",
+                      "Grow Your Skills",
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.blueAccent,
@@ -252,8 +254,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ),
+                  if(_categoryController.categoryList.isNotEmpty)
                   SizedBox(height: 16,),
 
+                  if(_categoryController.categoryList.isNotEmpty)
                   SizedBox(
                     height: 215,
                     child: GridView.builder(
@@ -273,7 +277,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           spacing: 10,
                           children: [
                             InkWell(
-                              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => CategoryScreen(categoryId: category.id.toString(),),)),
+                              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => CategoryScreen(categoryId: category.id.toString(),category: category.categoryName.toString()),)),
                               child: Container(
                                 height: 65,
                                 width: double.infinity,
@@ -316,6 +320,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
                   ),
+                  if(_categoryController.categoryList.isNotEmpty)
                   SizedBox(height: 16,),
 
                   Container(
@@ -379,7 +384,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: InkWell(
                             onTap: () {
                               final textToShare =
-                                  "Check out this service:";
+                                  "Check out this skill:";
                               Share.share(textToShare);
                             },
                             child: Container(
@@ -442,7 +447,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
               if (nearbyServices.isEmpty) {
                 debugPrint("No services Near You");
-                return EmptyServiceWidget();
+                return Padding(
+                  padding:  EdgeInsets.only(top: _categoryController.categoryList.isNotEmpty ?0:100),
+                  child: EmptyServiceWidget(),
+                );
               }
 
               return Column(
@@ -462,7 +470,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   SizedBox(height: 10),
 
                   SizedBox(
-                    height: 200,
+                    height: 220,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: nearbyServices.length,
@@ -551,12 +559,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   SizedBox(height: 10),
 
-                  ListView.builder(
+                  GridView.builder(
                     shrinkWrap: true,
-                    scrollDirection: Axis.vertical,
-                    itemCount: nearbyServices.length,
+                    padding: const EdgeInsets.symmetric(horizontal: 10,),
                     physics: NeverScrollableScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                        childAspectRatio: 0.75,
+                          // crossAxisCount: nearbyServices.length,
+                      ),
                     itemBuilder: (context, index) {
                       final service = nearbyServices[index];
 
@@ -584,7 +597,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       );
                     },
+                    itemCount: nearbyServices.length,
                   ),
+
                 ],
               );
             }),
@@ -617,7 +632,7 @@ class ServiceCard extends StatelessWidget {
         ),
       ),
       child: Container(
-        width: 260,
+        width: 220,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(14),
@@ -840,6 +855,7 @@ Widget _buildServiceShimmer() {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        SizedBox(height: 10,),
 
         /// Title
         Padding(

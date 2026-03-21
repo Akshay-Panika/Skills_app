@@ -121,15 +121,14 @@ class _ServiceScreenState extends State<ServiceScreen> {
           );
         }
 
-        return GridView.builder(
-          itemCount: filteredServices.length,
-          shrinkWrap: true,
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 1,
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            mainAxisExtent: 200,
+        return  GridView.builder(
+          padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 10),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: 0.75,
+            // crossAxisCount: nearbyServices.length,
           ),
           itemBuilder: (context, index) {
             final service = nearbyServices[index];
@@ -149,11 +148,16 @@ class _ServiceScreenState extends State<ServiceScreen> {
               distanceText = "${distanceKm.toStringAsFixed(2)} km"; // more stable
             }
 
-            return ServiceCard(
-              service: service,
-              serviceDistance: distanceText,
+            return Container(
+              height: 200,
+              padding: EdgeInsets.only(bottom: 10),
+              child: ServiceCard(
+                service: service,
+                serviceDistance: distanceText,
+              ),
             );
           },
+          itemCount: nearbyServices.length,
         );
       }),
     );

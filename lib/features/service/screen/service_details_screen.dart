@@ -6,6 +6,7 @@ import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:skills_app/features/chat/screen/chating_screen.dart';
 import '../../account/controller/user_profile_controller.dart';
 import '../../account/model/user_profile_model.dart';
+import '../../auth/helper/auth_preferences.dart';
 import '../model/service_list_model.dart';
 
 class ServiceDetailsScreen extends StatefulWidget {
@@ -26,10 +27,15 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
 
   final UserProfileController controller = Get.put(UserProfileController());
 
-  @override
-  Widget build(BuildContext context) {
+  int? currentUserId;
+  late ServiceListModel service;
 
-    final service = widget.services.firstWhere(
+  @override
+  void initState() {
+    super.initState();
+    loadUser();
+
+    service = widget.services.firstWhere(
           (s) => s.id.toString() == widget.serviceId,
       orElse: () => ServiceListModel(
         id: 0,
@@ -43,7 +49,17 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
         subcategory: 0,
       ),
     );
+
     controller.fetchUserProfile(service.user);
+  }
+
+  void loadUser() async {
+    currentUserId = await AuthPreferences.getUserId();
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
 
     return Scaffold(
       backgroundColor: const Color(0xffF7F8FA),
@@ -54,6 +70,23 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
             expandedHeight: 300,
             pinned: true,
             backgroundColor: Colors.transparent,
+            automaticallyImplyLeading: false,
+            leading: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: InkWell(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                borderRadius: BorderRadius.circular(30),
+                child: CircleAvatar(
+                  backgroundColor: Colors.white,
+                  child: Icon(
+                    Icons.arrow_back,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ),
             flexibleSpace: FlexibleSpaceBar(
               background: service.serviceImage.isNotEmpty
                   ? Image.network(
@@ -143,7 +176,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: Center(child: FaIcon(FontAwesomeIcons.mapLocation, color: Colors.green,size: 30,)),
+                    child: Center(child: FaIcon(FontAwesomeIcons.ad, color: Colors.grey,size: 30,)),
                   ),
 
 
@@ -160,7 +193,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             CircleAvatar(
-                              radius: 25,
+                              radius: 32,
                               backgroundColor: Colors.grey.withOpacity(0.16),
                               child: const Icon(Icons.person, color: Colors.white),
                             ),
@@ -187,7 +220,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             CircleAvatar(
-                              radius: 25,
+                              radius: 32,
                               backgroundColor: Colors.grey.withOpacity(0.16),
                               child: const Icon(Icons.person, color: Colors.white),
                             ),
@@ -209,9 +242,18 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                       child: Row(
                         children: [
                           CircleAvatar(
-                            radius: 25,
-                            backgroundColor: Colors.grey.withOpacity(0.16),
-                            child: const Icon(Icons.person, color: Colors.white),
+                            radius: 32,
+                            backgroundColor: Colors.grey.withOpacity(.15),
+                            backgroundImage: profile.userImage != null && profile.userImage!.isNotEmpty
+                                ? NetworkImage(profile.userImage!)
+                                : null,
+                            child: profile.userImage == null || profile.userImage!.isEmpty
+                                ? const Icon(
+                              Icons.image_not_supported_outlined,
+                              size: 32,
+                              color: Colors.grey,
+                            )
+                                : null,
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -242,7 +284,11 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
       ),
 
       /// CHAT BUTTON
-      bottomNavigationBar: Padding(
+
+      bottomNavigationBar:
+      (currentUserId != null && currentUserId != service.user)
+          ?
+      Padding(
         padding: const EdgeInsets.only(left: 16.0, right: 16, bottom: 30),
         child: SizedBox(
           height: 50,
@@ -277,6 +323,25 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                 ),
               )
             ],
+          ),
+        ),
+      )
+      :  Padding(
+        padding: const EdgeInsets.only(left: 16.0, right: 16, bottom: 30),
+        child: SizedBox(
+          height: 40,
+          child:  ElevatedButton.icon(
+            onPressed: () => Navigator.pop(context),
+            icon:  FaIcon(FontAwesomeIcons.ad, color: Colors.white),
+            label: const Text(
+              "Self Mentor",
+              style: TextStyle(color: Colors.white),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blueAccent,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+            ),
           ),
         ),
       ),

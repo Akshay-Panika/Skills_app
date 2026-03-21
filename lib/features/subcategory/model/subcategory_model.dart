@@ -35,7 +35,7 @@ class SubCategory {
   final int id;
   final int category;
   final String subcategoryName;
-  final String subcategoryImage;
+  final String? subcategoryImage;
   final String categoryName;
 
   SubCategory({

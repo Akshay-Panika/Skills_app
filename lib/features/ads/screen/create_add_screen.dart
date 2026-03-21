@@ -254,6 +254,7 @@ class _CreateAddScreenState extends State<CreateAddScreen>
                             Expanded(
                               child: DropdownButtonFormField(
                                 value: selectedCategoryId,
+                                isExpanded: true,
                                 hint: const Text("Category",style: TextStyle(fontSize: 14),),
                                 items: categoryController.categoryList.map((
                                   cat,
@@ -282,6 +283,7 @@ class _CreateAddScreenState extends State<CreateAddScreen>
                             /// SUBCATEGORY DROPDOWN
                             Expanded(
                               child: DropdownButtonFormField(
+                                isExpanded: true,
                                 value: selectedSubcategoryId,
                                 hint: const Text("Subcategory",style: TextStyle(fontSize: 14),),
                                 items: subController.subCategories.map((sub) {

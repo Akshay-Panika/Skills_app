@@ -93,8 +93,8 @@ class ChatScreen extends StatelessWidget {
             labelColor: Colors.black,
             tabs: [
               Tab(text: "All"),
-              Tab(text: "Buying"),
               Tab(text: "Selling"),
+              Tab(text: "Buying"),
             ],
           ),
         ),
@@ -110,7 +110,7 @@ class ChatScreen extends StatelessWidget {
               },
             ),
 
-            /// BUYING
+
             ListView.builder(
               itemCount: buyingChats.length,
               itemBuilder: (_, i) {
@@ -119,7 +119,7 @@ class ChatScreen extends StatelessWidget {
               },
             ),
 
-            /// SELLING
+
             ListView.builder(
               itemCount: sellingChats.length,
               itemBuilder: (_, i) {
@@ -179,54 +179,26 @@ class ChatServiceCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    chat.serviceName,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w600, fontSize: 14),
-                  ),
-        
+                  Text(chat.serviceName,
+                      style: const TextStyle(fontWeight: FontWeight.w600)),
                   const SizedBox(height: 4),
-        
-                  Text(
-                    chat.lastMessage,
-                    style: TextStyle(
-                        color: Colors.grey.shade600, fontSize: 13),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-        
+
+                  Text(chat.type,
+                      style: const TextStyle(
+                          fontSize: 12, color: Colors.grey)),
                   const SizedBox(height: 6),
-        
                   Row(
+                    spacing: 10,
                     children: [
-                      Text(
-                        "₹ ${chat.amount}",
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w600, fontSize: 13),
-                      ),
-        
-                      const SizedBox(width: 8),
-        
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: chat.isPaid
-                              ? Colors.green.withOpacity(.12)
-                              : Colors.orange.withOpacity(.12),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          chat.isPaid ? "Paid" : "Unpaid",
+                      Text(chat.amount,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,)),
+                      Text("0 View",
                           style: TextStyle(
-                            color: chat.isPaid
-                                ? Colors.green
-                                : Colors.orange,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
+                              color: Colors.grey.shade600, fontSize: 12)),
+
+                      const SizedBox(width: 10),
+
                     ],
                   )
                 ],

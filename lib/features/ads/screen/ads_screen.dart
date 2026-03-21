@@ -100,10 +100,8 @@ class _AdsScreenState extends State<AdsScreen> {
 
                   return AdCard(
                     title: service.serviceName,
-                    price: service.serviceAmount != null
-                        ? "₹ ${service.serviceAmount}"
-                        : "Free",
-                    location: "India",
+                    price: service.serviceAmount != null ? "₹ ${service.serviceAmount}" : "Free",
+                    serviceDescription: service.serviceDescription,
                     views: "0 views",
                     image: service.serviceImage,
                     status: service.serviceStatus ? "Active" : "Inactive",
@@ -154,8 +152,8 @@ class AdCard extends StatelessWidget {
   final int serviceId;
   final int userId;
   final String title;
+  final String serviceDescription;
   final String price;
-  final String location;
   final String views;
   final String status;
   final String image;
@@ -165,8 +163,8 @@ class AdCard extends StatelessWidget {
     required this.serviceId,
     required this.userId,
     required this.title,
+    required this.serviceDescription,
     required this.price,
-    required this.location,
     required this.views,
     required this.status,
     required this.image,
@@ -174,7 +172,6 @@ class AdCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isActive = status == "Active";
 
     final deleteController = Get.find<ServiceDeleteController>();
     final listController = Get.find<ServiceListByUserController>();
@@ -208,43 +205,25 @@ class AdCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(title,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w600, fontSize: 14)),
-
+                        style: const TextStyle(fontWeight: FontWeight.w600)),
                     const SizedBox(height: 4),
 
-                    Text(price,
+                    Text(serviceDescription,
                         style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15)),
-
+                            fontSize: 12, color: Colors.grey)),
                     const SizedBox(height: 6),
-
                     Row(
+                      spacing: 10,
                       children: [
+                        Text(price,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,)),
                         Text(views,
                             style: TextStyle(
                                 color: Colors.grey.shade600, fontSize: 12)),
 
                         const SizedBox(width: 10),
 
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: isActive
-                                ? Colors.green.withOpacity(.12)
-                                : Colors.grey.withOpacity(.15),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            status,
-                            style: TextStyle(
-                              color: isActive ? Colors.green : Colors.grey,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
                       ],
                     )
                   ],

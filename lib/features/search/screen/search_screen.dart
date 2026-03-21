@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+
+import '../../category/controller/category_controller.dart';
+import '../../category/screen/category_screen.dart';
 
 class SearchScreen extends StatelessWidget {
-  const SearchScreen({super.key});
+   SearchScreen({super.key});
+
+  final CategoryController _categoryController = Get.put(CategoryController());
 
   static const Color primaryColor = Color(0xFF1565C0); // Deep Blue
   static const Color accentColor = Color(0xFF00897B);  // Teal
@@ -35,18 +43,6 @@ class SearchScreen extends StatelessWidget {
     },
   ];
 
-  final List<Map<String, dynamic>> categories = const [
-    {'label': 'Coding &\nTech', 'icon': Icons.laptop_mac},
-    {'label': 'Design &\nCreative', 'icon': Icons.palette},
-    {'label': 'Language\nLearning', 'icon': Icons.translate},
-    {'label': 'Business &\nFinance', 'icon': Icons.trending_up},
-    {'label': 'Music &\nArts', 'icon': Icons.music_note},
-    {'label': 'Health &\nFitness', 'icon': Icons.fitness_center},
-    {'label': 'Science &\nMaths', 'icon': Icons.science},
-    {'label': 'Teaching &\nTutoring', 'icon': Icons.school},
-    {'label': 'Photography\n& Video', 'icon': Icons.camera_alt},
-    {'label': 'Personal\nDevelopment', 'icon': Icons.self_improvement},
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -112,11 +108,7 @@ class SearchScreen extends StatelessWidget {
           // Search row
           Row(
             children: [
-              InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Icon(Icons.arrow_back, color: Colors.blueAccent, size: 24)),
+              IconButton(onPressed: () => Navigator.pop(context), icon: Icon(Icons.arrow_back, color: Colors.blueAccent, size: 24)),
               const SizedBox(width: 20),
               Expanded(
                 child: Container(
@@ -371,68 +363,93 @@ class SearchScreen extends StatelessWidget {
 
   // ─── Categories ───────────────────────────────────────────────────────────
   Widget _buildCategories() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: Column(
+    return Obx((){
+      if(_categoryController.isLoading.value){
+        return SizedBox.shrink();
+      }
+      return  Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Popular Categories',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF111111),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              "Popular Skills",
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.blueAccent,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
-          const SizedBox(height: 14),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            padding: EdgeInsets.zero,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 5,
-                mainAxisSpacing: 14,
-                crossAxisSpacing: 14,
-                mainAxisExtent:100
+          SizedBox(height: 16,),
+
+          SizedBox(
+            height: 215,
+            child: GridView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              scrollDirection: Axis.horizontal,
+              itemCount: _categoryController.categoryList.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 14,
+                  crossAxisSpacing: 14,
+                  mainAxisExtent:65
+              ),
+              itemBuilder: (context, index) {
+                final category = _categoryController.categoryList[index];
+
+                return Column(
+                  spacing: 10,
+                  children: [
+                    InkWell(
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => CategoryScreen(categoryId: category.id.toString(),category: category.categoryName.toString(),),)),
+                      child: Container(
+                        height: 65,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.network(
+                            category.categoryImage ?? "",
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Center(
+                                child: Icon(
+                                  Icons.image_not_supported_outlined,
+                                  color: Colors.grey,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                    Text(
+                      category.categoryName ?? "",
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      softWrap: true,
+                      overflow: TextOverflow.ellipsis,
+                      style:  TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 10,
+                          height: 1.2,
+                          color: Colors.grey.shade700
+                      ),
+                    )
+                  ],
+                );
+              },
             ),
-            itemCount: categories.length,
-            itemBuilder: (_, index) => _buildCategoryItem(categories[index]),
           ),
+          SizedBox(height: 16,),
+
         ],
-      ),
-    );
+      );
+    });
   }
 
-  Widget _buildCategoryItem(Map<String, dynamic> cat) {
-    return GestureDetector(
-      onTap: () {},
-      child: Column(
-        children: [
-          Container(
-            height: 65,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(0.16),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(
-              cat['icon'] as IconData,
-              color: Colors.blueAccent,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            cat['label'] as String,
-            textAlign: TextAlign.center,
-            style:  TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 10,
-                height: 1.2,
-                color: Colors.grey.shade700
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
