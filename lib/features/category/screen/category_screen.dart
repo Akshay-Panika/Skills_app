@@ -6,7 +6,6 @@ import '../../subcategory/model/subcategory_model.dart';
 import '../../subcategory/repository/subcategory_repository.dart';
 import '../controller/category_controller.dart';
 
-
 class CategoryScreen extends StatefulWidget {
   final String categoryId;
   final String category;
@@ -22,6 +21,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
   String? selectedCategoryId;
   String? selectedCategory;
+  final ScrollController _categoryScrollController = ScrollController();
 
   @override
   void initState() {
@@ -31,6 +31,11 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
     // Fetch subcategories for initial category
     subController.fetchSubCategories(int.parse(selectedCategoryId!));
+
+    // Scroll to selected category after build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollToSelectedCategory();
+    });
   }
 
   void onCategoryTap(String categoryId, String category) {
@@ -39,6 +44,27 @@ class _CategoryScreenState extends State<CategoryScreen> {
       selectedCategory = category;
     });
     subController.fetchSubCategories(int.parse(categoryId));
+    scrollToSelectedCategory();
+  }
+
+  void scrollToSelectedCategory() {
+    if (selectedCategoryId == null) return;
+
+    final index = categoryController.categoryList
+        .indexWhere((c) => c.id.toString() == selectedCategoryId);
+    if (index == -1) return;
+
+    const itemHeight = 90.0;
+    final offset = index * itemHeight;
+
+    _categoryScrollController.animateTo(
+      offset.clamp(
+        _categoryScrollController.position.minScrollExtent,
+        _categoryScrollController.position.maxScrollExtent,
+      ),
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
@@ -66,14 +92,15 @@ class _CategoryScreenState extends State<CategoryScreen> {
               }
 
               return ListView.builder(
+                controller: _categoryScrollController,
                 itemCount: categoryController.categoryList.length,
                 itemBuilder: (context, index) {
                   final category = categoryController.categoryList[index];
 
                   return GestureDetector(
-                    onTap: () => onCategoryTap(category.id.toString(),category.categoryName.toString()),
+                    onTap: () => onCategoryTap(category.id.toString(), category.categoryName.toString()),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 10),
+                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                       decoration: BoxDecoration(
                         color: (selectedCategoryId == category.id.toString())
                             ? Colors.blue.shade50
@@ -88,8 +115,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                               category.categoryImage!,
                               height: 40,
                               width: 40,
-                              errorBuilder:
-                                  (context, error, stackTrace) {
+                              errorBuilder: (context, error, stackTrace) {
                                 return const Icon(
                                   Icons.image_not_supported_outlined,
                                   color: Colors.grey,
@@ -107,8 +133,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 11,
-                              color: (selectedCategoryId ==
-                                  category.id.toString())
+                              color: (selectedCategoryId == category.id.toString())
                                   ? Colors.blueAccent
                                   : Colors.black87,
                             ),
@@ -126,20 +151,20 @@ class _CategoryScreenState extends State<CategoryScreen> {
           Expanded(
             child: Column(
               children: [
-                SizedBox(height: 10,),
+                const SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
-                    children:  [
+                    children: [
                       Text(selectedCategory.toString(),
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w600)),
-                      SizedBox(width: 8),
-                      Expanded(
-                          child: Divider(
-                            thickness: 1,
-                          )),
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                      const SizedBox(width: 8),
+                      const Expanded(
+                        child: Divider(
+                          thickness: 1,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -149,30 +174,31 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 Expanded(
                   child: Obx(() {
                     if (subController.isLoading.value) {
-                      return Padding(
-                        padding:  EdgeInsets.only(top: 10.0,left: 20),
+                      return const Padding(
+                        padding: EdgeInsets.only(top: 10.0, left: 20),
                         child: Align(
-                            alignment: Alignment.topLeft,
-                            child: Text("Please Wait...", style: TextStyle(color: Colors.grey),)),
+                          alignment: Alignment.topLeft,
+                          child: Text("Please Wait...", style: TextStyle(color: Colors.grey)),
+                        ),
                       );
                     }
 
                     final List<SubCategory> subcategories = subController.subCategories;
 
                     if (subcategories.isEmpty) {
-                      return Padding(
-                        padding:  EdgeInsets.only(top: 10.0,left: 20),
+                      return const Padding(
+                        padding: EdgeInsets.only(top: 10.0, left: 20),
                         child: Align(
-                            alignment: Alignment.topLeft,
-                            child: Text("No Subcategory Available", style: TextStyle(color: Colors.grey),)),
+                          alignment: Alignment.topLeft,
+                          child: Text("No Subcategory Available", style: TextStyle(color: Colors.grey)),
+                        ),
                       );
                     }
 
                     return GridView.builder(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       itemCount: subcategories.length,
-                      gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 3,
                         mainAxisSpacing: 18,
                         crossAxisSpacing: 18,
@@ -183,12 +209,11 @@ class _CategoryScreenState extends State<CategoryScreen> {
                         return InkWell(
                           onTap: () {
                             Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ServiceScreen(
-                                    subcategoryId: sub.id.toString(),
-                                  ),
-                                ));
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ServiceScreen(subcategoryId: sub.id.toString()),
+                              ),
+                            );
                           },
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
@@ -196,15 +221,16 @@ class _CategoryScreenState extends State<CategoryScreen> {
                               Container(
                                 height: 64,
                                 width: 64,
-                                decoration: BoxDecoration(
+                                decoration: const BoxDecoration(
                                   color: Colors.white,
                                   shape: BoxShape.circle,
                                 ),
+                                padding: EdgeInsets.all(12),
                                 child: (sub.subcategoryImage != null && sub.subcategoryImage!.isNotEmpty)
                                     ? ClipOval(
                                   child: Image.network(
                                     sub.subcategoryImage!,
-                                    fit: BoxFit.cover,
+                                    fit: BoxFit.fill,
                                     errorBuilder: (context, error, stackTrace) {
                                       return const Icon(
                                         Icons.image_not_supported_outlined,

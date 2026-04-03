@@ -285,11 +285,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(10),
                                 ),
+                                padding: EdgeInsets.all(12),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
                                   child: Image.network(
                                     category.categoryImage ?? "",
-                                    fit: BoxFit.cover,
+                                    fit: BoxFit.fill,
                                     errorBuilder: (context, error, stackTrace) {
                                       return const Center(
                                         child: Icon(

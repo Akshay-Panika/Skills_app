@@ -1,7 +1,17 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import '../service/chat_api_service.dart';
+import '../service/chat_socket_service.dart';
 
 class ChatingScreen extends StatefulWidget {
-  const ChatingScreen({super.key});
+  final int chatRoomId;
+  final int senderId;
+
+  const ChatingScreen({
+    super.key,
+    required this.chatRoomId,
+    required this.senderId,
+  });
 
   @override
   State<ChatingScreen> createState() => _ChatingScreenState();
@@ -11,68 +21,107 @@ class _ChatingScreenState extends State<ChatingScreen> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  // Store messages
+  final ChatSocketService socketService = ChatSocketService();
+
   List<Map<String, dynamic>> messages = [];
 
-  // Sample typing simulation
-  bool isTyping = false;
+  @override
+  void initState() {
+    super.initState();
 
-  void sendMessage(String text) {
-    if (text.trim().isEmpty) return;
+    loadOldMessages();   // ✅ GET
+    connectSocket();     // ✅ LIVE
+  }
+
+  /// ✅ LOAD OLD MESSAGES
+  void loadOldMessages() async {
+    try {
+      final data = await ChatApiService.getMessages(widget.chatRoomId);
+
+      setState(() {
+        messages = data.map<Map<String, dynamic>>((msg) {
+          return {
+            "text": msg["message"],
+            "isMe": msg["sender"] == widget.senderId,
+          };
+        }).toList();
+      });
+
+      scrollToBottom();
+    } catch (e) {
+      print("❌ API error: $e");
+    }
+  }
+
+  /// ✅ CONNECT SOCKET
+  void connectSocket() {
+    socketService.connect(widget.chatRoomId);
+
+    socketService.stream.listen(
+          (data) {
+        final decoded = jsonDecode(data);
+
+        setState(() {
+          messages.add({
+            "text": decoded["message"],
+            "isMe": decoded["sender_id"] == widget.senderId,
+          });
+        });
+
+        scrollToBottom();
+      },
+      onError: (e) => print("❌ Socket error: $e"),
+      onDone: () => print("⚠️ Socket closed"),
+    );
+  }
+
+  /// ✅ SEND MESSAGE
+  void sendMessage() {
+    final text = _controller.text.trim();
+    if (text.isEmpty) return;
+
+    socketService.sendMessage(text, widget.senderId);
 
     setState(() {
-      messages.add({"text": text, "isMe": true, "time": TimeOfDay.now()});
-      _controller.clear();
-      isTyping = false;
+      messages.add({
+        "text": text,
+        "isMe": true,
+      });
     });
 
-    // Scroll to bottom
+    _controller.clear();
+    scrollToBottom();
+  }
+
+  void scrollToBottom() {
     Future.delayed(const Duration(milliseconds: 100), () {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent + 60,
+          _scrollController.position.maxScrollExtent + 80,
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOut,
         );
       }
     });
+  }
 
-    // Simulate reply from other user
-    Future.delayed(const Duration(seconds: 1), () {
-      setState(() {
-        messages.add({
-          "text": "This is a reply to '$text'",
-          "isMe": false,
-          "time": TimeOfDay.now()
-        });
-
-        if (_scrollController.hasClients) {
-          _scrollController.animateTo(
-            _scrollController.position.maxScrollExtent + 60,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-          );
-        }
-      });
-    });
+  @override
+  void dispose() {
+    socketService.disconnect();
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Chat"),
-        titleTextStyle: TextStyle(fontSize: 18,fontWeight: FontWeight.w500,color: Colors.black),
+        title: const Text("Live Chat"),
         backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
-        elevation: 1,
-        scrolledUnderElevation: 0,
-        shadowColor: Colors.white,
       ),
       body: Column(
         children: [
-          // Messages List
+          /// MESSAGE LIST
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
@@ -80,30 +129,30 @@ class _ChatingScreenState extends State<ChatingScreen> {
               padding: const EdgeInsets.all(12),
               itemBuilder: (context, index) {
                 final msg = messages[index];
+
                 return Align(
-                  alignment:
-                  msg["isMe"] ? Alignment.centerRight : Alignment.centerLeft,
+                  alignment: msg["isMe"]
+                      ? Alignment.centerRight
+                      : Alignment.centerLeft,
                   child: Container(
-                    padding:
-                    const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 8, horizontal: 12),
                     margin: const EdgeInsets.symmetric(vertical: 4),
                     constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width * 0.7),
+                        maxWidth:
+                        MediaQuery.of(context).size.width * 0.7),
                     decoration: BoxDecoration(
                       color: msg["isMe"]
                           ? Colors.blueAccent
                           : Colors.grey.shade300,
-                      borderRadius: BorderRadius.only(
-                        topLeft: const Radius.circular(12),
-                        topRight: const Radius.circular(12),
-                        bottomLeft: Radius.circular(msg["isMe"] ? 12 : 0),
-                        bottomRight: Radius.circular(msg["isMe"] ? 0 : 12),
-                      ),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       msg["text"],
                       style: TextStyle(
-                          color: msg["isMe"] ? Colors.white : Colors.black87),
+                        color:
+                        msg["isMe"] ? Colors.white : Colors.black,
+                      ),
                     ),
                   ),
                 );
@@ -111,27 +160,19 @@ class _ChatingScreenState extends State<ChatingScreen> {
             ),
           ),
 
-          // Typing field
+          /// INPUT
           SafeArea(
             child: Padding(
-              padding:
-              const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6),
+              padding: const EdgeInsets.all(8),
               child: Row(
                 children: [
                   Expanded(
                     child: TextField(
                       controller: _controller,
-                      onChanged: (v) {
-                        setState(() {
-                          isTyping = v.isNotEmpty;
-                        });
-                      },
                       decoration: InputDecoration(
-                        hintText: "Type a message...",
+                        hintText: "Type message...",
                         filled: true,
                         fillColor: Colors.grey.shade200,
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),
                           borderSide: BorderSide.none,
@@ -140,15 +181,11 @@ class _ChatingScreenState extends State<ChatingScreen> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  // Send button
                   CircleAvatar(
-                    radius: 22,
-                    backgroundColor: isTyping ? Colors.blueAccent : Colors.grey,
+                    backgroundColor: Colors.blueAccent,
                     child: IconButton(
                       icon: const Icon(Icons.send, color: Colors.white),
-                      onPressed: isTyping
-                          ? () => sendMessage(_controller.text)
-                          : null,
+                      onPressed: sendMessage,
                     ),
                   )
                 ],

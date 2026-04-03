@@ -156,7 +156,7 @@ class ChatServiceCard extends StatelessWidget {
         ],
       ),
       child: InkWell(
-        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatingScreen(),)),
+        // onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatingScreen(),)),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,

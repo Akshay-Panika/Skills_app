@@ -45,174 +45,96 @@ class _AccountScreenState extends State<AccountScreen> {
         padding: const EdgeInsets.all(16),
         children: [
           /// PROFILE CARD
-          Obx((){
+          Obx(() {
             if (controller.isLoading.value) {
-              return  Stack(
-                children: [
-                  Container(
-                    height: 200,
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(.05),
-                          blurRadius: 8,
-                        )
-                      ],
+              return Container(
+                height: 200,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(color: Colors.black.withOpacity(.05), blurRadius: 8)
+                  ],
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CircleAvatar(
+                      radius: 32,
+                      backgroundColor: Colors.grey.withOpacity(.15),
+                      child: const Icon(
+                        Icons.image_not_supported_outlined,
+                        size: 32,
+                        color: Colors.grey,
+                      ),
                     ),
-                    child: Row(
+                    const SizedBox(width: 14),
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        CircleAvatar(
-                          radius: 32,
-                          backgroundColor: Colors.grey.withOpacity(.15),
-                          child: const Icon(Icons.image_not_supported_outlined, size: 32, color: Colors.grey),
-                        ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Guest Id",style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                              SizedBox(height: 4),
-                              Text("+91",style: TextStyle(color: Colors.grey)),
-                            ],
-                          ),
-                        ),
+                      children: const [
+                        Text("Guest Id",
+                            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                        SizedBox(height: 4),
+                        Text("+91", style: TextStyle(color: Colors.grey)),
                       ],
                     ),
-                  ),
-                  // Positioned(
-                  //   right: 0,
-                  //   top: 0,
-                  //   child: IconButton(
-                  //     onPressed: () {},
-                  //     icon: const Icon(Icons.more_vert, color: Colors.black),
-                  //   ),
-                  // ),
-                ],
+                  ],
+                ),
               );
             }
 
             final UserProfileModel? profile = controller.userProfile.value;
 
-            // Null state
-            if (profile == null) {
-              return  Stack(
+            return Container(
+              height: 200,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(color: Colors.black.withOpacity(.05), blurRadius: 8)
+                ],
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    height: 200,
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(.05),
-                          blurRadius: 8,
-                        )
-                      ],
-                    ),
-                    child: Row(
+                  CircleAvatar(
+                    radius: 32,
+                    backgroundColor: Colors.grey.withOpacity(.15),
+                    backgroundImage: (profile?.userImage?.isNotEmpty ?? false)
+                        ? NetworkImage(profile!.userImage!)
+                        : null,
+                    child: (profile?.userImage?.isEmpty ?? true)
+                        ? const Icon(
+                      Icons.image_not_supported_outlined,
+                      size: 32,
+                      color: Colors.grey,
+                    )
+                        : null,
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        CircleAvatar(
-                          radius: 32,
-                          backgroundColor: Colors.grey.withOpacity(.15),
-                          child: const Icon(Icons.image_not_supported_outlined, size: 32, color: Colors.grey),
+                        Text(
+                          (profile?.userName?.isNotEmpty ?? false)
+                              ? profile!.userName
+                              : 'Guest',
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w600, fontSize: 16),
                         ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Guest Id",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w600, fontSize: 16)),
-                              SizedBox(height: 4),
-                              Text("+91 ",
-                                  style: TextStyle(color: Colors.grey)),
-                            ],
-                          ),
-                        ),
+                        const SizedBox(height: 4),
+                        Text(profile?.userPhone ?? '',
+                            style: const TextStyle(color: Colors.grey)),
                       ],
                     ),
                   ),
-                  // Positioned(
-                  //   right: 0,
-                  //   top: 0,
-                  //   child: IconButton(
-                  //     onPressed: () {},
-                  //     icon: const Icon(Icons.more_vert, color: Colors.black),
-                  //   ),
-                  // ),
                 ],
-              );
-            }
-
-            return  Stack(
-              children: [
-                Container(
-                  height: 200,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(.05),
-                        blurRadius: 8,
-                      )
-                    ],
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CircleAvatar(
-                        radius: 32,
-                        backgroundColor: Colors.grey.withOpacity(.15),
-                        backgroundImage: profile.userImage != null && profile.userImage!.isNotEmpty
-                            ? NetworkImage(profile.userImage!)
-                            : null,
-                        child: profile.userImage == null || profile.userImage!.isEmpty
-                            ? const Icon(
-                          Icons.image_not_supported_outlined,
-                          size: 32,
-                          color: Colors.grey,
-                        )
-                            : null,
-                      ),
-                      const SizedBox(width: 14),
-                       Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(profile.userName,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w600, fontSize: 16)),
-                            SizedBox(height: 4),
-                            Text(profile.userPhone,
-                                style: TextStyle(color: Colors.grey)),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                // Positioned(
-                //   right: 0,
-                //   top: 0,
-                //   child: IconButton(
-                //     onPressed: () {},
-                //     icon: const Icon(Icons.more_vert, color: Colors.black),
-                //   ),
-                // ),
-              ],
+              ),
             );
           }),
-
 
           const SizedBox(height: 18),
 

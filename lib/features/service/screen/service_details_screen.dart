@@ -4,9 +4,11 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:skills_app/features/chat/screen/chating_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../account/controller/user_profile_controller.dart';
 import '../../account/model/user_profile_model.dart';
 import '../../auth/helper/auth_preferences.dart';
+import '../../chat/service/chat_api_service.dart';
 import '../model/service_list_model.dart';
 
 class ServiceDetailsScreen extends StatefulWidget {
@@ -29,6 +31,8 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
 
   int? currentUserId;
   late ServiceListModel service;
+
+  bool _bookmark = false;
 
   @override
   void initState() {
@@ -318,10 +322,9 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
             children: [
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const ChatingScreen())),
+                  onPressed: () {
+                    openWhatsApp("+918989207770", "Hello Seller I want to this course!");
+                  },
                   icon: const Icon(Icons.chat, color: Colors.white),
                   label: const Text(
                     "Chat With Mentor",
@@ -336,19 +339,23 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
               ),
               const SizedBox(width: 10),
               ElevatedButton(
-                onPressed: () {},
-                child: const Icon(Icons.bookmark_border, color: Colors.white),
+                onPressed: () {
+                  setState(() {
+                    _bookmark = !_bookmark;
+                  });
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blueAccent,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
                 ),
+                child:  Icon(_bookmark ? Icons.bookmark:Icons.bookmark_border, color: Colors.white),
               )
             ],
           ),
         ),
       )
-      :  Padding(
+      :Padding(
         padding: const EdgeInsets.only(left: 16.0, right: 16, bottom: 30),
         child: SizedBox(
           height: 40,
@@ -368,5 +375,17 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
         ),
       ),
     );
+  }
+}
+
+
+
+void openWhatsApp(String phone, String message) async {
+  final url = Uri.parse('https://wa.me/$phone?text=${Uri.encodeComponent(message)}');
+
+  try {
+    await launchUrl(url, mode: LaunchMode.externalApplication);
+  } catch (e) {
+    print("Error launching WhatsApp: $e");
   }
 }
