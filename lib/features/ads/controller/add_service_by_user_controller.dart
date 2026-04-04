@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:skills_app/core/widget/flutter_toast_widget.dart';
+import 'package:skills_app/core/widget/flutter_toast.dart';
 import 'package:skills_app/features/ads/controller/service_list_by_user_controller.dart';
 import '../../auth/helper/auth_preferences.dart';
 import '../../service/controller/service_list_controller.dart';
@@ -47,13 +47,13 @@ class AddServiceByUserController extends GetxController {
         longitude: longitude,
       );
 
-      FlutterToastWidget.success("Service Created Successfully");
+      FlutterToast.success("Service Created Successfully");
       Get.find<ServiceListController>().fetchServiceList();
       Get.find<ServiceListByUserController>().fetchMyServices();
       print("Created Service ID: ${data.id}");
 
     } catch (e) {
-      FlutterToastWidget.error("Error ${e.toString()}");
+      FlutterToast.error("Error ${e.toString()}");
     } finally {
       isLoading.value = false;
     }

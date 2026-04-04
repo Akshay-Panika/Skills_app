@@ -4,6 +4,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:skills_app/core/constant/app_size.dart';
 import '../../account/screen/account_screen.dart';
 import '../../ads/screen/ads_screen.dart';
 import '../../chat/screen/chat_screen.dart';
@@ -58,9 +59,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
               bool isScrollingDown = _scrollStatusController.status.value == "Scrolling Down";
 
               return Container(
-                height: 80,
+                height: context.sHeight*0.08,
                 color: Colors.transparent,
                 child: Row(
+                  spacing: 10,
                   children: [
                     Expanded(
                       child: AnimatedSlide(
@@ -69,9 +71,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ? const Offset(0, 1.5) // hide
                             : const Offset(0, 0), // show
                         child: Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 10),
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.only(
+                              topRight: Radius.circular(10),
+                              bottomRight: Radius.circular(10),
+                            ),
                             color: Colors.white,
                             border: Border.all(color: Colors.grey, width: 0.3),
                           ),
@@ -82,28 +86,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 onPressed: () => setState(() => _currentIndex = 0),
                                 icon: FaIcon(FontAwesomeIcons.home,
                                     color: _currentIndex == 0
-                                        ? Colors.blueAccent
+                                        ? Color(0xFF0D6E6E)
                                         : Colors.grey),
                               ),
                               IconButton(
                                 onPressed: () => setState(() => _currentIndex = 1),
                                 icon: FaIcon(FontAwesomeIcons.comment,
                                     color: _currentIndex == 1
-                                        ? Colors.blueAccent
+                                        ? Color(0xFF0D6E6E)
                                         : Colors.grey),
                               ),
                               IconButton(
                                 onPressed: () => setState(() => _currentIndex = 2),
                                 icon: FaIcon(FontAwesomeIcons.ad,
                                     color: _currentIndex == 2
-                                        ? Colors.blueAccent
+                                        ? Color(0xFF0D6E6E)
                                         : Colors.grey),
                               ),
                               IconButton(
                                 onPressed: () => setState(() => _currentIndex = 3),
                                 icon: FaIcon(FontAwesomeIcons.user,
                                     color: _currentIndex == 3
-                                        ? Colors.blueAccent
+                                        ? Color(0xFF0D6E6E)
                                         : Colors.grey),
                               ),
                             ],
@@ -114,9 +118,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                     // Right button always visible
                     Container(
-                      padding: const EdgeInsets.only(left: 10),
+                      padding:  EdgeInsets.only(left: context.sWidth*0.02),
                       decoration: const BoxDecoration(
-                        color: Colors.blueAccent,
+                        color: Color(0xFF0D6E6E),
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(10),
                           bottomLeft: Radius.circular(10),
@@ -141,40 +145,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<bool> _showExitDialog() async {
     return await showDialog(
       context: context,
-      barrierDismissible: false, // user must choose
+      barrierDismissible: false,
       builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        elevation: 8,
-        child: Container(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
           padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              FaIcon(
-                FontAwesomeIcons.chalkboardTeacher,
-                size: 50,
-                color: Colors.blueAccent,
-              ),
-
-              const SizedBox(height: 16),
               Text(
                 "Exit App?",
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
               Text(
                 "Are you sure you want to exit the app?",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
                   color: Colors.grey[700],
                 ),
               ),
@@ -183,6 +175,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 children: [
                   Expanded(
                     child: OutlinedButton(
+                      onPressed: () => Navigator.of(context).pop(false),
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(color: Colors.grey.shade300),
                         shape: RoundedRectangleBorder(
@@ -190,27 +183,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
-                      onPressed: () => Navigator.of(context).pop(false),
                       child: const Text(
                         "Cancel",
-                        style: TextStyle(color: Colors.black87, fontSize: 16),
+                        style: TextStyle(fontSize: 14, color: Colors.black87),
                       ),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(true),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueAccent,
+                        backgroundColor: Color(0xFF0D6E6E),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
-                      onPressed: () => Navigator.of(context).pop(true),
                       child: const Text(
                         "Exit",
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                        style: TextStyle(fontSize: 14, color: Colors.white),
                       ),
                     ),
                   ),
@@ -221,6 +213,5 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ),
     ) ?? false;
-  }
-}
+  }}
 

@@ -5,6 +5,7 @@ import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:skills_app/features/chat/screen/chating_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../core/constant/app_color.dart';
 import '../../account/controller/user_profile_controller.dart';
 import '../../account/model/user_profile_model.dart';
 import '../../auth/helper/auth_preferences.dart';
@@ -66,7 +67,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      backgroundColor: const Color(0xffF7F8FA),
+      backgroundColor:  AppColor.surface,
       body: CustomScrollView(
         slivers: [
           /// IMAGE SECTION
@@ -91,6 +92,9 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                 ),
               ),
             ),
+            actions: [
+              IconButton(onPressed: () => null, icon: Icon(Icons.more_vert, color: Colors.red,))
+            ],
             flexibleSpace: FlexibleSpaceBar(
               background: service.serviceImage.isNotEmpty
                   ? Image.network(
@@ -148,7 +152,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                       SizedBox(width: 4),
                       Text(
                         "${widget.distanceText}",
-                        style: TextStyle(color: Colors.grey),
+                        style: TextStyle(color: Colors.black87),
                       ),
                     ],
                   ),
@@ -279,7 +283,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                             ],
                           ),
                         ),
-                        
+
                         Positioned(
                           right: 10,top: 10,
                           child:  Row(
@@ -331,7 +335,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                     style: TextStyle(color: Colors.white),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent,
+                    backgroundColor: Color(0xFF0D6E6E),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10)),
                   ),
@@ -345,7 +349,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                   });
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
+                  backgroundColor: Color(0xFF0D6E6E),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
                 ),
@@ -367,7 +371,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
               style: TextStyle(color: Colors.white),
             ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blueAccent,
+              backgroundColor: Color(0xFF0D6E6E),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)),
             ),

@@ -1,6 +1,6 @@
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:skills_app/core/widget/flutter_toast_widget.dart';
+import 'package:skills_app/core/widget/flutter_toast.dart';
 import '../helper/auth_preferences.dart';
 import '../repository/auth_repository.dart';
 
@@ -25,7 +25,7 @@ class AuthController extends GetxController {
   Future<void> sendOtp(String phone) async {
 
     if (!isValidPhone(phone)) {
-      FlutterToastWidget.error("Enter valid phone number");
+      FlutterToast.error("Enter valid phone number");
       return;
     }
 
@@ -41,11 +41,11 @@ class AuthController extends GetxController {
 
       startTimer();
 
-      FlutterToastWidget.success("OTP Sent Successfully");
+      FlutterToast.success("OTP Sent Successfully");
 
     } else {
 
-      FlutterToastWidget.error(res["error"] ?? "Failed to send OTP");
+      FlutterToast.error(res["error"] ?? "Failed to send OTP");
 
     }
 
@@ -54,7 +54,7 @@ class AuthController extends GetxController {
   Future<bool> verifyOtp(String phone, String otp) async {
 
     if (!isValidOtp(otp)) {
-      FlutterToastWidget.error(
+      FlutterToast.error(
           "Enter valid 6 digit OTP"
       );
       return false;
@@ -72,13 +72,13 @@ class AuthController extends GetxController {
       int userId = res["data"]["id"];
       await AuthPreferences.setLogin(userId);
 
-      FlutterToastWidget.success("Login Successful");
+      FlutterToast.success("Login Successful");
 
       return true;
 
     } else {
 
-      FlutterToastWidget.error(
+      FlutterToast.error(
           res["error"] ?? "OTP verification failed"
       );
 

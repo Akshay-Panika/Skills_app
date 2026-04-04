@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:skills_app/core/constant/app_color.dart';
+import '../../../core/constant/app_size.dart';
 import '../../service/screen/service_screen.dart';
 import '../../subcategory/controller/subategory_controller.dart';
 import '../../subcategory/model/subcategory_model.dart';
@@ -70,11 +72,10 @@ class _CategoryScreenState extends State<CategoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffF7F8FA),
+      backgroundColor: AppColor.surface,
       appBar: AppBar(
         title: const Text("Categories"),
-        titleTextStyle: const TextStyle(
-            fontSize: 18, fontWeight: FontWeight.w500, color: Colors.black),
+        titleTextStyle:  TextStyle(fontSize: context.text16, fontWeight: FontWeight.w500, color: AppColor.title),
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
         scrolledUnderElevation: 0,
@@ -84,7 +85,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
         children: [
           /// LEFT CATEGORY LIST
           Container(
-            width: 90,
+            width: context.sWidth*0.24,
             color: Colors.grey.shade100,
             child: Obx(() {
               if (categoryController.isLoading.value) {
@@ -102,19 +103,18 @@ class _CategoryScreenState extends State<CategoryScreen> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                       decoration: BoxDecoration(
-                        color: (selectedCategoryId == category.id.toString())
-                            ? Colors.blue.shade50
-                            : Colors.white,
+                        color: Colors.white,
+                        // color: (selectedCategoryId == category.id.toString()) ? AppColor.primary : Colors.white,
                       ),
                       child: Column(
                         children: [
                           SizedBox(
-                            height: 60,
+                            height: context.sHeight*0.06,
                             child: category.categoryImage != null
                                 ? Image.network(
                               category.categoryImage!,
-                              height: 40,
-                              width: 40,
+                              height: context.sHeight*0.04,
+                              width: context.sHeight*0.04,
                               errorBuilder: (context, error, stackTrace) {
                                 return const Icon(
                                   Icons.image_not_supported_outlined,
@@ -132,10 +132,11 @@ class _CategoryScreenState extends State<CategoryScreen> {
                             category.categoryName ?? "",
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontSize: 11,
+                              fontWeight: (selectedCategoryId == category.id.toString())?FontWeight.w500:FontWeight.w400,
+                              fontSize: context.text12,
                               color: (selectedCategoryId == category.id.toString())
-                                  ? Colors.blueAccent
-                                  : Colors.black87,
+                                  ? AppColor.primary
+                                  : AppColor.title,
                             ),
                           ),
                         ],

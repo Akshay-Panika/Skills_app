@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:skills_app/core/constant/app_color.dart';
+import 'package:skills_app/core/constant/app_size.dart';
 
 import '../../category/controller/category_controller.dart';
 import '../../category/screen/category_screen.dart';
+import '../../home/widget/category_card.dart';
 
 class SearchScreen extends StatelessWidget {
    SearchScreen({super.key});
@@ -47,7 +51,7 @@ class SearchScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xffF7F8FA),
+      backgroundColor: AppColor.surface,
       body: Column(
         children: [
           _buildHeader(context),
@@ -77,7 +81,7 @@ class SearchScreen extends StatelessWidget {
   // ─── Header ───────────────────────────────────────────────────────────────
   Widget _buildHeader(BuildContext context) {
     return Container(
-      color: Colors.lightBlueAccent.withOpacity(0.16),
+      color: AppColor.primary,
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).padding.top + 8,
         bottom: 14,
@@ -90,12 +94,12 @@ class SearchScreen extends StatelessWidget {
           // App name row
           Row(
             children:  [
-              Icon(Icons.menu_book_rounded, color: Colors.blueAccent, size: 22),
+              Icon(Icons.menu_book_rounded, color: AppColor.white, size: 22),
               SizedBox(width: 8),
               Text(
                 'SkillHub',
                 style: TextStyle(
-                  color: Colors.blueAccent,
+                  color: AppColor.white,
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.5,
@@ -108,27 +112,28 @@ class SearchScreen extends StatelessWidget {
           // Search row
           Row(
             children: [
-              IconButton(onPressed: () => Navigator.pop(context), icon: Icon(Icons.arrow_back, color: Colors.blueAccent, size: 24)),
+              IconButton(onPressed: () => Navigator.pop(context), icon: Icon(Icons.arrow_back, color: Colors.white, size: 24)),
               const SizedBox(width: 20),
               Expanded(
                 child: Container(
-                  height: 44,
+                  height: context.sHeight*0.045,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColor.surface,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
                     children: [
                       const SizedBox(width: 10),
-                      const Icon(Icons.search, color: Color(0xFF888888), size: 20),
+                      FaIcon(FontAwesomeIcons.search, color: Colors.grey, size: 18),
                       const SizedBox(width: 8),
                       Expanded(
                         child: TextField(
-                          decoration: const InputDecoration(
+                          style: TextStyle(fontSize: context.text14,color: AppColor.subtitle,),
+                          decoration:  InputDecoration(
                             hintText: 'Find Courses, Skills, Tutors...',
                             hintStyle: TextStyle(
-                              fontSize: 13,
-                              color: Color(0xFF999999),
+                              fontSize: context.text14,
+                              color: AppColor.subtitle,
                             ),
                             border: InputBorder.none,
                             isDense: true,
@@ -167,11 +172,11 @@ class SearchScreen extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border.all(color: Colors.blueAccent, width: 0.3),
         borderRadius: BorderRadius.circular(6),
-        color: Colors.lightBlueAccent.withOpacity(0.16),
+        color: Color(0xFF0D6E6E),
       ),
       child: Row(
         children: [
-          Icon(Icons.location_on, color: Colors.blueAccent, size: 20),
+          Icon(Icons.location_on, color: Colors.white, size: 20),
           const SizedBox(width: 8),
           const Expanded(
             child: Text(
@@ -179,19 +184,19 @@ class SearchScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: Colors.blueAccent,
+                color: Colors.white,
               ),
             ),
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.blueAccent,
+              color: AppColor.surface,
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Text(
               '🌐  Online & Offline',
-              style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600),
+              style: TextStyle(color: Colors.black87, fontSize: 11, fontWeight: FontWeight.w600),
             ),
           ),
         ],
@@ -212,7 +217,7 @@ class SearchScreen extends StatelessWidget {
               const Text(
                 'Recent Searches',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
                   fontWeight: FontWeight.w700,
                   color: Color(0xFF111111),
                 ),
@@ -273,7 +278,7 @@ class SearchScreen extends StatelessWidget {
           const Text(
             'Recommended for You',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.w700,
               color: Color(0xFF111111),
             ),
@@ -376,7 +381,7 @@ class SearchScreen extends StatelessWidget {
               "Popular Skills",
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.blueAccent,
+                color: Colors.black87,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -398,51 +403,7 @@ class SearchScreen extends StatelessWidget {
               itemBuilder: (context, index) {
                 final category = _categoryController.categoryList[index];
 
-                return Column(
-                  spacing: 10,
-                  children: [
-                    InkWell(
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => CategoryScreen(categoryId: category.id.toString(),category: category.categoryName.toString(),),)),
-                      child: Container(
-                        height: 65,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        padding: EdgeInsets.all(12),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Image.network(
-                            category.categoryImage ?? "",
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return const Center(
-                                child: Icon(
-                                  Icons.image_not_supported_outlined,
-                                  color: Colors.grey,
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                    Text(
-                      category.categoryName ?? "",
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                      softWrap: true,
-                      overflow: TextOverflow.ellipsis,
-                      style:  TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 10,
-                          height: 1.2,
-                          color: Colors.grey.shade700
-                      ),
-                    )
-                  ],
-                );
+                return CategoryCard( category: category,);
               },
             ),
           ),

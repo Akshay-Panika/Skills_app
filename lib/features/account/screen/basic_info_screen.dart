@@ -1,13 +1,22 @@
 import 'dart:io';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-
 import '../../auth/helper/auth_preferences.dart';
 import '../controller/user_profile_controller.dart';
 import '../model/user_profile_model.dart';
+
+class _C {
+  static const primary     = Color(0xFF0D6E6E);
+  static const primaryDark = Color(0xFF094F4F);
+  static const accent      = Color(0xFFFFB347);
+  static const surface     = Color(0xFFF4F7F7);
+  static const card        = Color(0xFFFFFFFF);
+  static const textDark    = Color(0xFF0D1F1F);
+  static const textMid     = Color(0xFF4A6565);
+  static const textLight   = Color(0xFF8AABAB);
+  static const chipBg      = Color(0xFFE6F2F2);
+}
 
 class BasicInfoScreen extends StatefulWidget {
   const BasicInfoScreen({super.key});
@@ -17,19 +26,17 @@ class BasicInfoScreen extends StatefulWidget {
 }
 
 class _BasicInfoScreenState extends State<BasicInfoScreen> {
-
   final UserProfileController controller = Get.put(UserProfileController());
 
-  final _formKey = GlobalKey<FormState>();
-
-  final nameController = TextEditingController();
+  final _formKey      = GlobalKey<FormState>();
+  final nameController  = TextEditingController();
   final emailController = TextEditingController();
-  final bioController = TextEditingController();
+  final bioController   = TextEditingController();
 
-  File? selectedImage;
+  File?   selectedImage;
   String? networkImage;
   String? selectedGender;
-  int? userId;
+  int?    userId;
 
   final List<String> genderList = ["Male", "Female", "Other"];
 
@@ -39,73 +46,60 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
     loadProfile();
   }
 
-  /// LOAD PROFILE
   void loadProfile() async {
     userId = await AuthPreferences.getUserId();
-
     if (userId == null) return;
 
     await controller.fetchUserProfile(userId!);
-
     final profile = controller.userProfile.value;
 
     if (profile != null) {
-      nameController.text = profile.userName ?? "";
+      nameController.text  = profile.userName  ?? "";
       emailController.text = profile.userEmail ?? "";
-      bioController.text = profile.userBio ?? "";
-
+      bioController.text   = profile.userBio   ?? "";
       selectedGender = normalizeGender(profile.userGender);
-      networkImage = profile.userImage;
+      networkImage   = profile.userImage;
       setState(() {});
     }
   }
 
-  /// NORMALIZE GENDER
   String? normalizeGender(String? gender) {
     if (gender == null) return null;
-
-    String g = gender.toLowerCase().trim();
-
-    if (g == "male" || g == "m") return "Male";
+    final g = gender.toLowerCase().trim();
+    if (g == "male"   || g == "m") return "Male";
     if (g == "female" || g == "f") return "Female";
-    if (g == "other") return "Other";
-
+    if (g == "other")               return "Other";
     return null;
   }
 
-  /// SAVE PROFILE
   void saveProfile() {
-
     if (!_formKey.currentState!.validate()) return;
-
     if (userId == null) return;
-
     if (selectedGender == null) {
-      Get.snackbar("Error", "Please select gender");
+      Get.snackbar("Error", "Please select gender",
+          backgroundColor: Colors.red.shade50,
+          colorText: Colors.red.shade700);
       return;
     }
 
-    UserProfileModel model = UserProfileModel(
-      userPhone: "",
-      userName: nameController.text.trim(),
-      userEmail: emailController.text.trim(),
-      userGender: selectedGender!,
-      userBio: bioController.text.trim(),
-      user: userId!,
+    controller.updateProfile(
+      userId!,
+      UserProfileModel(
+        userPhone:  "",
+        userName:   nameController.text.trim(),
+        userEmail:  emailController.text.trim(),
+        userGender: selectedGender!,
+        userBio:    bioController.text.trim(),
+        user:       userId!,
+      ),
+      imageFile: selectedImage,
     );
-
-    controller.updateProfile(userId!, model, imageFile: selectedImage,);
   }
 
   void pickImage() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-    );
-
+    final result = await FilePicker.platform.pickFiles(type: FileType.image);
     if (result != null && result.files.single.path != null) {
-      setState(() {
-        selectedImage = File(result.files.single.path!);
-      });
+      setState(() => selectedImage = File(result.files.single.path!));
     }
   }
 
@@ -120,279 +114,346 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-
-      appBar: AppBar(
-        title: const Text("Create Profile"),
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        foregroundColor: Colors.black,
-      ),
-
+      backgroundColor: _C.surface,
       body: Obx(() {
-
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+            child: CircularProgressIndicator(color: _C.primary),
+          );
         }
 
-        return SafeArea(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
+        return Column(
+          children: [
+            // ── Gradient Header ──────────────────────────────────────────────
+            _buildHeader(context),
 
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+            // ── Form ─────────────────────────────────────────────────────────
+            Expanded(
+              child: Form(
+                key: _formKey,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _fieldLabel("Full Name"),
+                      _inputField(
+                        controller: nameController,
+                        hint: "Enter your full name",
+                        icon: Icons.person_outline_rounded,
+                        validator: (v) =>
+                        (v == null || v.trim().isEmpty) ? "Enter name" : null,
+                      ),
 
-                        Center(
-                          child: GestureDetector(
-                            onTap: pickImage,
-                            child: CircleAvatar(
-                              radius: 50,
-                              backgroundColor: Colors.grey.shade200,
+                      const SizedBox(height: 18),
+                      _fieldLabel("Email Address"),
+                      _inputField(
+                        controller: emailController,
+                        hint: "Enter your email",
+                        icon: Icons.email_outlined,
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (v) {
+                          if (v == null || v.trim().isEmpty) return "Enter email";
+                          if (!v.contains("@")) return "Enter valid email";
+                          return null;
+                        },
+                      ),
 
-                              backgroundImage: selectedImage != null
-                                  ? FileImage(selectedImage!)
-                                  : (networkImage != null && networkImage!.isNotEmpty)
-                                  ? NetworkImage(networkImage!) as ImageProvider
-                                  : null,
+                      const SizedBox(height: 18),
+                      _fieldLabel("Phone Number"),
+                      _inputField(
+                        initialValue:
+                        controller.userProfile.value?.userPhone ?? "",
+                        hint: "Phone number",
+                        icon: Icons.phone_outlined,
+                        readOnly: true,
+                        suffix: const Icon(Icons.lock_outline_rounded,
+                            size: 16, color: _C.textLight),
+                      ),
 
-                              child: (selectedImage == null &&
-                                  (networkImage == null || networkImage!.isEmpty))
-                                  ? const FaIcon(
-                                FontAwesomeIcons.camera,
-                                color: Colors.grey,
-                              )
-                                  : null,
-                            ),
-                          ),
-                        ),
+                      const SizedBox(height: 18),
+                      _fieldLabel("Gender"),
+                      _genderSelector(),
 
-                        const SizedBox(height: 16),
+                      const SizedBox(height: 18),
+                      _fieldLabel("Short Bio"),
+                      _inputField(
+                        controller: bioController,
+                        hint: "Write something about yourself…",
+                        icon: Icons.edit_note_rounded,
+                        maxLines: 3,
+                      ),
 
-                        Text(
-                          "Tell us about you",
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleLarge
-                              ?.copyWith(fontWeight: FontWeight.w700),
-                        ),
-
-                        const SizedBox(height: 6),
-
-                        Text(
-                          "This information helps create your profile.",
-                          style: TextStyle(color: Colors.grey.shade600),
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        /// NAME
-                        fieldLabel("Full Name"),
-                        TextFormField(
-                          controller: nameController,
-                          decoration: inputDecoration("Enter your full name"),
-                          validator: (v) =>
-                          v == null || v.trim().isEmpty
-                              ? "Enter name"
-                              : null,
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        /// EMAIL
-                        fieldLabel("Email"),
-                        TextFormField(
-                          controller: emailController,
-                          keyboardType: TextInputType.emailAddress,
-                          decoration: inputDecoration("Enter your email"),
-                          validator: (v) {
-                            if (v == null || v.trim().isEmpty) {
-                              return "Enter email";
-                            }
-                            if (!v.contains("@")) {
-                              return "Enter valid email";
-                            }
-                            return null;
-                          },
-                        ),
-
-                        const SizedBox(height: 20),
-                        fieldLabel("Phone Number"),
-                        TextFormField(
-                          initialValue: controller.userProfile.value?.userPhone ?? "",
-                          readOnly: true,
-                          decoration: inputDecoration("Phone number").copyWith(
-                            suffixIcon: Icon(Icons.lock, size: 18),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-
-                        /// GENDER
-                        fieldLabel("Gender"),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: genderList.map((gender) {
-                            return Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Radio<String>(
-                                  value: gender,
-                                  groupValue: selectedGender,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      selectedGender = value;
-                                    });
-                                  },
-                                  activeColor: Colors.blueAccent,
-                                ),
-                                Text(gender),
-                              ],
-                            );
-                          }).toList(),
-                        ),
-                        // DropdownButtonFormField<String>(
-                        //   value: genderList.contains(selectedGender)
-                        //       ? selectedGender
-                        //       : null,
-                        //   decoration: inputDecoration("Select gender"),
-                        //   items: genderList.map((g) {
-                        //     return DropdownMenuItem(
-                        //       value: g,
-                        //       child: Text(g),
-                        //     );
-                        //   }).toList(),
-                        //   onChanged: (v) {
-                        //     setState(() => selectedGender = v);
-                        //   },
-                        //   validator: (v) =>
-                        //   v == null ? "Please select gender" : null,
-                        // ),
-
-                        const SizedBox(height: 20),
-
-                        /// BIO
-                        fieldLabel("Short Bio"),
-                        TextFormField(
-                          controller: bioController,
-                          maxLines: 3,
-                          decoration:
-                          inputDecoration("Write something about yourself"),
-                        ),
-
-                        const SizedBox(height: 30),
-                      ],
-                    ),
+                      const SizedBox(height: 30),
+                    ],
                   ),
                 ),
-
-                /// BUTTON
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: controller.isLoading.value
-                          ? null
-                          : saveProfile,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueAccent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: controller.isLoading.value
-                          ? const CircularProgressIndicator(
-                        color: Colors.white,
-                      )
-                          : const Text(
-                        "Save & Continue",
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                )
-              ],
+              ),
             ),
-          ),
+
+            // ── Save Button ──────────────────────────────────────────────────
+            _buildSaveButton(),
+          ],
         );
       }),
     );
   }
 
-  /// LABEL
-  Widget fieldLabel(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Text(
-        text,
-        style: const TextStyle(
-          fontWeight: FontWeight.w600,
-          fontSize: 13,
+  // ── Header ─────────────────────────────────────────────────────────────────
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [_C.primaryDark, _C.primary],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            // Top bar
+            Padding(
+              padding: const EdgeInsets.fromLTRB(4, 8, 16, 0),
+              child: Row(
+                children: [
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                        color: Colors.white, size: 20),
+                  ),
+                  const Expanded(
+                    child: Text(
+                      "Edit Profile",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Avatar picker
+            GestureDetector(
+              onTap: pickImage,
+              child: Stack(
+                alignment: Alignment.bottomRight,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 3),
+                      boxShadow: [
+                        BoxShadow(
+                          color: _C.primaryDark.withOpacity(0.3),
+                          blurRadius: 16,
+                          offset: const Offset(0, 6),
+                        )
+                      ],
+                    ),
+                    child: CircleAvatar(
+                      radius: 46,
+                      backgroundColor: _C.chipBg,
+                      backgroundImage: selectedImage != null
+                          ? FileImage(selectedImage!) as ImageProvider
+                          : (networkImage != null && networkImage!.isNotEmpty)
+                          ? NetworkImage(networkImage!)
+                          : null,
+                      child: (selectedImage == null &&
+                          (networkImage == null || networkImage!.isEmpty))
+                          ? const Icon(Icons.person_outline_rounded,
+                          size: 44, color: _C.primary)
+                          : null,
+                    ),
+                  ),
+                  Container(
+                    width: 30,
+                    height: 30,
+                    decoration: const BoxDecoration(
+                      color: _C.accent,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.camera_alt_rounded,
+                        color: Colors.white, size: 16),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 10),
+            const Text(
+              "Tap to change photo",
+              style: TextStyle(color: Colors.white60, fontSize: 12),
+            ),
+            const SizedBox(height: 24),
+          ],
         ),
       ),
     );
   }
 
-  /// 🔥 LIGHT BORDER INPUT DECORATION
-  InputDecoration inputDecoration(String hint) {
-    return InputDecoration(
-      hintText: hint,
-      filled: true,
-      fillColor: Colors.white,
+  // ── Gender Selector ─────────────────────────────────────────────────────────
+  Widget _genderSelector() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+      decoration: BoxDecoration(
+        color: _C.card,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: _C.chipBg, width: 1.2),
+      ),
+      child: Row(
+        children: genderList.map((gender) {
+          final bool selected = selectedGender == gender;
+          return Expanded(
+            child: GestureDetector(
+              onTap: () => setState(() => selectedGender = gender),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                margin: const EdgeInsets.all(4),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: selected ? _C.primary : Colors.transparent,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  gender,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: selected ? Colors.white : _C.textMid,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
 
+  // ── Save Button ─────────────────────────────────────────────────────────────
+  Widget _buildSaveButton() {
+    return Container(
+      color: _C.surface,
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 24),
+      child: SizedBox(
+        width: double.infinity,
+        height: 52,
+        child: ElevatedButton(
+          onPressed: controller.isLoading.value ? null : saveProfile,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: _C.primary,
+            disabledBackgroundColor: _C.textLight,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+          ),
+          child: controller.isLoading.value
+              ? const SizedBox(
+            width: 22,
+            height: 22,
+            child: CircularProgressIndicator(
+                color: Colors.white, strokeWidth: 2.5),
+          )
+              : const Text(
+            "Save & Continue",
+            style: TextStyle(
+              fontSize: 15,
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.3,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ── Field Label ─────────────────────────────────────────────────────────────
+  Widget _fieldLabel(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontWeight: FontWeight.w700,
+          fontSize: 13,
+          color: _C.textDark,
+        ),
+      ),
+    );
+  }
+
+  // ── Input Field ─────────────────────────────────────────────────────────────
+  Widget _inputField({
+    TextEditingController? controller,
+    String? initialValue,
+    required String hint,
+    required IconData icon,
+    TextInputType keyboardType = TextInputType.text,
+    bool readOnly = false,
+    int maxLines = 1,
+    Widget? suffix,
+    String? Function(String?)? validator,
+  }) {
+    final border = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: const BorderSide(color: _C.chipBg, width: 1.2),
+    );
+
+    final decoration = InputDecoration(
+      hintText: hint,
+      hintStyle: const TextStyle(color: _C.textLight, fontSize: 13.5),
+      filled: true,
+      fillColor: readOnly ? const Color(0xFFF9FBFB) : _C.card,
+      prefixIcon: Icon(icon, color: _C.textLight, size: 20),
+      suffixIcon: suffix,
       contentPadding:
       const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(
-          color: Colors.grey.shade300,
-          width: 0.8,
-        ),
-      ),
-
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(
-          color: Colors.grey.shade300,
-          width: 0.8,
-        ),
-      ),
-
+      border: border,
+      enabledBorder: border,
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(
-          color: Colors.blueAccent,
-          width: 1.2,
-        ),
+        borderSide: const BorderSide(color: _C.primary, width: 1.5),
       ),
-
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(
-          color: Colors.red,
-          width: 1,
-        ),
+        borderSide: const BorderSide(color: Colors.red, width: 1),
       ),
-
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(
-          color: Colors.red,
-          width: 1.2,
-        ),
+        borderSide: const BorderSide(color: Colors.red, width: 1.5),
       ),
+    );
+
+    if (controller != null) {
+      return TextFormField(
+        controller: controller,
+        decoration: decoration,
+        keyboardType: keyboardType,
+        readOnly: readOnly,
+        maxLines: maxLines,
+        style: const TextStyle(color: _C.textDark, fontSize: 14),
+        validator: validator,
+      );
+    }
+
+    return TextFormField(
+      initialValue: initialValue,
+      decoration: decoration,
+      keyboardType: keyboardType,
+      readOnly: readOnly,
+      maxLines: maxLines,
+      style: const TextStyle(color: _C.textDark, fontSize: 14),
+      validator: validator,
     );
   }
 }

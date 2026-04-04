@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:skills_app/features/dashboard/screen/dashboard_screen.dart';
 import 'package:lottie/lottie.dart';
+import 'package:skills_app/core/constant/app_color.dart';
+import '../../../core/constant/app_size.dart';
+import '../../../core/widget/app_button.dart';
 import 'auth_screen.dart';
 
 class IntroScreen extends StatefulWidget {
@@ -60,6 +62,7 @@ class _IntroScreenState extends State<IntroScreen> {
         ),
         child: Column(
           children: [
+            SizedBox(height: context.sHeight*0.06,),
             Expanded(
               child: PageView.builder(
                 controller: _controller,
@@ -70,7 +73,6 @@ class _IntroScreenState extends State<IntroScreen> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(height: 50,),
                       Expanded(
                         child: Container(
                           width: double.infinity,
@@ -82,7 +84,7 @@ class _IntroScreenState extends State<IntroScreen> {
                         ),
                       ),
                       Expanded(child: Padding(
-                        padding: const EdgeInsets.all(16.0),
+                        padding:  EdgeInsets.all(context.sWidth*0.05),
                         child: Column(
                           spacing: 10,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -90,18 +92,18 @@ class _IntroScreenState extends State<IntroScreen> {
                             Text(
                               pages[index]["title"],
                               textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontSize: 22,
+                              style: TextStyle(
+                                fontSize: context.text18,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                                color: AppColor.title,
                               ),
                             ),
                             Text(
                               pages[index]["desc"],
                               textAlign: TextAlign.start,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey,
+                              style:  TextStyle(
+                                fontSize: context.text14,
+                                color: AppColor.subtitle,
                               ),
                             ),
                           ],
@@ -121,10 +123,10 @@ class _IntroScreenState extends State<IntroScreen> {
                     (index) => AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
                   margin: const EdgeInsets.all(4),
-                  width: currentIndex == index ? 50 : 25,
-                  height: 3,
+                  width: currentIndex == index ? context.sWidth*0.1 : context.sWidth*0.05,
+                  height: context.sHeight*0.004,
                   decoration: BoxDecoration(
-                    color: currentIndex == index ?Colors.blueAccent:Colors.grey.withOpacity(0.16),
+                    color: currentIndex == index ? AppColor.primary: AppColor.secondary,
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
@@ -143,20 +145,16 @@ class _IntroScreenState extends State<IntroScreen> {
                     onPressed: _goToDashboard,
                     child:  Text(
                       "Skip",
-                      style: TextStyle(color: Colors.blueAccent,fontWeight: FontWeight.bold,fontSize: 16),
+                      style: TextStyle(color: AppColor.primary,fontWeight: FontWeight.bold,fontSize: context.text14),
                     ),
                   ),
                   SizedBox(
-                    width: 150,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.blueAccent,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                      ),
+                    width: context.sWidth*0.4,
+                    child: AppButton(
+                      text: currentIndex == pages.length - 1
+                          ? "Get Started"
+                          : "Next",
+                      isLoading: false,
                       onPressed: () {
                         if (currentIndex == pages.length - 1) {
                           _goToDashboard();
@@ -167,17 +165,9 @@ class _IntroScreenState extends State<IntroScreen> {
                           );
                         }
                       },
-                      child: Text(
-                        currentIndex == pages.length - 1
-                            ? "Get Started"
-                            : "Next",
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
                     ),
                   ),
+
                 ],
               ),
             ),

@@ -5,6 +5,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:skills_app/features/service/controller/service_list_controller.dart';
 import 'package:skills_app/features/service/screen/service_details_screen.dart';
 import '../../home/screen/home_screen.dart';
+import '../../home/widget/service_card.dart';
 import '../../location/controller/location_controller.dart';
 import '../model/service_list_model.dart';
 import '../repository/service_list_repository.dart';
@@ -85,12 +86,6 @@ class _ServiceScreenState extends State<ServiceScreen> {
         final lat = _getLocationController.latitude.value;
         final lon = _getLocationController.longitude.value;
 
-        if (_serviceListController.isLoading.value || !_getLocationController.isLocationLoaded.value) {
-          return _buildServiceShimmer();
-        }
-
-        if (lat == 0.0 || lon == 0.0) {return _buildServiceShimmer();}
-
         final filteredServices = _serviceListController.services.where((service) {
           bool matchSubcategory =
               service.subcategory?.toString() == widget.subcategoryId;
@@ -100,20 +95,14 @@ class _ServiceScreenState extends State<ServiceScreen> {
           return matchSubcategory && matchPaid;
         }).toList();
 
-        final nearbyServices = filteredServices.where((service) {
-          if (service.latitude == null || service.longitude == null) return false;
-
-          double distanceKm = Geolocator.distanceBetween(
-            lat,
-            lon,
-            service.latitude!,
-            service.longitude!,
-          ) / 1000;
-
-          return distanceKm <= 20;
+        final nearby = filteredServices.where((s) {
+          if (s.latitude == null) return false;
+          double d = Geolocator.distanceBetween(lat, lon, s.latitude!, s.longitude!) / 1000;
+          bool matchesPaidFilter = _isPaid ? (s.serviceStatus == true) : true;
+          return d <= 20 && matchesPaidFilter;
         }).toList();
 
-        if (nearbyServices.isEmpty) {
+        if (nearby.isEmpty) {
           debugPrint("No services Near You");
           return Padding(
             padding: const EdgeInsets.only(top: 200.0),
@@ -131,7 +120,7 @@ class _ServiceScreenState extends State<ServiceScreen> {
             // crossAxisCount: nearbyServices.length,
           ),
           itemBuilder: (context, index) {
-            final service = nearbyServices[index];
+            final service = nearby[index];
 
             double distanceKm = Geolocator.distanceBetween(
               lat,
@@ -157,126 +146,126 @@ class _ServiceScreenState extends State<ServiceScreen> {
               ),
             );
           },
-          itemCount: nearbyServices.length,
+          itemCount: nearby.length,
         );
       }),
     );
   }
 }
 
-class ServiceCard extends StatelessWidget {
-  final ServiceListModel service;
-  final String serviceDistance;
-  const ServiceCard({super.key, required this.service,required this.serviceDistance, });
-
-  @override
-  Widget build(BuildContext context) {
-
-    return InkWell(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ServiceDetailsScreen(
-            services: Get.find<ServiceListController>().services,
-            serviceId: service.id.toString(),
-            distanceText: serviceDistance,
-          ),
-        ),
-      ),
-      child: Container(
-        width: 260,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: Colors.grey.shade100, width: .5),
-        ),
-        child: Stack(
-          alignment: Alignment.topRight,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: service.serviceImage.isNotEmpty
-                      ? ClipRRect(
-                    borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(14)),
-                    child: Image.network(
-                      service.serviceImage,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      errorBuilder: (c, e, st) => const Center(
-                          child: Icon(Icons.image_not_supported_outlined,
-                              color: Colors.grey)),
-                    ),
-                  )
-                      : Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(14)),
-                    ),
-                    child: const Center(
-                        child: Icon(Icons.image_not_supported_outlined,
-                            color: Colors.grey)),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Name + Description
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(service.serviceName,
-                                style: const TextStyle(fontWeight: FontWeight.w600)),
-                            const SizedBox(height: 4),
-                            Text(service.serviceDescription,
-                                style: const TextStyle(
-                                    fontSize: 12, color: Colors.grey)),
-                          ],
-                        ),
-                      ),
-                      // Price
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                              service.serviceAmount != null
-                                  ? "₹${service.serviceAmount}"
-                                  : "Free",
-                              style: const TextStyle(fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 4),
-                          Row(
-                            children:  [
-                              Icon(Icons.location_on,
-                                  size: 12, color: Colors.green),
-                              Text(
-                                "$serviceDistance",
-                                style: TextStyle(fontSize: 12, color: Colors.grey),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.bookmark_border, color: Colors.blueAccent)),
-          ],
-        ),
-      ),
-    );
-  }
-}
+// class ServiceCard extends StatelessWidget {
+//   final ServiceListModel service;
+//   final String serviceDistance;
+//   const ServiceCard({super.key, required this.service,required this.serviceDistance, });
+//
+//   @override
+//   Widget build(BuildContext context) {
+//
+//     return InkWell(
+//       onTap: () => Navigator.push(
+//         context,
+//         MaterialPageRoute(
+//           builder: (context) => ServiceDetailsScreen(
+//             services: Get.find<ServiceListController>().services,
+//             serviceId: service.id.toString(),
+//             distanceText: serviceDistance,
+//           ),
+//         ),
+//       ),
+//       child: Container(
+//         width: 260,
+//         decoration: BoxDecoration(
+//           color: Colors.white,
+//           borderRadius: BorderRadius.circular(14),
+//           border: Border.all(color: Colors.grey.shade100, width: .5),
+//         ),
+//         child: Stack(
+//           alignment: Alignment.topRight,
+//           children: [
+//             Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 Expanded(
+//                   child: service.serviceImage.isNotEmpty
+//                       ? ClipRRect(
+//                     borderRadius: const BorderRadius.vertical(
+//                         top: Radius.circular(14)),
+//                     child: Image.network(
+//                       service.serviceImage,
+//                       fit: BoxFit.cover,
+//                       width: double.infinity,
+//                       errorBuilder: (c, e, st) => const Center(
+//                           child: Icon(Icons.image_not_supported_outlined,
+//                               color: Colors.grey)),
+//                     ),
+//                   )
+//                       : Container(
+//                     decoration: BoxDecoration(
+//                       color: Colors.grey.shade100,
+//                       borderRadius: const BorderRadius.vertical(
+//                           top: Radius.circular(14)),
+//                     ),
+//                     child: const Center(
+//                         child: Icon(Icons.image_not_supported_outlined,
+//                             color: Colors.grey)),
+//                   ),
+//                 ),
+//                 Padding(
+//                   padding: const EdgeInsets.all(12),
+//                   child: Row(
+//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                     crossAxisAlignment: CrossAxisAlignment.start,
+//                     children: [
+//                       // Name + Description
+//                       Expanded(
+//                         child: Column(
+//                           crossAxisAlignment: CrossAxisAlignment.start,
+//                           children: [
+//                             Text(service.serviceName,
+//                                 style: const TextStyle(fontWeight: FontWeight.w600)),
+//                             const SizedBox(height: 4),
+//                             Text(service.serviceDescription,
+//                                 style: const TextStyle(
+//                                     fontSize: 12, color: Colors.grey)),
+//                           ],
+//                         ),
+//                       ),
+//                       // Price
+//                       Column(
+//                         crossAxisAlignment: CrossAxisAlignment.end,
+//                         children: [
+//                           Text(
+//                               service.serviceAmount != null
+//                                   ? "₹${service.serviceAmount}"
+//                                   : "Free",
+//                               style: const TextStyle(fontWeight: FontWeight.bold)),
+//                           const SizedBox(height: 4),
+//                           Row(
+//                             children:  [
+//                               Icon(Icons.location_on,
+//                                   size: 12, color: Colors.green),
+//                               Text(
+//                                 "$serviceDistance",
+//                                 style: TextStyle(fontSize: 12, color: Colors.grey),
+//                               ),
+//                             ],
+//                           ),
+//                         ],
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//               ],
+//             ),
+//             IconButton(
+//                 onPressed: () {},
+//                 icon: const Icon(Icons.bookmark_border, color: Colors.blueAccent)),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 Widget _buildServiceShimmer() {
   return Shimmer.fromColors(

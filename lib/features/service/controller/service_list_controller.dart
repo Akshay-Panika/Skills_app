@@ -19,7 +19,7 @@ class ServiceListController extends GetxController {
     super.onInit();
   }
 
-  void fetchServiceList() async {
+  Future<void> fetchServiceList() async {
     try {
       isLoading.value = true;
       final response = await repository.getServiceList();
@@ -30,5 +30,4 @@ class ServiceListController extends GetxController {
     } finally {
       isLoading.value = false;
     }
-  }
-}
+  }}
