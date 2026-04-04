@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
-        android:label="skills_app"
+        android:label="Skills App"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
