@@ -106,4 +106,9 @@ class AuthController extends GetxController {
 
   }
 
+  void resetAuth() {
+    isOtpSent.value = false;
+    resendSeconds.value = 30;
+  }
+
 }

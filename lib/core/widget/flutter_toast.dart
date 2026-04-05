@@ -5,7 +5,6 @@ class FlutterToast {
 
   static void show({
     required String message,
-    IconData? icon,
     Color backgroundColor = Colors.black87,
     Color textColor = Colors.white,
     ToastGravity gravity = ToastGravity.BOTTOM,

@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
-import 'package:skills_app/features/chat/screen/chating_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constant/app_color.dart';
 import '../../account/controller/user_profile_controller.dart';
 import '../../account/model/user_profile_model.dart';
 import '../../auth/helper/auth_preferences.dart';
-import '../../chat/service/chat_api_service.dart';
 import '../model/service_list_model.dart';
 
 class ServiceDetailsScreen extends StatefulWidget {
@@ -79,15 +78,15 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
             leading: Padding(
               padding: const EdgeInsets.all(8.0),
               child: InkWell(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                borderRadius: BorderRadius.circular(30),
+                onTap: () => Get.back(),
                 child: CircleAvatar(
                   backgroundColor: Colors.white,
-                  child: Icon(
-                    Icons.arrow_back,
-                    color: Colors.black,
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 4),
+                    child: IconButton(
+                      icon: Icon(Icons.arrow_back_ios, color: Colors.black),
+                      onPressed: () => Get.back(),
+                    ),
                   ),
                 ),
               ),

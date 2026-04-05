@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import '../../../core/constant/app_size.dart';
+import '../../../core/widget/my_appbar.dart';
 import '../../service/screen/service_screen.dart';
 import '../../subcategory/controller/subategory_controller.dart';
 import '../../subcategory/model/subcategory_model.dart';
@@ -73,13 +74,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColor.surface,
-      appBar: AppBar(
-        title: const Text("Categories"),
-        titleTextStyle:  TextStyle(fontSize: context.text16, fontWeight: FontWeight.w500, color: AppColor.title),
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
-        scrolledUnderElevation: 0,
-        shadowColor: Colors.transparent,
+      appBar: myAppBar(
+        title: 'Categories',
+        showBackButton: true,
       ),
       body: Row(
         children: [

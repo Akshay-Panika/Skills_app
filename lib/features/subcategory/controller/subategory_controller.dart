@@ -14,7 +14,7 @@ class SubCategoryController extends GetxController {
   var count = 0.obs;
 
   // Fetch subcategories for a category id
-  void fetchSubCategories(int categoryId) async {
+  Future<void>  fetchSubCategories(int categoryId) async {
     try {
       isLoading.value = true;
       SubCategoryResponse response =

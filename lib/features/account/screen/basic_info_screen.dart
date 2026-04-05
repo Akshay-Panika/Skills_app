@@ -2,21 +2,15 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:skills_app/core/constant/app_color.dart';
+import 'package:skills_app/core/constant/app_size.dart';
+import 'package:skills_app/core/widget/app_button.dart';
+import 'package:skills_app/core/widget/flutter_toast.dart';
+import 'package:skills_app/core/widget/my_appbar.dart';
 import '../../auth/helper/auth_preferences.dart';
 import '../controller/user_profile_controller.dart';
 import '../model/user_profile_model.dart';
-
-class _C {
-  static const primary     = Color(0xFF0D6E6E);
-  static const primaryDark = Color(0xFF094F4F);
-  static const accent      = Color(0xFFFFB347);
-  static const surface     = Color(0xFFF4F7F7);
-  static const card        = Color(0xFFFFFFFF);
-  static const textDark    = Color(0xFF0D1F1F);
-  static const textMid     = Color(0xFF4A6565);
-  static const textLight   = Color(0xFF8AABAB);
-  static const chipBg      = Color(0xFFE6F2F2);
-}
+import '../widget/basic_info_shimmer.dart';
 
 class BasicInfoScreen extends StatefulWidget {
   const BasicInfoScreen({super.key});
@@ -28,25 +22,24 @@ class BasicInfoScreen extends StatefulWidget {
 class _BasicInfoScreenState extends State<BasicInfoScreen> {
   final UserProfileController controller = Get.put(UserProfileController());
 
-  final _formKey      = GlobalKey<FormState>();
-  final nameController  = TextEditingController();
+  final nameController = TextEditingController();
   final emailController = TextEditingController();
-  final bioController   = TextEditingController();
+  final bioController = TextEditingController();
 
-  File?   selectedImage;
+  File? selectedImage;
   String? networkImage;
   String? selectedGender;
-  int?    userId;
+  int? userId;
 
   final List<String> genderList = ["Male", "Female", "Other"];
 
   @override
   void initState() {
     super.initState();
-    loadProfile();
+    _loadProfile();
   }
 
-  void loadProfile() async {
+  Future<void> _loadProfile() async {
     userId = await AuthPreferences.getUserId();
     if (userId == null) return;
 
@@ -54,49 +47,69 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
     final profile = controller.userProfile.value;
 
     if (profile != null) {
-      nameController.text  = profile.userName  ?? "";
+      nameController.text = profile.userName ?? "";
       emailController.text = profile.userEmail ?? "";
-      bioController.text   = profile.userBio   ?? "";
-      selectedGender = normalizeGender(profile.userGender);
-      networkImage   = profile.userImage;
+      bioController.text = profile.userBio ?? "";
+      selectedGender = _normalizeGender(profile.userGender);
+      networkImage = profile.userImage;
       setState(() {});
     }
   }
 
-  String? normalizeGender(String? gender) {
+  String? _normalizeGender(String? gender) {
     if (gender == null) return null;
     final g = gender.toLowerCase().trim();
-    if (g == "male"   || g == "m") return "Male";
+    if (g == "male" || g == "m") return "Male";
     if (g == "female" || g == "f") return "Female";
-    if (g == "other")               return "Other";
+    if (g == "other") return "Other";
     return null;
   }
 
-  void saveProfile() {
-    if (!_formKey.currentState!.validate()) return;
+  void _saveProfile() async {
     if (userId == null) return;
-    if (selectedGender == null) {
-      Get.snackbar("Error", "Please select gender",
-          backgroundColor: Colors.red.shade50,
-          colorText: Colors.red.shade700);
+
+    if (nameController.text.trim().isEmpty) {
+      FlutterToast.error("Please enter your full name");
       return;
     }
 
-    controller.updateProfile(
+    final email = emailController.text.trim();
+    if (email.isEmpty) {
+      FlutterToast.error("Please enter your email address");
+      return;
+    } else if (!GetUtils.isEmail(email)) {
+      FlutterToast.error("Please enter a valid email address");
+      return;
+    }
+
+    if (bioController.text.trim().isEmpty) {
+      FlutterToast.error("Please write your bio");
+      return;
+    }
+
+    if (selectedGender == null || selectedGender!.isEmpty) {
+      FlutterToast.error("Please select your gender");
+      return;
+    }
+
+    final updatedProfile = UserProfileModel(
+      user: userId!,
+      userName: nameController.text.trim(),
+      userEmail: email,
+      userGender: selectedGender!,
+      userBio: bioController.text.trim(),
+      userPhone: controller.userProfile.value?.userPhone ?? "",
+    );
+
+    await controller.updateProfile(
       userId!,
-      UserProfileModel(
-        userPhone:  "",
-        userName:   nameController.text.trim(),
-        userEmail:  emailController.text.trim(),
-        userGender: selectedGender!,
-        userBio:    bioController.text.trim(),
-        user:       userId!,
-      ),
+      updatedProfile,
       imageFile: selectedImage,
     );
-  }
 
-  void pickImage() async {
+    FlutterToast.success("Profile updated successfully");
+  }
+  Future<void> _pickImage() async {
     final result = await FilePicker.platform.pickFiles(type: FileType.image);
     if (result != null && result.files.single.path != null) {
       setState(() => selectedImage = File(result.files.single.path!));
@@ -114,346 +127,248 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _C.surface,
+      backgroundColor: AppColor.white,
+      appBar: myAppBar(
+        title: 'Profile',
+        backgroundColor: AppColor.primary,
+        titleColor: Colors.white,
+        showBackButton: true,
+        buttonColor: Colors.white,
+      ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(
-            child: CircularProgressIndicator(color: _C.primary),
-          );
+          return BasicInfoShimmer();
         }
-
+        // return BasicInfoShimmer();
         return Column(
           children: [
-            // ── Gradient Header ──────────────────────────────────────────────
             _buildHeader(context),
-
-            // ── Form ─────────────────────────────────────────────────────────
             Expanded(
-              child: Form(
-                key: _formKey,
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _fieldLabel("Full Name"),
-                      _inputField(
-                        controller: nameController,
-                        hint: "Enter your full name",
-                        icon: Icons.person_outline_rounded,
-                        validator: (v) =>
-                        (v == null || v.trim().isEmpty) ? "Enter name" : null,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _fieldLabel(context, "Full Name"),
+                    _inputField(
+                      context,
+                      controller: nameController,
+                      hint: "Enter your full name",
+                      icon: Icons.person_outline_rounded,
+                    ),
+                    const SizedBox(height: 18),
+                    _fieldLabel(context, "Email Address"),
+                    _inputField(
+                      context,
+                      controller: emailController,
+                      hint: "Enter your email",
+                      icon: Icons.email_outlined,
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                    const SizedBox(height: 18),
+                    _fieldLabel(context, "Phone Number"),
+                    _inputField(
+                      context,
+                      initialValue: controller.userProfile.value?.userPhone ?? "",
+                      hint: "Phone number",
+                      icon: Icons.phone_outlined,
+                      readOnly: true,
+                      suffix: const Icon(
+                        Icons.lock_outline_rounded,
+                        size: 16,
+                        color: AppColor.title,
                       ),
-
-                      const SizedBox(height: 18),
-                      _fieldLabel("Email Address"),
-                      _inputField(
-                        controller: emailController,
-                        hint: "Enter your email",
-                        icon: Icons.email_outlined,
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (v) {
-                          if (v == null || v.trim().isEmpty) return "Enter email";
-                          if (!v.contains("@")) return "Enter valid email";
-                          return null;
-                        },
-                      ),
-
-                      const SizedBox(height: 18),
-                      _fieldLabel("Phone Number"),
-                      _inputField(
-                        initialValue:
-                        controller.userProfile.value?.userPhone ?? "",
-                        hint: "Phone number",
-                        icon: Icons.phone_outlined,
-                        readOnly: true,
-                        suffix: const Icon(Icons.lock_outline_rounded,
-                            size: 16, color: _C.textLight),
-                      ),
-
-                      const SizedBox(height: 18),
-                      _fieldLabel("Gender"),
-                      _genderSelector(),
-
-                      const SizedBox(height: 18),
-                      _fieldLabel("Short Bio"),
-                      _inputField(
-                        controller: bioController,
-                        hint: "Write something about yourself…",
-                        icon: Icons.edit_note_rounded,
-                        maxLines: 3,
-                      ),
-
-                      const SizedBox(height: 30),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 18),
+                    _fieldLabel(context, "Gender"),
+                    _genderSelector(context),
+                    const SizedBox(height: 18),
+                    _fieldLabel(context, "Short Bio"),
+                    _inputField(
+                      context,
+                      controller: bioController,
+                      hint: "Write something about yourself…",
+                      icon: Icons.note_alt_outlined,
+                    ),
+                    const SizedBox(height: 30),
+                  ],
                 ),
               ),
             ),
-
-            // ── Save Button ──────────────────────────────────────────────────
-            _buildSaveButton(),
+            Padding(
+              padding: EdgeInsets.only(
+                left: 16,
+                right: 16,
+                bottom: context.sHeight * 0.04,
+              ),
+              child: AppButton(
+                text: "Save & Continue",
+                isLoading: controller.isLoading.value,
+                onPressed: _saveProfile,
+              ),
+            ),
           ],
         );
       }),
     );
   }
 
-  // ── Header ─────────────────────────────────────────────────────────────────
   Widget _buildHeader(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [_C.primaryDark, _C.primary],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            // Top bar
-            Padding(
-              padding: const EdgeInsets.fromLTRB(4, 8, 16, 0),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                        color: Colors.white, size: 20),
-                  ),
-                  const Expanded(
-                    child: Text(
-                      "Edit Profile",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w800,
+      color: AppColor.primary,
+      width: double.infinity,
+      child: Column(
+        children: [
+          SizedBox(height: context.sHeight * 0.02),
+          GestureDetector(
+            onTap: _pickImage,
+            child: Stack(
+              alignment: Alignment.bottomRight,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 3),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColor.secondary.withOpacity(0.3),
+                        blurRadius: 16,
+                        offset: const Offset(0, 6),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Avatar picker
-            GestureDetector(
-              onTap: pickImage,
-              child: Stack(
-                alignment: Alignment.bottomRight,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 3),
-                      boxShadow: [
-                        BoxShadow(
-                          color: _C.primaryDark.withOpacity(0.3),
-                          blurRadius: 16,
-                          offset: const Offset(0, 6),
-                        )
-                      ],
-                    ),
-                    child: CircleAvatar(
-                      radius: 46,
-                      backgroundColor: _C.chipBg,
-                      backgroundImage: selectedImage != null
-                          ? FileImage(selectedImage!) as ImageProvider
-                          : (networkImage != null && networkImage!.isNotEmpty)
-                          ? NetworkImage(networkImage!)
-                          : null,
-                      child: (selectedImage == null &&
-                          (networkImage == null || networkImage!.isEmpty))
-                          ? const Icon(Icons.person_outline_rounded,
-                          size: 44, color: _C.primary)
-                          : null,
-                    ),
-                  ),
-                  Container(
-                    width: 30,
-                    height: 30,
-                    decoration: const BoxDecoration(
-                      color: _C.accent,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.camera_alt_rounded,
-                        color: Colors.white, size: 16),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 10),
-            const Text(
-              "Tap to change photo",
-              style: TextStyle(color: Colors.white60, fontSize: 12),
-            ),
-            const SizedBox(height: 24),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ── Gender Selector ─────────────────────────────────────────────────────────
-  Widget _genderSelector() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-      decoration: BoxDecoration(
-        color: _C.card,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: _C.chipBg, width: 1.2),
-      ),
-      child: Row(
-        children: genderList.map((gender) {
-          final bool selected = selectedGender == gender;
-          return Expanded(
-            child: GestureDetector(
-              onTap: () => setState(() => selectedGender = gender),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                margin: const EdgeInsets.all(4),
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                decoration: BoxDecoration(
-                  color: selected ? _C.primary : Colors.transparent,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  gender,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: selected ? Colors.white : _C.textMid,
+                  child: CircleAvatar(
+                    radius: context.sHeight * 0.048,
+                    backgroundColor: AppColor.surface,
+                    backgroundImage: selectedImage != null
+                        ? FileImage(selectedImage!) as ImageProvider
+                        : (networkImage != null && networkImage!.isNotEmpty)
+                        ? NetworkImage(networkImage!)
+                        : null,
+                    child: (selectedImage == null &&
+                        (networkImage == null || networkImage!.isEmpty))
+                        ? const Icon(
+                      Icons.person_outline_rounded,
+                      size: 44,
+                      color: AppColor.primary,
+                    )
+                        : null,
                   ),
                 ),
-              ),
+                Container(
+                  width: context.sHeight * 0.03,
+                  height: context.sHeight * 0.03,
+                  decoration: const BoxDecoration(
+                    color: AppColor.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.camera_alt_rounded,
+                    color: AppColor.primary,
+                    size: context.sHeight * 0.016,
+                  ),
+                ),
+              ],
             ),
-          );
-        }).toList(),
+          ),
+          SizedBox(height: context.sHeight * 0.02),
+          Text(
+            "Tap to change photo",
+            style: TextStyle(color: Colors.white60, fontSize: context.text14),
+          ),
+          SizedBox(height: context.sHeight * 0.02),
+        ],
       ),
     );
   }
 
-  // ── Save Button ─────────────────────────────────────────────────────────────
-  Widget _buildSaveButton() {
-    return Container(
-      color: _C.surface,
-      padding: const EdgeInsets.fromLTRB(20, 10, 20, 24),
-      child: SizedBox(
-        width: double.infinity,
-        height: 52,
-        child: ElevatedButton(
-          onPressed: controller.isLoading.value ? null : saveProfile,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: _C.primary,
-            disabledBackgroundColor: _C.textLight,
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
-            ),
-          ),
-          child: controller.isLoading.value
-              ? const SizedBox(
-            width: 22,
-            height: 22,
-            child: CircularProgressIndicator(
-                color: Colors.white, strokeWidth: 2.5),
-          )
-              : const Text(
-            "Save & Continue",
-            style: TextStyle(
-              fontSize: 15,
-              color: Colors.white,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.3,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ── Field Label ─────────────────────────────────────────────────────────────
-  Widget _fieldLabel(String text) {
+  Widget _fieldLabel(BuildContext context, String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(
         text,
-        style: const TextStyle(
-          fontWeight: FontWeight.w700,
-          fontSize: 13,
-          color: _C.textDark,
+        style: TextStyle(
+          fontWeight: FontWeight.w500,
+          fontSize: context.text12,
+          color: AppColor.title,
         ),
       ),
     );
   }
 
-  // ── Input Field ─────────────────────────────────────────────────────────────
-  Widget _inputField({
-    TextEditingController? controller,
-    String? initialValue,
-    required String hint,
-    required IconData icon,
-    TextInputType keyboardType = TextInputType.text,
-    bool readOnly = false,
-    int maxLines = 1,
-    Widget? suffix,
-    String? Function(String?)? validator,
-  }) {
+  Widget _inputField(
+      BuildContext context, {
+        TextEditingController? controller,
+        String? initialValue,
+        required String hint,
+        required IconData icon,
+        TextInputType keyboardType = TextInputType.text,
+        bool readOnly = false,
+        int maxLines = 1,
+        Widget? suffix,
+      }) {
     final border = OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: _C.chipBg, width: 1.2),
+      borderSide: BorderSide(color: AppColor.primary.withOpacity(.1), width: 1.2),
     );
 
     final decoration = InputDecoration(
       hintText: hint,
-      hintStyle: const TextStyle(color: _C.textLight, fontSize: 13.5),
+      hintStyle: TextStyle(color: AppColor.subtitle, fontSize: context.text14),
       filled: true,
-      fillColor: readOnly ? const Color(0xFFF9FBFB) : _C.card,
-      prefixIcon: Icon(icon, color: _C.textLight, size: 20),
+      fillColor: AppColor.surface,
+      prefixIcon: Icon(icon, color: AppColor.title, size: context.sHeight * 0.02),
       suffixIcon: suffix,
-      contentPadding:
-      const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      contentPadding: EdgeInsets.symmetric(
+        horizontal: context.sHeight * 0.014,
+        vertical: context.sHeight * 0.014,
+      ),
       border: border,
       enabledBorder: border,
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: _C.primary, width: 1.5),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Colors.red, width: 1),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Colors.red, width: 1.5),
-      ),
+      focusedBorder: border,
+      errorBorder: border,
+      focusedErrorBorder: border,
     );
 
-    if (controller != null) {
-      return TextFormField(
-        controller: controller,
-        decoration: decoration,
-        keyboardType: keyboardType,
-        readOnly: readOnly,
-        maxLines: maxLines,
-        style: const TextStyle(color: _C.textDark, fontSize: 14),
-        validator: validator,
-      );
-    }
-
     return TextFormField(
-      initialValue: initialValue,
+      controller: controller,
+      initialValue: controller == null ? initialValue : null,
       decoration: decoration,
       keyboardType: keyboardType,
       readOnly: readOnly,
       maxLines: maxLines,
-      style: const TextStyle(color: _C.textDark, fontSize: 14),
-      validator: validator,
+      style: TextStyle(color: AppColor.title, fontSize: context.text14),
+    );
+  }
+
+  Widget _genderSelector(BuildContext context) {
+    return Row(
+      children: genderList.map((gender) {
+        final bool selected = selectedGender == gender;
+        return Expanded(
+          child: GestureDetector(
+            onTap: () => setState(() => selectedGender = gender),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              margin: const EdgeInsets.all(4),
+              padding: EdgeInsets.symmetric(vertical: context.sHeight * 0.01),
+              decoration: BoxDecoration(
+                color: selected ? AppColor.primary : AppColor.surface,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                gender,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: context.text14,
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                  color: selected ? AppColor.white : AppColor.primary,
+                ),
+              ),
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 }

@@ -89,7 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColor.surface,
+      backgroundColor: AppColor.white,
       appBar: AppBar(
         backgroundColor: AppColor.primary,
         surfaceTintColor: AppColor.primary,
@@ -108,6 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onRefresh: () => homeController.onRefresh(),
             child: CustomScrollView(
               controller: _scrollController,
+              physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
             
                 SliverToBoxAdapter(
@@ -380,7 +381,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         SizedBox(height: 10),
             
                         SizedBox(
-                          height: context.sHeight*0.28,
+                          height: context.sHeight*0.2,
                           child: ListView.builder(
                             scrollDirection: Axis.horizontal,
                             itemCount: nearby.length,
@@ -404,8 +405,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               }
             
                               return Padding(
-                                padding: const EdgeInsets.only(left: 8.0),
-                                child: ServiceCard(
+                                padding:  EdgeInsets.only(left: 10,  right: index == nearby.length - 1 ? 10 : 0, ),
+                                child: RServiceCard(
                                   service: service,
                                   serviceDistance: distanceText,
                                 ),
@@ -476,7 +477,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               crossAxisCount: 2,
                               crossAxisSpacing: 10,
                               mainAxisSpacing: 10,
-                              childAspectRatio: 0.75,
+                              childAspectRatio: 0.8,
                                 // crossAxisCount: nearbyServices.length,
                             ),
                           itemBuilder: (context, index) {

@@ -1,78 +1,83 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:skills_app/core/constant/app_color.dart';
+
+import '../../../core/constant/app_size.dart';
 
 class HomeShimmerCard extends StatelessWidget {
   const HomeShimmerCard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    const baseColor = Color(0xFFE0E0E0);
-    const highlightColor = Color(0xFFF5F5F5);
+    final width = context.sWidth;
+    final height = context.sHeight;
 
     return Scaffold(
-      // 1. Shimmer AppBar
+      backgroundColor: AppColor.surface,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF006D5B), // Image ka teal color
+        backgroundColor: AppColor.primary,
         elevation: 0,
         automaticallyImplyLeading: false,
+
         title: Shimmer.fromColors(
           baseColor: Colors.white24,
-          highlightColor: Colors.white54,
+          highlightColor: Colors.white70,
           child: Row(
             children: [
               Container(
-                width: 40,
-                height: 40,
+                width: width * 0.1, // responsive
+                height: width * 0.1,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: width * 0.025),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(width: 80, height: 12, color: Colors.white),
-                  const SizedBox(height: 4),
-                  Container(width: 120, height: 10, color: Colors.white),
+                  Container(width: width * 0.2, height: height * 0.015, color: Colors.white),
+                  SizedBox(height: height * 0.005),
+                  Container(width: width * 0.3, height: height * 0.012, color: Colors.white),
                 ],
               ),
             ],
           ),
         ),
+
         actions: [
           Shimmer.fromColors(
             baseColor: Colors.white24,
-            highlightColor: Colors.white54,
-            child: const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+            highlightColor: Colors.white70,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: width * 0.04),
               child: Icon(Icons.notifications, color: Colors.white),
             ),
           ),
         ],
-        // 2. Search Bar Shimmer (Bottom of AppBar)
+
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(70),
+          preferredSize: Size.fromHeight(height * 0.08),
           child: Shimmer.fromColors(
             baseColor: Colors.white24,
-            highlightColor: Colors.white54,
+            highlightColor: Colors.white70,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              padding: EdgeInsets.fromLTRB(width * 0.04, 0, width * 0.04, height * 0.02),
               child: Row(
                 children: [
                   Expanded(
                     child: Container(
-                      height: 45,
+                      height: height * 0.04,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  SizedBox(width: width * 0.025),
                   Container(
-                    width: 50,
-                    height: 30,
+                    width: width * 0.12,
+                    height: height * 0.04,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
@@ -85,82 +90,96 @@ class HomeShimmerCard extends StatelessWidget {
         ),
       ),
 
-      body: SingleChildScrollView(
-        child: Shimmer.fromColors(
-          baseColor: baseColor,
-          highlightColor: highlightColor,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Section Title: Grow Your Skills
-                Container(width: 150, height: 20, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(4))),
-                const SizedBox(height: 20),
+      body: Shimmer.fromColors(
+        baseColor: Colors.grey.shade300,
+        highlightColor: Colors.grey.shade100,
+        child: ListView(
+          padding: EdgeInsets.all(width * 0.04),
+          children: [
+            Container(width: width * 0.3, height: height * 0.025, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(4))),
+            SizedBox(height: height * 0.02),
 
-                // Grid Categories (2 Rows)
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 5,
-                    mainAxisSpacing: 15,
-                    crossAxisSpacing: 10,
-                    childAspectRatio: 0.8,
+            /// Categories
+            GridView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: 10,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 5,
+                mainAxisSpacing: width * 0.03,
+                crossAxisSpacing: width * 0.02,
+                childAspectRatio: 0.8,
+              ),
+              itemBuilder: (_, __) => Column(
+                children: [
+                  Container(
+                    width: width * 0.15,
+                    height: width * 0.15,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
-                  itemCount: 10,
-                  itemBuilder: (_, __) => Column(
+                  SizedBox(height: height * 0.009),
+                  Container(width: width * 0.08, height: height * 0.012, color: Colors.white),
+                ],
+              ),
+            ),
+
+            // SizedBox(height: height * 0.01),
+
+            /// Banner
+            Container(
+              height: height * 0.12,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+
+            SizedBox(height: height * 0.03),
+
+            /// Section title
+            Container(
+              width: width * 0.4,
+              height: height * 0.02,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+
+            SizedBox(height: height * 0.02),
+
+            /// Horizontal cards
+            SizedBox(
+              height: height * 0.28,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: 3,
+                itemBuilder: (_, __) => Padding(
+                  padding: EdgeInsets.only(right: width * 0.04),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(width: 55, height: 55, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12))),
-                      const SizedBox(height: 8),
-                      Container(width: 40, height: 8, color: Colors.white),
+                      Container(
+                        width: width * 0.6,
+                        height: height * 0.18,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      SizedBox(height: height * 0.01),
+                      Container(width: width * 0.35, height: height * 0.018, color: Colors.white),
+                      SizedBox(height: height * 0.005),
+                      Container(width: width * 0.25, height: height * 0.015, color: Colors.white),
                     ],
                   ),
                 ),
-
-                const SizedBox(height: 25),
-
-                // Invite Banner
-                Container(
-                  width: double.infinity,
-                  height: 90,
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
-                ),
-
-                const SizedBox(height: 25),
-
-                // Section Title: Recent View Services
-                Container(width: 180, height: 20, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(4))),
-                const SizedBox(height: 15),
-
-                // Horizontal Service Cards
-                SizedBox(
-                  height: 260,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: 2,
-                    itemBuilder: (_, __) => Padding(
-                      padding: const EdgeInsets.only(right: 16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: 220,
-                            height: 160,
-                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
-                          ),
-                          const SizedBox(height: 12),
-                          Container(width: 160, height: 15, color: Colors.white),
-                          const SizedBox(height: 8),
-                          Container(width: 100, height: 12, color: Colors.white),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

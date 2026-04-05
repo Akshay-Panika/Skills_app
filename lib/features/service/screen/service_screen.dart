@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/features/service/controller/service_list_controller.dart';
 import 'package:skills_app/features/service/screen/service_details_screen.dart';
+import '../../../core/widget/my_appbar.dart';
 import '../../home/screen/home_screen.dart';
 import '../../home/widget/service_card.dart';
 import '../../location/controller/location_controller.dart';
@@ -28,15 +30,11 @@ class _ServiceScreenState extends State<ServiceScreen> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      backgroundColor: const Color(0xffF7F8FA),
-      appBar: AppBar(
-        title: const Text("Service"),
-        titleTextStyle: const TextStyle(
-            fontSize: 18, fontWeight: FontWeight.w500, color: Colors.black),
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
-        scrolledUnderElevation: 0,
-        shadowColor: Colors.transparent,
+      backgroundColor: AppColor.white,
+      appBar: myAppBar(
+        title: "Service",
+        showBackButton: true,
+        backgroundColor: AppColor.white,
         actions: [
           Transform.scale(
             scale: 0.8,

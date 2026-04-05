@@ -63,7 +63,7 @@ class _SplashScreenState extends State<SplashScreen> {
           children:  [
             FaIcon(
              FontAwesomeIcons.chalkboardTeacher,
-              size: context.height*0.08,
+              size: context.height*0.16,
               color: AppColor.primary,
             )
           ],
