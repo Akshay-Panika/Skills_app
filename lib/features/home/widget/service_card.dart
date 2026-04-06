@@ -24,7 +24,6 @@ class ServiceCard extends StatelessWidget {
         context,
         MaterialPageRoute(
           builder: (context) => ServiceDetailsScreen(
-            services: Get.find<ServiceListController>().services,
             serviceId: service.id.toString(),
             distanceText: serviceDistance,
           ),
@@ -109,7 +108,6 @@ class RServiceCard extends StatelessWidget {
         context,
         MaterialPageRoute(
           builder: (context) => ServiceDetailsScreen(
-            services: Get.find<ServiceListController>().services,
             serviceId: service.id.toString(),
             distanceText: serviceDistance,
           ),

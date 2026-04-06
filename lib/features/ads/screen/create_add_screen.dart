@@ -17,7 +17,14 @@ import '../repository/add_service_by_user_repository.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 
 class CreateAddScreen extends StatefulWidget {
-  const CreateAddScreen({super.key});
+  final bool isEdit;
+  final dynamic serviceData;
+
+  const CreateAddScreen({
+    super.key,
+    this.isEdit = false,
+    this.serviceData,
+  });
 
   @override
   State<CreateAddScreen> createState() => _CreateAddScreenState();
@@ -36,6 +43,7 @@ class _CreateAddScreenState extends State<CreateAddScreen>
   );
 
   File? selectedImage;
+  String? networkImage;
   String? selectedCategoryId;
   String? selectedSubcategoryId;
 
@@ -61,6 +69,34 @@ class _CreateAddScreenState extends State<CreateAddScreen>
         .animate(CurvedAnimation(parent: _animController, curve: Curves.easeOut));
     _animController.forward();
     categoryController.categoryList();
+
+    if (widget.isEdit && widget.serviceData != null) {
+      final s = widget.serviceData;
+
+      titleController.text = s.serviceName;
+      descController.text = s.serviceDescription;
+      priceController.text = s.serviceAmount ?? "";
+
+      selectedCategoryId = s.category.toString();
+      selectedSubcategoryId = s.subcategory.toString();
+
+      isPaid = s.serviceStatus;
+
+      if (widget.isEdit && widget.serviceData != null) {
+        final s = widget.serviceData;
+
+        titleController.text = s.serviceName;
+        descController.text = s.serviceDescription;
+        priceController.text = s.serviceAmount ?? "";
+
+        selectedCategoryId = s.category.toString();
+        selectedSubcategoryId = s.subcategory.toString();
+
+        isPaid = s.serviceStatus;
+
+        // ✅ IMPORTANT
+        networkImage = s.serviceImage;
+      }    }
   }
 
   @override
@@ -84,39 +120,66 @@ class _CreateAddScreenState extends State<CreateAddScreen>
       FlutterToast.error("Select category");
       return;
     }
+
     if (selectedSubcategoryId == null) {
       FlutterToast.error("Select subcategory");
       return;
     }
-    if (selectedImage == null) {
+
+    if (!widget.isEdit && selectedImage == null) {
       FlutterToast.error("Select service image");
       return;
     }
+
     if (titleController.text.trim().isEmpty) {
       FlutterToast.error("Enter service title");
       return;
     }
+
     if (descController.text.trim().isEmpty) {
       FlutterToast.error("Enter description");
       return;
     }
+
     if (isPaid && priceController.text.trim().isEmpty) {
       FlutterToast.error("Enter price");
       return;
     }
 
-    await serviceController.createService(
-      categoryId: int.parse(selectedCategoryId!),
-      subcategoryId: int.parse(selectedSubcategoryId!),
-      name: titleController.text.trim(),
-      description: descController.text.trim(),
-      amount: isPaid ? priceController.text.trim() : "0",
-      status: isPaid,
-      imagePath: selectedImage!.path,
-      latitude: locationController.latitude.value,
-      longitude: locationController.longitude.value,
-    );
+    // ✅ EDIT MODE
+    if (widget.isEdit) {
+      await serviceController.updateService(
+        serviceId: widget.serviceData.id,
+        categoryId: int.parse(selectedCategoryId!),
+        subcategoryId: int.parse(selectedSubcategoryId!),
+        name: titleController.text.trim(),
+        description: descController.text.trim(),
+        amount: isPaid ? priceController.text.trim() : "0",
+        status: isPaid,
+        swipeStatus: false,
+        // swipeStatus: widget.serviceData.swipeStatus,
+        imagePath: selectedImage?.path ?? "",
+        latitude: locationController.latitude.value,
+        longitude: locationController.longitude.value,
+      );
+    }
+    // ✅ CREATE MODE
+    else {
+      await serviceController.createService(
+        categoryId: int.parse(selectedCategoryId!),
+        subcategoryId: int.parse(selectedSubcategoryId!),
+        name: titleController.text.trim(),
+        description: descController.text.trim(),
+        amount: isPaid ? priceController.text.trim() : "0",
+        status: isPaid,
+        swipeStatus: false,
+        imagePath: selectedImage!.path,
+        latitude: locationController.latitude.value,
+        longitude: locationController.longitude.value,
+      );
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -381,30 +444,61 @@ class _CreateAddScreenState extends State<CreateAddScreen>
         children: [
           Image.file(selectedImage!, fit: BoxFit.fill),
           Positioned(
-              bottom: 0,right: 0,
-              child: AppCard(
-                  color: AppColor.surface,
-                  margin: EdgeInsets.zero,
-                  child: Row(
-                    children: [
-                      Icon(Icons.edit,size: 18,color: AppColor.primary),
-                      const SizedBox(width: 4),
-                      Text("Change", style: TextStyle(color: AppColor.primary)),
-                    ],
-                  ))),
+            bottom: 0,
+            right: 0,
+            child: AppCard(
+              color: AppColor.surface,
+              margin: EdgeInsets.zero,
+              child: Row(
+                children: [
+                  Icon(Icons.edit, size: 18, color: AppColor.primary),
+                  const SizedBox(width: 4),
+                  Text("Change", style: TextStyle(color: AppColor.primary)),
+                ],
+              ),
+            ),
+          ),
+        ],
+      )
+          : (networkImage != null && networkImage!.isNotEmpty)
+          ? Stack(
+        alignment: Alignment.center,
+        children: [
+          Image.network(networkImage!, fit: BoxFit.fill),
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: AppCard(
+              color: AppColor.surface,
+              margin: EdgeInsets.zero,
+              child: Row(
+                children: [
+                  Icon(Icons.edit, size: 18, color: AppColor.primary),
+                  const SizedBox(width: 4),
+                  Text("Change", style: TextStyle(color: AppColor.primary)),
+                ],
+              ),
+            ),
+          ),
         ],
       )
           : Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.add_a_photo_outlined, color: AppColor.primary, size: context.sHeight*0.04),
+          Icon(Icons.add_a_photo_outlined,
+              color: AppColor.primary,
+              size: context.sHeight * 0.04),
           const SizedBox(height: 20),
           Text("Upload Service Image",
               style: TextStyle(
-                  fontWeight: FontWeight.w600, color: AppColor.subtitle, fontSize: context.text14)),
+                  fontWeight: FontWeight.w600,
+                  color: AppColor.subtitle,
+                  fontSize: context.text14)),
           const SizedBox(height: 4),
           Text("Tap to choose from gallery",
-              style: TextStyle(fontSize: context.text12, color: AppColor.subtitle)),
+              style: TextStyle(
+                  fontSize: context.text12,
+                  color: AppColor.subtitle)),
         ],
       ),
     );

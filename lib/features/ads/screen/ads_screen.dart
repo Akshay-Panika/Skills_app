@@ -164,7 +164,6 @@ class SkillCard extends StatelessWidget {
         context,
         MaterialPageRoute(
           builder: (_) => ServiceDetailsScreen(
-            services: Get.find<ServiceListController>().services,
             serviceId: serviceId.toString(),
             distanceText: serviceDescription,
           ),
@@ -267,7 +266,7 @@ class SkillCard extends StatelessWidget {
       height: context.sHeight * 0.1,
       color: AppColor.surface,
       child: Icon(Icons.image_not_supported_outlined,
-          size: context.sHeight*0.016, color: AppColor.subtitle.withOpacity(0.7)),
+          size: context.sHeight*0.04, color: AppColor.subtitle.withOpacity(0.7)),
     );
   }
 
@@ -283,19 +282,109 @@ class SkillCard extends StatelessWidget {
       elevation: 6,
       onSelected: (value) async {
         if (value == "edit") {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => CreateAddScreen(
-                // serviceId: serviceId,
-                // title: title,
-                // description: serviceDescription,
-                // price: price,
-                // image: image,
-                // status: status == "Active",
+
+          final bool? confirm = await Get.dialog(
+            Dialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              backgroundColor: AppColor.surface,
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: context.sHeight * 0.05,
+                      height: context.sHeight * 0.05,
+                      decoration: BoxDecoration(
+                        color: AppColor.primary.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.edit_outlined,
+                        color: AppColor.primary,
+                        size: context.sHeight * 0.02,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      "Edit Service?",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: AppColor.title,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      "Do you want to update this service?",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: context.text12,
+                        color: AppColor.subtitle,
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () => Get.back(result: false),
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(
+                                  color: AppColor.surface, width: 1.5),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12)),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                            ),
+                            child: const Text(
+                              "Cancel",
+                              style: TextStyle(
+                                color: AppColor.error,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () => Get.back(result: true),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColor.primary,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12)),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                            ),
+                            child: const Text(
+                              "Edit",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           );
+
+          if (confirm == true) {
+            final service = listController.serviceList
+                .firstWhere((e) => e.id == serviceId);
+
+            Get.to(() => CreateAddScreen(
+              isEdit: true,
+              serviceData: service,
+            ));
+          }
         }
 
         if (value == "delete") {
@@ -329,7 +418,7 @@ class SkillCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      "This action cannot be undone.\nAre you sure?",
+                      "This action cannot be undone. Are you sure?",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                           fontSize: context.text12,

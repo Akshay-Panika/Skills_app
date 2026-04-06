@@ -4,6 +4,7 @@ class ServiceListModel {
   final String? serviceAmount;
   final String serviceName;
   final bool serviceStatus;
+  final bool swipeStatus;
   final String serviceDescription;
   final double? latitude;
   final double? longitude;
@@ -19,6 +20,7 @@ class ServiceListModel {
     this.serviceAmount,
     required this.serviceName,
     required this.serviceStatus,
+    required this.swipeStatus,
     required this.serviceDescription,
     this.latitude,
     this.longitude,
@@ -32,32 +34,43 @@ class ServiceListModel {
   factory ServiceListModel.fromJson(Map<String, dynamic> json) {
     return ServiceListModel(
       id: json['id'],
-      serviceImage: json['service_image'],
-      serviceAmount: json['service_amount'],
-      serviceName: json['service_name'],
-      serviceStatus: json['service_status'],
-      serviceDescription: json['service_description'],
-      latitude: json['latitude'] != null ? (json['latitude'] as num).toDouble() : null,
-      longitude: json['longitude'] != null ? (json['longitude'] as num).toDouble() : null,
-      createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : null,
-      updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at']) : null,
-      user: json['user'],
-      category: json['category'],
-      subcategory: json['subcategory'],
+      serviceImage: json['service_image'] ?? "",
+      serviceAmount: json['service_amount']?.toString(), // ✅ safe convert
+      serviceName: json['service_name'] ?? "",
+      serviceStatus: json['service_status'] ?? false,
+      swipeStatus: json['swipe_status'] ?? false,
+      serviceDescription: json['service_description'] ?? "",
+      latitude: json['latitude'] != null
+          ? (json['latitude'] as num).toDouble()
+          : null,
+      longitude: json['longitude'] != null
+          ? (json['longitude'] as num).toDouble()
+          : null,
+      createdAt: json['created_at'] != null
+          ? DateTime.tryParse(json['created_at'])
+          : null,
+      updatedAt: json['updated_at'] != null
+          ? DateTime.tryParse(json['updated_at'])
+          : null,
+      user: json['user'] ?? 0,
+      category: json['category'] ?? 0,
+      subcategory: json['subcategory'] ?? 0,
     );
   }
 }
-
 class ServiceListResponse {
   final int count;
   final List<ServiceListModel> services;
 
-  ServiceListResponse({required this.count, required this.services});
+  ServiceListResponse({
+    required this.count,
+    required this.services,
+  });
 
   factory ServiceListResponse.fromJson(Map<String, dynamic> json) {
     return ServiceListResponse(
-      count: json['count'],
-      services: (json['services'] as List)
+      count: json['count'] ?? 0,
+      services: (json['services'] as List? ?? [])
           .map((e) => ServiceListModel.fromJson(e))
           .toList(),
     );
