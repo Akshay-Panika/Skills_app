@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skills_app/core/widget/app_card.dart';
 
 import '../../../core/constant/app_color.dart';
 import '../../../core/constant/app_size.dart';
@@ -14,32 +15,29 @@ class CategoryCard extends StatelessWidget {
     return Column(
       spacing: 10,
       children: [
-        InkWell(
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => CategoryScreen(categoryId: category.id.toString(),category: category.categoryName.toString()),)),
-          child: Container(
-            height: 65,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: AppColor.surface,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            padding: EdgeInsets.all(12),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.network(
-                category.categoryImage ?? "",
-                fit: BoxFit.fill,
-                errorBuilder: (context, error, stackTrace) {
-                  return const Center(
-                    child: Icon(
-                      Icons.image_not_supported_outlined,
-                      color: Colors.grey,
-                    ),
-                  );
-                },
-              ),
+        AppCard(
+          height: context.sHeight*0.07,
+          width: double.infinity,
+          padding: EdgeInsets.all(12),
+          margin: EdgeInsets.zero,
+          color: AppColor.surface,
+          hasBorder: true,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image.network(
+              category.categoryImage ?? "",
+              fit: BoxFit.fill,
+              errorBuilder: (context, error, stackTrace) {
+                return const Center(
+                  child: Icon(
+                    Icons.image_not_supported_outlined,
+                    color: Colors.grey,
+                  ),
+                );
+              },
             ),
           ),
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => CategoryScreen(categoryId: category.id.toString(),category: category.categoryName.toString()),)),
         ),
         Text(
           category.categoryName ?? "",

@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_instance/src/extension_instance.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/constant/app_size.dart';
 import '../../../core/widget/app_dilog.dart';
@@ -14,16 +10,8 @@ import '../../home/controller/home_screen_controller.dart';
 import '../../home/screen/home_screen.dart';
 import '../../ads/screen/create_add_screen.dart';
 import '../../location/controller/location_controller.dart';
-import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:skills_app/core/constant/app_size.dart';
-import '../../account/screen/account_screen.dart';
-import '../../ads/screen/ads_screen.dart';
-import '../../chat/screen/chat_screen.dart';
-import '../../home/screen/home_screen.dart';
-import '../../ads/screen/create_add_screen.dart';
-import '../../location/controller/location_controller.dart';
+
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
