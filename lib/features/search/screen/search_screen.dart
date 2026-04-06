@@ -1,22 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_instance/src/extension_instance.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:get/get.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/constant/app_size.dart';
 
 import '../../category/controller/category_controller.dart';
-import '../../category/screen/category_screen.dart';
 import '../../home/widget/category_card.dart';
 
 class SearchScreen extends StatelessWidget {
-   SearchScreen({super.key});
+  SearchScreen({super.key});
 
-  final CategoryController _categoryController = Get.put(CategoryController());
-
-  static const Color primaryColor = Color(0xFF1565C0); // Deep Blue
-  static const Color accentColor = Color(0xFF00897B);  // Teal
+  final CategoryController _categoryController =
+  Get.put(CategoryController());
 
   final List<String> recentSearches = const [
     'Python for beginners',
@@ -30,45 +25,44 @@ class SearchScreen extends StatelessWidget {
     {
       'title': 'Top-rated Python & Machine Learning courses near you',
       'icon': Icons.code,
-      'color': Color(0xFFE3F2FD),
-      'iconColor': Color(0xFF1565C0),
+      'color': C.chipBg,
+      'iconColor': C.primary,
     },
     {
       'title': 'Explore Graphic Design skills from expert tutors',
       'icon': Icons.brush,
-      'color': Color(0xFFE8F5E9),
-      'iconColor': Color(0xFF2E7D32),
+      'color': C.chipBg,
+      'iconColor': C.success,
     },
     {
       'title': 'Find local & online English Speaking coaches',
       'icon': Icons.record_voice_over,
-      'color': Color(0xFFFFF3E0),
-      'iconColor': Color(0xFFE65100),
+      'color': C.chipBg,
+      'iconColor': C.accent,
     },
   ];
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColor.surface,
+      backgroundColor: AppColor.white,
       body: Column(
         children: [
           _buildHeader(context),
-          SizedBox(height: 10,),
+          SizedBox(height: context.sHeight * 0.01),
           Expanded(
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildLocationBar(),
-                  const SizedBox(height: 16),
-                  _buildRecentSearches(),
-                  const SizedBox(height: 16),
-                  _buildRecommendations(),
-                  const SizedBox(height: 16),
-                  _buildCategories(),
-                  const SizedBox(height: 30),
+                  _buildLocationBar(context),
+                  SizedBox(height: context.sHeight * 0.02),
+                  _buildRecentSearches(context),
+                  SizedBox(height: context.sHeight * 0.02),
+                  _buildRecommendations(context),
+                  SizedBox(height: context.sHeight * 0.02),
+                  _buildCategories(context),
+                  SizedBox(height: context.sHeight * 0.03),
                 ],
               ),
             ),
@@ -78,7 +72,32 @@ class SearchScreen extends StatelessWidget {
     );
   }
 
-  // ─── Header ───────────────────────────────────────────────────────────────
+  // 🔹 Common Title Row (Reusable)
+  Widget _sectionTitle(String title, BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 5,
+          height: 16,
+          decoration: BoxDecoration(
+            color: C.primary,
+            borderRadius: BorderRadius.circular(5),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: context.text14,
+            fontWeight: FontWeight.w700,
+            color: AppColor.title,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // 🔹 HEADER
   Widget _buildHeader(BuildContext context) {
     return Container(
       color: AppColor.primary,
@@ -91,72 +110,65 @@ class SearchScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // App name row
           Row(
-            children:  [
-              Icon(Icons.menu_book_rounded, color: AppColor.white, size: 22),
-              SizedBox(width: 8),
+            children: [
+              const Icon(Icons.menu_book_rounded,
+                  color: AppColor.white),
+              const SizedBox(width: 8),
               Text(
                 'SkillHub',
                 style: TextStyle(
                   color: AppColor.white,
-                  fontSize: 18,
+                  fontSize: context.text16,
                   fontWeight: FontWeight.w700,
-                  letterSpacing: 0.5,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: context.sHeight * 0.01),
 
-          // Search row
           Row(
             children: [
-              IconButton(onPressed: () => Navigator.pop(context), icon: Icon(Icons.arrow_back, color: Colors.white, size: 24)),
-              const SizedBox(width: 20),
+              IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.arrow_back,
+                    color: AppColor.white),
+              ),
               Expanded(
                 child: Container(
-                  height: context.sHeight*0.045,
+                  height: context.sHeight * 0.05,
                   decoration: BoxDecoration(
-                    color: AppColor.surface,
+                    color: AppColor.white,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
                     children: [
                       const SizedBox(width: 10),
-                      FaIcon(FontAwesomeIcons.search, color: Colors.grey, size: 18),
+                      const FaIcon(FontAwesomeIcons.search,
+                          color: AppColor.subtitle, size: 16),
                       const SizedBox(width: 8),
                       Expanded(
                         child: TextField(
-                          style: TextStyle(fontSize: context.text14,color: AppColor.subtitle,),
-                          decoration:  InputDecoration(
-                            hintText: 'Find Courses, Skills, Tutors...',
+                          style: TextStyle(
+                              fontSize: context.text12,
+                              color: AppColor.subtitle),
+                          decoration: InputDecoration(
+                            hintText:
+                            'Find Courses, Skills, Tutors...',
                             hintStyle: TextStyle(
-                              fontSize: context.text14,
-                              color: AppColor.subtitle,
-                            ),
+                                fontSize: context.text12,
+                                color: AppColor.subtitle),
                             border: InputBorder.none,
-                            isDense: true,
-                            contentPadding: EdgeInsets.symmetric(vertical: 12),
                           ),
                         ),
                       ),
-                      const Icon(Icons.mic, color: Color(0xFF888888), size: 20),
+                      const Icon(Icons.mic,
+                          color: AppColor.subtitle),
                       const SizedBox(width: 10),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
-              // Container(
-              //   height: 44,
-              //   width: 44,
-              //   decoration: BoxDecoration(
-              //     color: accentColor,
-              //     borderRadius: BorderRadius.circular(6),
-              //   ),
-              //   child: const Icon(Icons.tune, color: Colors.white, size: 22),
-              // ),
             ],
           ),
         ],
@@ -164,39 +176,44 @@ class SearchScreen extends StatelessWidget {
     );
   }
 
-  // ─── Location / Mode Bar ──────────────────────────────────────────────────
-  Widget _buildLocationBar() {
+  // 🔹 LOCATION BAR
+  Widget _buildLocationBar(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.blueAccent, width: 0.3),
+        border: Border.all(color: C.primary, width: 0.3),
         borderRadius: BorderRadius.circular(6),
-        color: Color(0xFF0D6E6E),
+        color: C.primary,
       ),
       child: Row(
         children: [
-          Icon(Icons.location_on, color: Colors.white, size: 20),
+          const Icon(Icons.location_on,
+              color: AppColor.white),
           const SizedBox(width: 8),
-          const Expanded(
+          Expanded(
             child: Text(
               'Hadapsar, Pune',
               style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Colors.white,
+                fontSize: context.text12,
+                color: AppColor.white,
               ),
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            padding: const EdgeInsets.symmetric(
+                horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: AppColor.surface,
+              color: AppColor.white,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Text(
-              '🌐  Online & Offline',
-              style: TextStyle(color: Colors.black87, fontSize: 11, fontWeight: FontWeight.w600),
+            child: Text(
+              '🌐 Online & Offline',
+              style: TextStyle(
+                fontSize: context.text10,
+                fontWeight: FontWeight.w600,
+                color: C.textDark,
+              ),
             ),
           ),
         ],
@@ -204,8 +221,8 @@ class SearchScreen extends StatelessWidget {
     );
   }
 
-  // ─── Recent Searches ──────────────────────────────────────────────────────
-  Widget _buildRecentSearches() {
+  // 🔹 RECENT SEARCHES
+  Widget _buildRecentSearches(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Column(
@@ -214,32 +231,22 @@ class SearchScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Recent Searches',
+              _sectionTitle("Recent Searches", context),
+              Text(
+                "Clear all",
                 style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF111111),
+                  fontSize: context.text12,
+                  color: C.primary,
                 ),
-              ),
-              GestureDetector(
-                onTap: () {},
-                child: const Text(
-                  'Clear all',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.blueAccent,
-                  ),
-                ),
-              ),
+              )
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: context.sHeight * 0.015),
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: recentSearches.map(_buildTag).toList(),
+            children:
+            recentSearches.map(_buildTag).toList(),
           ),
         ],
       ),
@@ -248,54 +255,52 @@ class SearchScreen extends StatelessWidget {
 
   Widget _buildTag(String label) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      padding:
+      const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
       decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFCCCCCC)),
+        border: Border.all(color: C.textLight),
         borderRadius: BorderRadius.circular(20),
-        color: Colors.white,
+        color: AppColor.white,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.history, size: 14, color: Color(0xFF888888)),
+          const Icon(Icons.history,
+              size: 14, color: C.textLight),
           const SizedBox(width: 6),
-          Text(
-            label,
-            style: const TextStyle(fontSize: 12.5, color: Color(0xFF333333)),
-          ),
+          Text(label,
+              style:
+              const TextStyle(color: C.textDark)),
         ],
       ),
     );
   }
 
-  // ─── Recommendations ──────────────────────────────────────────────────────
-  Widget _buildRecommendations() {
+  // 🔹 RECOMMENDATIONS
+  Widget _buildRecommendations(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Recommended for You',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF111111),
-            ),
-          ),
-          const SizedBox(height: 3),
-          const Text(
+          _sectionTitle("Recommended for You", context),
+          const SizedBox(height: 4),
+          Text(
             'Based on your learning interests',
-            style: TextStyle(fontSize: 12, color: Color(0xFF888888)),
+            style: TextStyle(
+                fontSize: context.text12,
+                color: C.textLight),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: context.sHeight * 0.015),
           SizedBox(
-            height: 178,
+            height: context.sHeight * 0.2,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: recommendations.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 10),
-              itemBuilder: (_, index) => _buildRecCard(recommendations[index]),
+              separatorBuilder: (_, __) =>
+              const SizedBox(width: 10),
+              itemBuilder: (_, i) =>
+                  _buildRecCard(recommendations[i]),
             ),
           ),
         ],
@@ -305,113 +310,79 @@ class SearchScreen extends StatelessWidget {
 
   Widget _buildRecCard(Map<String, dynamic> rec) {
     return Container(
-      width: 148,
+      width: 150,
       decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFE0E0E0)),
+        border: Border.all(color: C.chipBg),
         borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-        color: Colors.white,
+        color: AppColor.white,
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Icon banner
           Container(
-            height: 94,
-            width: double.infinity,
+            height: 90,
             decoration: BoxDecoration(
-              color: rec['color'] as Color,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(8),
-                topRight: Radius.circular(8),
-              ),
+              color: rec['color'],
+              borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(8)),
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(rec['icon'] as IconData, size: 48, color: rec['iconColor'] as Color),
-              ],
+            child: Center(
+              child: Icon(rec['icon'],
+                  size: 40, color: rec['iconColor']),
             ),
           ),
-
-          // Text
           Padding(
-            padding: const EdgeInsets.fromLTRB(8, 8, 6, 8),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Expanded(
-                  child: Text(
-                    rec['title'] as String,
-                    style: const TextStyle(
-                      fontSize: 11.5,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF222222),
-                      height: 1.4,
-                    ),
-                  ),
-                ),
-                Icon(Icons.chevron_right, size: 16, color: primaryColor),
-              ],
+            padding: const EdgeInsets.all(8),
+            child: Text(
+              rec['title'],
+              style: const TextStyle(
+                  fontSize: 11.5, color: C.textDark),
             ),
-          ),
+          )
         ],
       ),
     );
   }
 
-  // ─── Categories ───────────────────────────────────────────────────────────
-  Widget _buildCategories() {
-    return Obx((){
-      if(_categoryController.isLoading.value){
-        return SizedBox.shrink();
+  // 🔹 CATEGORIES
+  Widget _buildCategories(BuildContext context) {
+    return Obx(() {
+      if (_categoryController.isLoading.value) {
+        return const SizedBox();
       }
-      return  Column(
+
+      return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Text(
-              "Popular Skills",
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.black87,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
+            padding:
+            const EdgeInsets.symmetric(horizontal: 16),
+            child: _sectionTitle("Popular Skills", context),
           ),
-          SizedBox(height: 16,),
-
+          SizedBox(height: context.sHeight * 0.02),
           SizedBox(
-            height: 215,
+            height: context.sHeight * 0.25,
             child: GridView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
+              padding:
+              const EdgeInsets.symmetric(horizontal: 10),
               scrollDirection: Axis.horizontal,
-              itemCount: _categoryController.categoryList.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 14,
-                  crossAxisSpacing: 14,
-                  mainAxisExtent:65
+              itemCount:
+              _categoryController.categoryList.length,
+              gridDelegate:
+              const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 14,
+                crossAxisSpacing: 14,
+                mainAxisExtent: 65,
               ),
               itemBuilder: (context, index) {
-                final category = _categoryController.categoryList[index];
-
-                return CategoryCard( category: category,);
+                final category =
+                _categoryController.categoryList[index];
+                return CategoryCard(category: category);
               },
             ),
           ),
-          SizedBox(height: 16,),
-
         ],
       );
     });
   }
-
 }
