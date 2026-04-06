@@ -66,7 +66,11 @@ class ServiceCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(service.serviceAmount != null ? "₹${service.serviceAmount}" : "Free", style:  TextStyle(fontWeight: FontWeight.w600,fontSize: context.text12)),
+                          Text(
+                              service.serviceAmount != null
+                                  ? "₹${double.tryParse(service.serviceAmount!)?.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '') ?? service.serviceAmount!}"
+                                  : "Free",
+                              style:  TextStyle(fontWeight: FontWeight.w600,fontSize: context.text12)),
                           Row(
                             children:  [
                               Icon(Icons.location_on, size: 12, color: Colors.green),
@@ -160,7 +164,11 @@ class RServiceCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(service.serviceAmount != null ? "₹${service.serviceAmount}" : "Free", style:  TextStyle(fontWeight: FontWeight.w600,fontSize: context.text12)),
+                      Text(
+                          service.serviceAmount != null
+                              ? "₹${double.tryParse(service.serviceAmount!)?.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '') ?? service.serviceAmount!}"
+                              : "Free",
+                          style:  TextStyle(fontWeight: FontWeight.w600,fontSize: context.text12)),
                       Row(
                         children:  [
                           Icon(Icons.location_on, size: 12, color: Colors.green),

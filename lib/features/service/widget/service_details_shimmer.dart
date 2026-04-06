@@ -1,4 +1,6 @@
+// servicedetails/widget/service_details_shimmer.dart
 import 'package:flutter/material.dart';
+import '../../../core/constant/app_size.dart';
 
 class ServiceDetailsShimmer extends StatefulWidget {
   const ServiceDetailsShimmer({super.key});
@@ -67,9 +69,9 @@ class _ServiceDetailsShimmerState extends State<ServiceDetailsShimmer>
       body: CustomScrollView(
         physics: const NeverScrollableScrollPhysics(),
         slivers: [
-          /// ── IMAGE SHIMMER (SliverAppBar) ─────────────────────────
+          // IMAGE SHIMMER
           SliverAppBar(
-            expandedHeight: 300,
+            expandedHeight: context.sWidth * 0.7,
             pinned: true,
             backgroundColor: Colors.transparent,
             automaticallyImplyLeading: false,
@@ -108,57 +110,58 @@ class _ServiceDetailsShimmerState extends State<ServiceDetailsShimmer>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  /// ── TITLE & PRICE ────────────────────────────────
+                  // TITLE & PRICE + LOCATION
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: _shimmerBox(height: 20, width: 200),
+                      // Title
+                      Expanded(child: _shimmerBox(height: context.text16, width: 200)),
+
+                      // Price & Location
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          _shimmerBox(width: 60, height: context.text16),
+                          SizedBox(height: context.sHeight * 0.005),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _shimmerBox(
+                                  width: context.sWidth * 0.04,
+                                  height: context.sWidth * 0.04,
+                                  radius: 50),
+                              SizedBox(width: context.sWidth * 0.01),
+                              _shimmerBox(width: context.sWidth * 0.2, height: context.text14),
+                            ],
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 16),
-                      _shimmerBox(width: 60, height: 20),
                     ],
                   ),
+                  SizedBox(height: context.sHeight * 0.02),
 
-                  const SizedBox(height: 12),
+                  // DESCRIPTION
+                  _shimmerBox(width: context.sWidth * 0.4, height: context.text16),
+                  SizedBox(height: context.sHeight * 0.01),
+                  _shimmerBox(height: context.text14),
+                  SizedBox(height: context.sHeight * 0.005),
+                  _shimmerBox(height: context.text14),
+                  SizedBox(height: context.sHeight * 0.005),
+                  _shimmerBox(width: context.sWidth * 0.5, height: context.text14),
+                  SizedBox(height: context.sHeight * 0.02),
 
-                  /// ── LOCATION ─────────────────────────────────────
-                  Row(
-                    children: [
-                      _shimmerBox(width: 16, height: 16, radius: 50),
-                      const SizedBox(width: 6),
-                      _shimmerBox(width: 140, height: 14),
-                    ],
-                  ),
-
-                  const SizedBox(height: 18),
-
-                  /// ── DESCRIPTION TITLE ────────────────────────────
-                  _shimmerBox(width: 100, height: 18),
-                  const SizedBox(height: 10),
-
-                  /// ── DESCRIPTION LINES ────────────────────────────
-                  _shimmerBox(height: 13),
-                  const SizedBox(height: 6),
-                  _shimmerBox(height: 13),
-                  const SizedBox(height: 6),
-                  _shimmerBox(height: 13),
-                  const SizedBox(height: 6),
-                  _shimmerBox(width: 220, height: 13),
-
-                  /// ── AD BANNER ────────────────────────────────────
+                  // AD BANNER
                   Container(
-                    height: 250,
-                    margin: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: _shimmerBox(height: 250, radius: 14),
+                    height: context.sWidth * 0.6,
+                    margin: EdgeInsets.zero,
+                    child: _shimmerBox(height: context.sWidth * 0.6, radius: 14),
                   ),
+                  SizedBox(height: context.sHeight * 0.02),
 
-                  /// ── SELLER CARD ───────────────────────────────────
+                  // SELLER CARD
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(14),
@@ -166,43 +169,24 @@ class _ServiceDetailsShimmerState extends State<ServiceDetailsShimmer>
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        /// Avatar
-                        _shimmerBox(
-                            width: 64, height: 64, radius: 50),
-
-                        const SizedBox(width: 12),
-
-                        /// Name + Bio
+                        _shimmerBox(width: 64, height: 64, radius: 50),
+                        SizedBox(width: context.sWidth * 0.03),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const SizedBox(height: 6),
-                              _shimmerBox(width: 120, height: 16),
-                              const SizedBox(height: 8),
-                              _shimmerBox(height: 12),
-                              const SizedBox(height: 4),
-                              _shimmerBox(width: 160, height: 12),
+                              _shimmerBox(width: context.sWidth * 0.4, height: context.text16),
+                              SizedBox(height: context.sHeight * 0.005),
+                              _shimmerBox(height: context.text14),
+                              SizedBox(height: context.sHeight * 0.002),
+                              // _shimmerBox(width: context.sWidth * 0.5, height: context.text14),
                             ],
                           ),
-                        ),
-
-                        const SizedBox(width: 12),
-
-                        /// Rating (top right)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            _shimmerBox(width: 40, height: 14),
-                            const SizedBox(height: 4),
-                            _shimmerBox(width: 70, height: 12),
-                          ],
                         ),
                       ],
                     ),
                   ),
-
-                  const SizedBox(height: 30),
+                  SizedBox(height: context.sHeight * 0.03),
                 ],
               ),
             ),
@@ -210,18 +194,19 @@ class _ServiceDetailsShimmerState extends State<ServiceDetailsShimmer>
         ],
       ),
 
-      /// ── BOTTOM BUTTON SHIMMER ──────────────────────────────────
+      // BOTTOM BUTTON SHIMMER
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 30),
+        padding: EdgeInsets.only(
+            left: context.sWidth * 0.04,
+            right: context.sWidth * 0.04,
+            bottom: context.sHeight * 0.03),
         child: SizedBox(
-          height: 50,
+          height: context.sWidth * 0.12,
           child: Row(
             children: [
-              Expanded(
-                child: _shimmerBox(height: 50, radius: 10),
-              ),
-              const SizedBox(width: 10),
-              _shimmerBox(width: 54, height: 50, radius: 10),
+              Expanded(child: _shimmerBox(height: context.sWidth * 0.12, radius: 10)),
+              SizedBox(width: context.sWidth * 0.02),
+              _shimmerBox(width: context.sWidth * 0.12, height: context.sWidth * 0.12, radius: 10),
             ],
           ),
         ),
@@ -230,7 +215,7 @@ class _ServiceDetailsShimmerState extends State<ServiceDetailsShimmer>
   }
 }
 
-/// ── GRADIENT TRANSFORM ─────────────────────────────────────────────
+// GRADIENT TRANSFORM
 class _SlidingGradientTransform extends GradientTransform {
   final double slidePercent;
   const _SlidingGradientTransform(this.slidePercent);

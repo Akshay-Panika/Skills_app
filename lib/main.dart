@@ -22,6 +22,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'features/account/controller/user_profile_controller.dart';
 import 'features/auth/helper/auth_preferences.dart';
 import 'features/auth/screen/auth_screen.dart';
 import 'features/auth/screen/intro_screen.dart';
@@ -34,6 +35,9 @@ void main() async {
 
   final bool introSeen = prefs.getBool('intro_seen') ?? false;
   final bool isLoggedIn = await AuthPreferences.isLoggedIn();
+
+  // Get.put(UserProfileController(), permanent: true);
+
 
   runApp(
     MyApp(

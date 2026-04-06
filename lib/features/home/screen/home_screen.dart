@@ -265,7 +265,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
             
-                 SliverToBoxAdapter(child: SizedBox(height: context.sHeight*0.02,),),
+                 SliverToBoxAdapter(child: SizedBox(height: context.sHeight*0.03,),),
             
                 SliverToBoxAdapter(
                   child: Obx((){
@@ -330,95 +330,95 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 SliverToBoxAdapter(child: SizedBox(height: context.sHeight*0.02,),),
             
-                SliverToBoxAdapter(
-                  child: Obx(() {
-                    final lat = _getLocationController.latitude.value;
-                    final lon = _getLocationController.longitude.value;
-                    final services = _serviceListController.services;
-
-                    final nearby = services.where((s) {
-                      if (s.latitude == null) return false;
-                      double d = Geolocator.distanceBetween(lat, lon, s.latitude!, s.longitude!) / 1000;
-                      bool matchesPaidFilter = _isPaid ? (s.serviceStatus == true) : true;
-                      return d <= 20 && matchesPaidFilter;
-                    }).toList();
-
-                    if (nearby.isEmpty) {
-                      debugPrint("No services Near You");
-                      return Padding(
-                        padding:  EdgeInsets.only(top: _categoryController.categoryList.isNotEmpty ?0:100),
-                        child: EmptyServiceWidget(),
-                      );
-                    }
-            
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                          child: Row(
-                            spacing: 10,
-                            children: [
-                              Container(
-                                width: 5,
-                                height: 16,
-                                decoration: BoxDecoration(
-                                  color: Color(0xFF0D6E6E),
-                                  borderRadius: BorderRadius.circular(5)
-                                ),
-                              ),
-                              Text(
-                                "Recent View Services",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.black87,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 10),
-            
-                        SizedBox(
-                          height: context.sHeight*0.2,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: nearby.length,
-                            padding: EdgeInsets.zero,
-                            itemBuilder: (context, index) {
-                              final service = nearby[index];
-            
-                              double distanceKm = Geolocator.distanceBetween(
-                                lat,
-                                lon,
-                                service.latitude!,
-                                service.longitude!,
-                              ) / 1000;
-            
-                              String distanceText;
-            
-                              if (distanceKm < 1) {
-                                distanceText = "${(distanceKm * 1000).round()} m";
-                              } else {
-                                distanceText = "${distanceKm.toStringAsFixed(2)} km"; // more stable
-                              }
-            
-                              return Padding(
-                                padding:  EdgeInsets.only(left: 10,  right: index == nearby.length - 1 ? 10 : 0, ),
-                                child: RServiceCard(
-                                  service: service,
-                                  serviceDistance: distanceText,
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    );
-                  }),
-                ),
-                SliverToBoxAdapter(child: SizedBox(height: context.sHeight*0.02,),),
+                // SliverToBoxAdapter(
+                //   child: Obx(() {
+                //     final lat = _getLocationController.latitude.value;
+                //     final lon = _getLocationController.longitude.value;
+                //     final services = _serviceListController.services;
+                //
+                //     final nearby = services.where((s) {
+                //       if (s.latitude == null) return false;
+                //       double d = Geolocator.distanceBetween(lat, lon, s.latitude!, s.longitude!) / 1000;
+                //       bool matchesPaidFilter = _isPaid ? (s.serviceStatus == true) : true;
+                //       return d <= 20 && matchesPaidFilter;
+                //     }).toList();
+                //
+                //     if (nearby.isEmpty) {
+                //       debugPrint("No services Near You");
+                //       return Padding(
+                //         padding:  EdgeInsets.only(top: _categoryController.categoryList.isNotEmpty ?0:100),
+                //         child: EmptyServiceWidget(),
+                //       );
+                //     }
+                //
+                //     return Column(
+                //       crossAxisAlignment: CrossAxisAlignment.start,
+                //       children: [
+                //         Padding(
+                //           padding: EdgeInsets.symmetric(horizontal: 16),
+                //           child: Row(
+                //             spacing: 10,
+                //             children: [
+                //               Container(
+                //                 width: 5,
+                //                 height: 16,
+                //                 decoration: BoxDecoration(
+                //                   color: Color(0xFF0D6E6E),
+                //                   borderRadius: BorderRadius.circular(5)
+                //                 ),
+                //               ),
+                //               Text(
+                //                 "Recent View Services",
+                //                 style: TextStyle(
+                //                   fontSize: 14,
+                //                   color: Colors.black87,
+                //                   fontWeight: FontWeight.w700,
+                //                 ),
+                //               ),
+                //             ],
+                //           ),
+                //         ),
+                //         SizedBox(height: 10),
+                //
+                //         SizedBox(
+                //           height: context.sHeight*0.2,
+                //           child: ListView.builder(
+                //             scrollDirection: Axis.horizontal,
+                //             itemCount: nearby.length,
+                //             padding: EdgeInsets.zero,
+                //             itemBuilder: (context, index) {
+                //               final service = nearby[index];
+                //
+                //               double distanceKm = Geolocator.distanceBetween(
+                //                 lat,
+                //                 lon,
+                //                 service.latitude!,
+                //                 service.longitude!,
+                //               ) / 1000;
+                //
+                //               String distanceText;
+                //
+                //               if (distanceKm < 1) {
+                //                 distanceText = "${(distanceKm * 1000).round()} m";
+                //               } else {
+                //                 distanceText = "${distanceKm.toStringAsFixed(2)} km"; // more stable
+                //               }
+                //
+                //               return Padding(
+                //                 padding:  EdgeInsets.only(left: 10,  right: index == nearby.length - 1 ? 10 : 0, ),
+                //                 child: RServiceCard(
+                //                   service: service,
+                //                   serviceDistance: distanceText,
+                //                 ),
+                //               );
+                //             },
+                //           ),
+                //         ),
+                //       ],
+                //     );
+                //   }),
+                // ),
+                // SliverToBoxAdapter(child: SizedBox(height: context.sHeight*0.02,),),
             
                 SliverToBoxAdapter(
                   child: Obx(() {
@@ -457,7 +457,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ),
                               Text(
-                                "Trending Courses",
+                                "Trending Courses For You",
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.black87,

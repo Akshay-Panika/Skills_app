@@ -16,6 +16,7 @@ import '../../notification/screen/notification_screen.dart';
 import '../controller/user_profile_controller.dart';
 import '../model/user_profile_model.dart';
 import 'basic_info_screen.dart';
+import 'delete_account_screen.dart';
 
 
 class AccountScreen extends StatefulWidget {
@@ -107,6 +108,14 @@ class _AccountScreenState extends State<AccountScreen> {
                   title: "Help & Support",
                   subtitle: "FAQs, chat & more",
                   onTap: () => Get.to(() => HelpSupportScreen()),
+                ),
+                _MenuTile(
+                  icon: Icons.delete_forever, // icon for delete account
+                  title: "Delete Account",
+                  subtitle: "Permanently remove your account",
+                  onTap: () {
+                    Get.to(() => DeleteAccountScreen()); // navigate to your delete account screen
+                  },
                 ),
                 SizedBox(height: context.sHeight*0.018),
                 _sectionLabel(context,"Account"),

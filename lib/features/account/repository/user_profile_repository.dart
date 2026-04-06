@@ -70,22 +70,4 @@ class UserProfileRepository {
     }
   }
 
-  // static Future<UserProfileModel?> updateUserProfile(
-  //     int userId, UserProfileModel model) async {
-  //   try {
-  //     final response = await DioClient.dio.put(
-  //       "profiles/$userId/",
-  //       data: model.toJson(),
-  //     );
-  //
-  //     if (response.statusCode == 200) {
-  //       return UserProfileModel.fromJson(response.data);
-  //     }
-  //
-  //     return null;
-  //   } on DioException catch (e) {
-  //     debugPrint("Update Error: ${e.message}");
-  //     return null;
-  //   }
-  // }
 }

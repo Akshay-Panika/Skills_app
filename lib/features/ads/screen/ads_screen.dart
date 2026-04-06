@@ -73,7 +73,7 @@ class _AdsScreenState extends State<AdsScreen> {
                         return SkillCard(
                           title: s.serviceName,
                           price: s.serviceAmount != null
-                              ? "₹${s.serviceAmount}"
+                              ? "₹${double.tryParse(s.serviceAmount!)?.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '') ?? s.serviceAmount!}"
                               : "Free",
                           serviceDescription: s.serviceDescription,
                           views: "0 views",
