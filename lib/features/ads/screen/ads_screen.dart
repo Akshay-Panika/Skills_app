@@ -1,27 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
+import 'package:skills_app/core/constant/app_color.dart';
+import 'package:skills_app/core/widget/app_card.dart';
+import '../../../core/constant/app_size.dart';
 import '../../../core/widget/flutter_toast.dart';
+import '../../../core/widget/my_appbar.dart';
 import '../../service/controller/service_delete_controller.dart';
 import '../../service/controller/service_list_controller.dart';
 import '../../service/screen/service_details_screen.dart';
 import '../controller/service_list_by_user_controller.dart';
 import '../repository/service_list_byuser_repository.dart';
-
-// ─── Design Tokens ─────────────────────────────────────────────────────────────
-class _C {
-  static const primary     = Color(0xFF0D6E6E);
-  static const primaryDark = Color(0xFF094F4F);
-  static const accent      = Color(0xFFFFB347);
-  static const surface     = Color(0xFFF4F7F7);
-  static const card        = Color(0xFFFFFFFF);
-  static const textDark    = Color(0xFF0D1F1F);
-  static const textMid     = Color(0xFF4A6565);
-  static const textLight   = Color(0xFF8AABAB);
-  static const chipBg      = Color(0xFFE6F2F2);
-  static const success     = Color(0xFF2ECC8A);
-  static const danger      = Color(0xFFE05757);
-}
+import '../widget/skill_empty_card.dart';
+import 'create_add_screen.dart';
 
 class AdsScreen extends StatefulWidget {
   const AdsScreen({super.key});
@@ -41,13 +31,16 @@ class _AdsScreenState extends State<AdsScreen> {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        backgroundColor: _C.surface,
+        backgroundColor: AppColor.surface,
+        appBar: myAppBar(
+          title: 'Skills',
+          showBackButton: false,
+          titleColor: AppColor.white,
+          backgroundColor: AppColor.primary,
+        ),
         body: Column(
           children: [
-            // ── Gradient Header ──────────────────────────────────────────────
             _buildHeader(context),
-
-            // ── Tab Content ──────────────────────────────────────────────────
             Expanded(
               child: TabBarView(
                 children: [
@@ -57,8 +50,7 @@ class _AdsScreenState extends State<AdsScreen> {
                       return Column(
                         children: [
                           LinearProgressIndicator(
-                            color: _C.primary,
-                            backgroundColor: _C.chipBg,
+                            color: AppColor.primary,
                             minHeight: 2,
                           ),
                           const Expanded(child: SizedBox()),
@@ -67,7 +59,7 @@ class _AdsScreenState extends State<AdsScreen> {
                     }
 
                     if (controller.serviceList.isEmpty) {
-                      return _EmptyState(
+                      return const SkillEmptyCard(
                         icon: Icons.storefront_outlined,
                         title: "No Ads Yet",
                         subtitle: "Your posted services will appear here",
@@ -75,11 +67,10 @@ class _AdsScreenState extends State<AdsScreen> {
                     }
 
                     return ListView.builder(
-                      padding: const EdgeInsets.fromLTRB(14, 14, 14, 20),
                       itemCount: controller.serviceList.length,
                       itemBuilder: (context, index) {
                         final s = controller.serviceList[index];
-                        return AdCard(
+                        return SkillCard(
                           title: s.serviceName,
                           price: s.serviceAmount != null
                               ? "₹${s.serviceAmount}"
@@ -94,9 +85,8 @@ class _AdsScreenState extends State<AdsScreen> {
                       },
                     );
                   }),
-
                   // Buy tab
-                  _EmptyState(
+                  const SkillEmptyCard(
                     icon: Icons.shopping_bag_outlined,
                     title: "No Purchases Yet",
                     subtitle: "Services you book will appear here",
@@ -112,73 +102,29 @@ class _AdsScreenState extends State<AdsScreen> {
 
   Widget _buildHeader(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [_C.primaryDark, _C.primary],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+      color: AppColor.primary,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.15),
+          borderRadius: BorderRadius.circular(12),
         ),
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Top bar
-            Padding(
-              padding: const EdgeInsets.fromLTRB(4, 8, 16, 0),
-              child: Row(
-                children: [
-                  SizedBox(width: 12,),
-                  // IconButton(
-                  //   onPressed: () => Navigator.pop(context),
-                  //   icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                  //       color: Colors.white, size: 20),
-                  // ),
-                  const Expanded(
-                    child: Text(
-                      "My Ads",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-            // Tab bar
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: TabBar(
-                labelColor: Colors.white,
-                unselectedLabelColor: Colors.white60,
-                labelStyle: const TextStyle(
-                    fontWeight: FontWeight.w700, fontSize: 14),
-                unselectedLabelStyle:
-                const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
-                indicator: BoxDecoration(
-                  color: Colors.white.withOpacity(0.22),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                indicatorSize: TabBarIndicatorSize.tab,
-                dividerColor: Colors.transparent,
-                tabs: const [
-                  Tab(text: "Sell"),
-                  Tab(text: "Buy"),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 14),
+        child: TabBar(
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white60,
+          labelStyle: TextStyle(
+              fontWeight: FontWeight.w700, fontSize: context.text12),
+          unselectedLabelStyle: TextStyle(
+              fontWeight: FontWeight.w500, fontSize: context.text12),
+          indicator: BoxDecoration(
+            color: Colors.white.withOpacity(0.22),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          indicatorSize: TabBarIndicatorSize.tab,
+          dividerColor: Colors.transparent,
+          tabs: const [
+            Tab(text: "Sell"),
+            Tab(text: "Buy"),
           ],
         ),
       ),
@@ -186,10 +132,9 @@ class _AdsScreenState extends State<AdsScreen> {
   }
 }
 
-// ─── Ad Card ──────────────────────────────────────────────────────────────────
-class AdCard extends StatelessWidget {
-  final int    serviceId;
-  final int    userId;
+class SkillCard extends StatelessWidget {
+  final int serviceId;
+  final int userId;
   final String title;
   final String serviceDescription;
   final String price;
@@ -197,7 +142,7 @@ class AdCard extends StatelessWidget {
   final String status;
   final String image;
 
-  const AdCard({
+  const SkillCard({
     super.key,
     required this.serviceId,
     required this.userId,
@@ -212,191 +157,117 @@ class AdCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final deleteController = Get.find<ServiceDeleteController>();
-    final listController   = Get.find<ServiceListByUserController>();
+    final listController = Get.find<ServiceListByUserController>();
 
-    final bool isActive  = status == "Active";
-    final bool isFree    = price == "Free";
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: _C.card,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: _C.primary.withOpacity(0.07),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+    return AppCard(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ServiceDetailsScreen(
+            services: Get.find<ServiceListController>().services,
+            serviceId: serviceId.toString(),
+            distanceText: serviceDescription,
           ),
-        ],
+        ),
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => ServiceDetailsScreen(
-                services: Get.find<ServiceListController>().services,
-                serviceId: serviceId.toString(),
-                distanceText: serviceDescription,
-              ),
-            ),
+      child: Row(
+        spacing: 10,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: image.isNotEmpty
+                ? Image.network(
+              image,
+              width: context.sHeight * 0.1,
+              height: context.sHeight * 0.1,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => _imgPlaceholder(context),
+            )
+                : _imgPlaceholder(context),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
+          Expanded(
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 10,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // ── Image ────────────────────────────────────────────────────
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: image.isNotEmpty
-                      ? Image.network(
-                    image,
-                    width: 90,
-                    height: 90,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => _imgPlaceholder(),
-                  )
-                      : _imgPlaceholder(),
-                ),
-
-                const SizedBox(width: 12),
-
-                // ── Info ─────────────────────────────────────────────────────
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Title + menu
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              title,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 14,
-                                color: _C.textDark,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          _popupMenu(context, deleteController, listController),
-                        ],
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: context.text14,
+                          color: AppColor.title,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-
-                      const SizedBox(height: 4),
-
                       Text(
                         serviceDescription,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                            fontSize: 12, color: _C.textMid, height: 1.4),
+                        style: TextStyle(
+                            fontSize: context.text12,
+                            color: AppColor.subtitle,
+                            height: 1.4),
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: context.sHeight*0.01,),
 
-                      // Price + status + views
                       Row(
+                        spacing: 10,
                         children: [
-                          // Price pill
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: isFree
-                                  ? _C.success.withOpacity(0.12)
-                                  : _C.primary.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              price,
+                          AppCard(
+                            margin: EdgeInsets.zero,
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            color: AppColor.primary,
+                            child: Text(price,
                               style: TextStyle(
-                                fontWeight: FontWeight.w800,
-                                fontSize: 12,
-                                color: isFree ? _C.success : _C.primary,
+                                fontWeight: FontWeight.w500,
+                                fontSize: context.text10,
+                                color:  AppColor.white,
                               ),
                             ),
                           ),
-
-                          const SizedBox(width: 8),
-
-                          // Status dot
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: isActive
-                                  ? _C.success.withOpacity(0.1)
-                                  : _C.danger.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 6,
-                                  height: 6,
-                                  decoration: BoxDecoration(
-                                    color:
-                                    isActive ? _C.success : _C.danger,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  status,
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w700,
-                                    color:
-                                    isActive ? _C.success : _C.danger,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          const Spacer(),
-
-                          // Views
-                          Row(
-                            children: [
-                              const Icon(Icons.remove_red_eye_outlined,
-                                  size: 12, color: _C.textLight),
-                              const SizedBox(width: 3),
-                              Text(
-                                views,
-                                style: const TextStyle(
-                                    fontSize: 11, color: _C.textLight),
+                          AppCard(
+                            margin: EdgeInsets.zero,
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            color: AppColor.surface,
+                            child: Text(status,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: context.text10,
+                                color:  AppColor.primary,
                               ),
-                            ],
+                            ),
                           ),
                         ],
                       ),
+
                     ],
                   ),
                 ),
+                _popupMenu(context, deleteController, listController),
+
               ],
             ),
           ),
-        ),
+        ],
       ),
     );
   }
 
-  Widget _imgPlaceholder() {
+  Widget _imgPlaceholder(BuildContext context) {
     return Container(
-      width: 90,
-      height: 90,
-      color: _C.chipBg,
-      child: const Icon(Icons.image_not_supported_outlined,
-          color: _C.textLight, size: 28),
+      width: context.sHeight * 0.1,
+      height: context.sHeight * 0.1,
+      color: AppColor.surface,
+      child: Icon(Icons.image_not_supported_outlined,
+          size: context.sHeight*0.016, color: AppColor.subtitle.withOpacity(0.7)),
     );
   }
 
@@ -406,49 +277,66 @@ class AdCard extends StatelessWidget {
       ServiceListByUserController listController,
       ) {
     return PopupMenuButton<String>(
-      icon: const Icon(Icons.more_vert_rounded,
-          color: _C.textLight, size: 20),
+      icon: Icon(Icons.more_vert_rounded, color: AppColor.title, size: 20),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      color: _C.card,
+      color: AppColor.surface,
       elevation: 6,
       onSelected: (value) async {
+        if (value == "edit") {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => CreateAddScreen(
+                // serviceId: serviceId,
+                // title: title,
+                // description: serviceDescription,
+                // price: price,
+                // image: image,
+                // status: status == "Active",
+              ),
+            ),
+          );
+        }
+
         if (value == "delete") {
           final bool? confirm = await Get.dialog(
             Dialog(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20)),
-              backgroundColor: _C.card,
+              backgroundColor: AppColor.surface,
               child: Padding(
                 padding: const EdgeInsets.all(24),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      width: 56,
-                      height: 56,
+                      width: context.sHeight * 0.05,
+                      height: context.sHeight * 0.05,
                       decoration: BoxDecoration(
-                        color: _C.danger.withOpacity(0.1),
+                        color: AppColor.error.withOpacity(0.1),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.delete_outline_rounded,
-                          color: _C.danger, size: 28),
+                      child: Icon(Icons.delete_outline_rounded,
+                          color: AppColor.error, size: context.sHeight * 0.02),
                     ),
-                    const SizedBox(height: 14),
-                    const Text(
+                    const SizedBox(height: 12),
+                    Text(
                       "Delete Service?",
                       style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
-                          color: _C.textDark),
+                          color: AppColor.title),
                     ),
-                    const SizedBox(height: 8),
-                    const Text(
+                    const SizedBox(height: 6),
+                    Text(
                       "This action cannot be undone.\nAre you sure?",
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                          fontSize: 13, color: _C.textMid, height: 1.5),
+                          fontSize: context.text12,
+                          color: AppColor.subtitle,
+                          height: 1.5),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
                     Row(
                       children: [
                         Expanded(
@@ -456,15 +344,14 @@ class AdCard extends StatelessWidget {
                             onPressed: () => Get.back(result: false),
                             style: OutlinedButton.styleFrom(
                               side: const BorderSide(
-                                  color: _C.chipBg, width: 1.5),
+                                  color: AppColor.surface, width: 1.5),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12)),
-                              padding:
-                              const EdgeInsets.symmetric(vertical: 12),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
                             ),
                             child: const Text("Cancel",
                                 style: TextStyle(
-                                    color: _C.textMid,
+                                    color: AppColor.error,
                                     fontWeight: FontWeight.w700)),
                           ),
                         ),
@@ -473,12 +360,11 @@ class AdCard extends StatelessWidget {
                           child: ElevatedButton(
                             onPressed: () => Get.back(result: true),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: _C.danger,
+                              backgroundColor: AppColor.error,
                               elevation: 0,
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12)),
-                              padding:
-                              const EdgeInsets.symmetric(vertical: 12),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
                             ),
                             child: const Text("Delete",
                                 style: TextStyle(
@@ -517,15 +403,15 @@ class AdCard extends StatelessWidget {
                 width: 30,
                 height: 30,
                 decoration: BoxDecoration(
-                    color: _C.chipBg,
+                    color: AppColor.surface,
                     borderRadius: BorderRadius.circular(8)),
-                child: const Icon(Icons.edit_outlined,
-                    size: 16, color: _C.primary),
+                child: Icon(Icons.edit_outlined,
+                    size: context.text14, color: AppColor.primary),
               ),
               const SizedBox(width: 10),
               const Text("Edit",
                   style: TextStyle(
-                      fontWeight: FontWeight.w600, color: _C.textDark)),
+                      fontWeight: FontWeight.w600, color: AppColor.title)),
             ],
           ),
         ),
@@ -534,18 +420,18 @@ class AdCard extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                width: 30,
-                height: 30,
+                width: context.sHeight * 0.03,
+                height: context.sHeight * 0.03,
                 decoration: BoxDecoration(
-                    color: _C.danger.withOpacity(0.1),
+                    color: AppColor.error.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8)),
-                child: const Icon(Icons.delete_outline_rounded,
-                    size: 16, color: _C.danger),
+                child: Icon(Icons.delete_outline_rounded,
+                    size: context.text14, color: AppColor.error),
               ),
               const SizedBox(width: 10),
               const Text("Delete",
                   style: TextStyle(
-                      fontWeight: FontWeight.w600, color: _C.danger)),
+                      fontWeight: FontWeight.w600, color: AppColor.error)),
             ],
           ),
         ),
@@ -554,45 +440,3 @@ class AdCard extends StatelessWidget {
   }
 }
 
-// ─── Empty State ──────────────────────────────────────────────────────────────
-class _EmptyState extends StatelessWidget {
-  final IconData icon;
-  final String   title;
-  final String   subtitle;
-
-  const _EmptyState({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 90,
-            height: 90,
-            decoration: const BoxDecoration(
-              color: _C.chipBg,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, size: 44, color: _C.primary),
-          ),
-          const SizedBox(height: 16),
-          Text(title,
-              style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
-                  color: _C.textDark)),
-          const SizedBox(height: 6),
-          Text(subtitle,
-              style:
-              const TextStyle(fontSize: 13, color: _C.textMid)),
-        ],
-      ),
-    );
-  }
-}

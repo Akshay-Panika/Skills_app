@@ -118,67 +118,6 @@ class _CreateAddScreenState extends State<CreateAddScreen>
     );
   }
 
-  // ── Field label ─────────────────────────────────────────────────────────
-  Widget _fieldLabel(BuildContext context, String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontWeight: FontWeight.w500,
-          fontSize: context.text12,
-          color: AppColor.title,
-        ),
-      ),
-    );
-  }
-
-  // ── Input field ─────────────────────────────────────────────────────────
-  Widget _inputField(
-      BuildContext context, {
-        TextEditingController? controller,
-        String? initialValue,
-        required String hint,
-        required IconData icon,
-        TextInputType keyboardType = TextInputType.text,
-        bool readOnly = false,
-        int maxLines = 1,
-        Widget? suffix,
-      }) {
-    final border = OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: BorderSide(color: AppColor.primary.withOpacity(.1), width: 1.2),
-    );
-
-    final decoration = InputDecoration(
-      hintText: hint,
-      hintStyle: TextStyle(color: AppColor.subtitle, fontSize: context.text14),
-      filled: true,
-      fillColor: AppColor.surface,
-      prefixIcon: Icon(icon, color: AppColor.title, size: context.sHeight * 0.02),
-      suffixIcon: suffix,
-      contentPadding: EdgeInsets.symmetric(
-        horizontal: context.sHeight * 0.014,
-        vertical: context.sHeight * 0.014,
-      ),
-      border: border,
-      enabledBorder: border,
-      focusedBorder: border,
-      errorBorder: border,
-      focusedErrorBorder: border,
-    );
-
-    return TextFormField(
-      controller: controller,
-      initialValue: controller == null ? initialValue : null,
-      decoration: decoration,
-      keyboardType: keyboardType,
-      readOnly: readOnly,
-      maxLines: maxLines,
-      style: TextStyle(color: AppColor.title, fontSize: context.text14),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -190,82 +129,241 @@ class _CreateAddScreenState extends State<CreateAddScreen>
           buttonColor: Colors.white,
           titleColor: Colors.white
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: FadeTransition(
-              opacity: _fadeAnim,
-              child: SlideTransition(
-                position: _slideAnim,
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.all(16),
-                  child: Column(
+      body: FadeTransition(
+        opacity: _fadeAnim,
+        child: SlideTransition(
+          position: _slideAnim,
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildImagePicker(context),
+                SizedBox(height: context.sHeight*0.04),
+                _buildTypeToggle(),
+                SizedBox(height: context.sHeight*0.01),
+                _fieldLabel(context, "Category"),
+
+                _dropdownCard(),
+
+                const SizedBox(height: 16),
+                _fieldLabel(context, "Service Title"),
+                const SizedBox(height: 8),
+                _inputField(context,
+                    controller: titleController,
+                    hint: "Enter service title",
+                    icon: Icons.title_rounded),
+                const SizedBox(height: 16),
+                _fieldLabel(context, "Description"),
+                const SizedBox(height: 8),
+                _inputField(context,
+                    controller: descController,
+                    hint: "Describe your service…",
+                    icon: Icons.notes_rounded,
+                    maxLines: 4),
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 350),
+                  curve: Curves.easeInOut,
+                  child: isPaid
+                      ? Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildImagePicker(context),
-                      SizedBox(height: context.sHeight*0.04),
-                      _buildTypeToggle(),
-                      SizedBox(height: context.sHeight*0.01),
-                      _fieldLabel(context, "Category"),
-                      Row(
-                        children: [
-                          Expanded(child: _categoryDropdown()),
-                          const SizedBox(width: 10),
-                          Expanded(child: _subcategoryDropdown()),
-                        ],
-                      ),
                       const SizedBox(height: 16),
-                      _fieldLabel(context, "Service Title"),
+                      _fieldLabel(context, "Price"),
                       const SizedBox(height: 8),
                       _inputField(context,
-                          controller: titleController,
-                          hint: "Enter service title",
-                          icon: Icons.title_rounded),
-                      const SizedBox(height: 16),
-                      _fieldLabel(context, "Description"),
-                      const SizedBox(height: 8),
-                      _inputField(context,
-                          controller: descController,
-                          hint: "Describe your service…",
-                          icon: Icons.notes_rounded,
-                          maxLines: 4),
-                      AnimatedSize(
-                        duration: const Duration(milliseconds: 350),
-                        curve: Curves.easeInOut,
-                        child: isPaid
-                            ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 16),
-                            _fieldLabel(context, "Price"),
-                            const SizedBox(height: 8),
-                            _inputField(context,
-                                controller: priceController,
-                                hint: "0",
-                                icon: Icons.currency_rupee_rounded,
-                                keyboardType: TextInputType.number),
-                          ],
-                        )
-                            : const SizedBox(),
-                      ),
-                      const SizedBox(height: 32),
-                      Obx(() {
-                        final loading = serviceController.isLoading.value;
-                        return AppButton(
-                          text: 'Post Service',
-                          isLoading: loading,
-                          onPressed: postService,
-                        );
-                      })
+                          controller: priceController,
+                          hint: "0",
+                          icon: Icons.currency_rupee_rounded,
+                          keyboardType: TextInputType.number),
                     ],
+                  )
+                      : const SizedBox(),
+                ),
+                const SizedBox(height: 32),
+                Obx(() {
+                  final loading = serviceController.isLoading.value;
+                  return AppButton(
+                    text: 'Post Service',
+                    isLoading: loading,
+                    onPressed: postService,
+                  );
+                })
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _dropdownCard() {
+    // Observables for dropdown visibility
+    final showCategoryList = false.obs;
+    final showSubcategoryList = false.obs;
+
+    return Obx(() {
+      final categoryItems = categoryController.categoryList;
+      final subcategoryItems = subController.subCategories;
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Category & Subcategory Buttons
+          Row(
+            children: [
+              Expanded(
+                child: AppCard(
+                  margin: EdgeInsets.zero,
+                  padding: EdgeInsets.all(14),
+                  color: AppColor.surface,
+                  hasBorder: true,
+                  child: Text(
+                    (selectedCategoryId != null && categoryItems.isNotEmpty)
+                        ? categoryItems
+                        .firstWhere(
+                          (cat) => cat.id.toString() == selectedCategoryId!,
+                      orElse: () => categoryItems.first,
+                    )
+                        .categoryName ?? "Category"
+                        : "Category",
+                    style: TextStyle(
+                      color: selectedCategoryId != null ? AppColor.title : AppColor.subtitle,
+                      fontWeight: FontWeight.w400,
+                      fontSize: context.text14,
+                    ),
+                  ),
+                  onTap: () {
+                    showCategoryList.value = !showCategoryList.value;
+                    showSubcategoryList.value = false;
+                  },
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: AppCard(
+                  margin: EdgeInsets.zero,
+                  padding: EdgeInsets.all(14),
+                  color: AppColor.surface,
+                  hasBorder: true,
+                  onTap: (selectedCategoryId == null)//|| subcategoryItems.isEmpty
+                      ? (){
+                    FlutterToast.error("Please Select Category");
+                  }
+                      : () {
+                    showSubcategoryList.value =
+                    !showSubcategoryList.value;
+                    showCategoryList.value = false;
+                  },
+                  child: Text(
+                    (selectedSubcategoryId != null && subcategoryItems.isNotEmpty)
+                        ? subcategoryItems
+                        .firstWhere(
+                          (sub) => sub.id.toString() == selectedSubcategoryId!,
+                      orElse: () => subcategoryItems.first,
+                    )
+                        .subcategoryName ?? "Subcategory"
+                        : "Subcategory",
+                    style: TextStyle(
+                      color: selectedSubcategoryId != null ? AppColor.title : AppColor.subtitle,
+                      fontWeight: FontWeight.w400,
+                      fontSize: context.text14,
+                    ),
                   ),
                 ),
               ),
-            ),
+            ],
           ),
+
+          // Category List with RadioButton
+          if (showCategoryList.value && categoryItems.isNotEmpty)
+            AppCard(
+              color: AppColor.surface,
+              padding: EdgeInsets.all(16),
+              margin: EdgeInsets.only(top: 10),
+              child: Column(
+                children: categoryItems.map((cat) {
+                  return ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(
+                      cat.categoryName ?? '',
+                      style: TextStyle(
+                        fontSize: context.text14,
+                        fontWeight: selectedCategoryId  == cat.id.toString()?FontWeight.w600:FontWeight.w500,
+                        color: selectedCategoryId  == cat.id.toString()
+                            ? AppColor.title
+                            : AppColor.subtitle,
+                      ),
+                    ),                    trailing: Radio<String>(
+                      value: cat.id.toString(),
+                      groupValue: selectedCategoryId,
+                      onChanged: (value) async {
+                        selectedCategoryId = value;
+                        selectedSubcategoryId = null;
+                        await subController.fetchSubCategories(int.parse(value!));
+                        showCategoryList.value = false;
+                      },
+                    ),
+                    onTap: () async {
+                      selectedCategoryId = cat.id.toString();
+                      selectedSubcategoryId = null;
+                      await subController.fetchSubCategories(cat.id!);
+                      showCategoryList.value = false;
+                    },
+                  );
+                }).toList(),
+              ),
+            ),
+
+          if (showSubcategoryList.value)
+            AppCard(
+              color: AppColor.surface,
+              padding: EdgeInsets.all(16),
+              margin: EdgeInsets.only(top: 10),
+              child: subcategoryItems.isEmpty
+                  ? Center(
+                    child: Text(
+                      "No subcategories available",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: AppColor.subtitle,
+                      ),
+                    ),
+                  )
+                  : Column(
+                children: subcategoryItems.map((sub) {
+                  return ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(
+                      sub.subcategoryName ?? '',
+                      style: TextStyle(
+                        fontSize: context.text14,
+                        color: selectedSubcategoryId == sub.id.toString()
+                            ? AppColor.title
+                            : AppColor.subtitle,
+                        fontWeight: selectedSubcategoryId == sub.id.toString()?FontWeight.w600:FontWeight.w500
+                      ),
+                    ),
+                    trailing: Radio<String>(
+                      value: sub.id.toString(),
+                      groupValue: selectedSubcategoryId,
+                      onChanged: (value) {
+                        selectedSubcategoryId = value;
+                        showSubcategoryList.value = false;
+                      },
+                    ),
+                    onTap: () {
+                      selectedSubcategoryId = sub.id.toString();
+                      showSubcategoryList.value = false;
+                    },
+                  );
+                }).toList(),
+              ),
+            ),
         ],
-      ),
-    );
+      );
+    });
   }
 
   Widget _buildImagePicker(BuildContext context) {
@@ -274,6 +372,7 @@ class _CreateAddScreenState extends State<CreateAddScreen>
       width: double.infinity,
       color: AppColor.surface,
       margin: EdgeInsets.zero,
+      hasBorder: true,
       padding:selectedImage != null ? EdgeInsets.zero:EdgeInsets.all(16),
       onTap: pickImage,
       child: selectedImage != null
@@ -310,7 +409,6 @@ class _CreateAddScreenState extends State<CreateAddScreen>
       ),
     );
   }
-
   Widget _buildTypeToggle() {
     return Row(
       spacing: 20,
@@ -357,105 +455,62 @@ class _CreateAddScreenState extends State<CreateAddScreen>
     );
   }
 
-  ({List<T> items, String? safeValue}) _dedup<T>(
-      List<T> raw,
-      String Function(T) key,
-      String? currentValue,
-      ) {
-    final seen = <String>{};
-    final items = raw.where((e) => seen.add(key(e))).toList();
-    final ids = items.map(key).toSet();
-    final safeValue = (currentValue != null && ids.contains(currentValue)) ? currentValue : null;
-    return (items: items, safeValue: safeValue);
-  }
-
-  Widget _categoryDropdown() {
-    final r = _dedup(
-      categoryController.categoryList.toList(),
-          (cat) => cat.id.toString(),
-      selectedCategoryId,
-    );
-
-    if (r.safeValue != selectedCategoryId) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) setState(() => selectedCategoryId = r.safeValue);
-      });
-    }
-
-    return DropdownButtonFormField<String>(
-      value: r.safeValue,
-      isExpanded: true,
-      hint: const Text("Category", style: TextStyle(fontSize: 13.5, color: AppColor.title)),
-      style: const TextStyle(fontSize: 13.5, color: AppColor.title),
-      decoration: _dec("Category"),
-      items: r.items.map((cat) {
-        return DropdownMenuItem(
-          value: cat.id.toString(),
-          child: Text(cat.categoryName ?? "", style: const TextStyle(fontSize: 13.5)),
-        );
-      }).toList(),
-      onChanged: (value) async {
-        setState(() {
-          selectedCategoryId = value;
-          selectedSubcategoryId = null;
-        });
-
-        if (value != null) {
-          await subController.fetchSubCategories(int.parse(value));
-
-          if (subController.subCategories.isEmpty) {
-            FlutterToast.error("No subcategory available");
-          }
-        }
-      },
+  Widget _fieldLabel(BuildContext context, String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontWeight: FontWeight.w500,
+          fontSize: context.text12,
+          color: AppColor.title,
+        ),
+      ),
     );
   }
 
-  Widget _subcategoryDropdown() {
-    return Obx(() {
-      final r = _dedup(
-        subController.subCategories.toList(),
-            (sub) => sub.id.toString(),
-        selectedSubcategoryId,
-      );
+  Widget _inputField(
+      BuildContext context, {
+        TextEditingController? controller,
+        String? initialValue,
+        required String hint,
+        required IconData icon,
+        TextInputType keyboardType = TextInputType.text,
+        bool readOnly = false,
+        int maxLines = 1,
+        Widget? suffix,
+      }) {
+    final border = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: AppColor.primary.withOpacity(.1), width: 1.2),
+    );
 
-      if (r.safeValue != selectedSubcategoryId) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) setState(() => selectedSubcategoryId = r.safeValue);
-        });
-      }
+    final decoration = InputDecoration(
+      hintText: hint,
+      hintStyle: TextStyle(color: AppColor.subtitle, fontSize: context.text14),
+      filled: true,
+      fillColor: AppColor.surface,
+      prefixIcon: Icon(icon, color: AppColor.title, size: context.sHeight * 0.02),
+      suffixIcon: suffix,
+      contentPadding: EdgeInsets.symmetric(
+        horizontal: context.sHeight * 0.014,
+        vertical: context.sHeight * 0.014,
+      ),
+      border: border,
+      enabledBorder: border,
+      focusedBorder: border,
+      errorBorder: border,
+      focusedErrorBorder: border,
+    );
 
-      return DropdownButtonFormField<String>(
-        value: r.safeValue,
-        isExpanded: true,
-        hint: const Text("Subcategory", style: TextStyle(fontSize: 13.5, color: AppColor.title)),
-        style: const TextStyle(fontSize: 13.5, color: AppColor.title),
-        decoration: _dec("Subcategory"),
-        items: r.items.map((sub) {
-          return DropdownMenuItem(
-            value: sub.id.toString(),
-            child: Text(sub.subcategoryName, style: const TextStyle(fontSize: 13.5)),
-          );
-        }).toList(),
-        onChanged: (value) => setState(() => selectedSubcategoryId = value),
-      );
-    });
+    return TextFormField(
+      controller: controller,
+      initialValue: controller == null ? initialValue : null,
+      decoration: decoration,
+      keyboardType: keyboardType,
+      readOnly: readOnly,
+      maxLines: maxLines,
+      style: TextStyle(color: AppColor.title, fontSize: context.text14),
+    );
   }
-}
-
-InputDecoration _dec(String hint) {
-  final border = OutlineInputBorder(
-    borderRadius: BorderRadius.circular(12),
-    borderSide: BorderSide(color: AppColor.primary.withOpacity(.1), width: 1.2),
-  );
-  return InputDecoration(
-    hintText: hint,
-    hintStyle: const TextStyle(fontSize: 13.5, color: AppColor.title),
-    filled: true,
-    fillColor: AppColor.surface,
-    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-    border: border,
-    enabledBorder: border,
-    focusedBorder: border,
-  );
 }

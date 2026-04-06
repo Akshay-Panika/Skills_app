@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:skills_app/core/constant/app_color.dart';
+import 'package:skills_app/core/constant/app_size.dart';
+import 'package:skills_app/core/widget/app_card.dart';
 
 class HelpSupportScreen extends StatelessWidget {
   const HelpSupportScreen({super.key});
@@ -7,7 +10,7 @@ class HelpSupportScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColor.white,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -30,34 +33,30 @@ class HelpSupportScreen extends StatelessWidget {
                   // Logo
                   Row(
                     children: [
-                      Container(
-                        padding: EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          color: Colors.blueAccent,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
+                      AppCard(
+                        color: AppColor.primary,
                         child:  FaIcon(
                           FontAwesomeIcons.chalkboardTeacher,
-                          size: 18,
+                          size: context.sHeight*0.02,
                           color: Colors.white,
                         ),
                       ),
-                      const SizedBox(width: 6),
-                      const Text(
+
+                       Text(
                         'Skill',
                         style: TextStyle(
                           color: Colors.black87,
-                          fontSize: 18,
+                          fontSize: context.text16,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 0.5,
                         ),
                       ),
                       const SizedBox(width: 4),
-                      const Text(
-                        'Support',
+                       Text(
+                        'Daan',
                         style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 11,
+                          color: Colors.black87,
+                          fontSize: context.text14,
                         ),
                       ),
                     ],
@@ -66,7 +65,6 @@ class HelpSupportScreen extends StatelessWidget {
               ),
             ),
 
-            // Avatar row + greeting
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               child: Column(
@@ -85,20 +83,20 @@ class HelpSupportScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 14),
-                  const Text(
+                   Text(
                     'Hello, Users',
                     style: TextStyle(
                       color: Colors.black87,
-                      fontSize: 15,
+                      fontSize: context.text14,
                     ),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
+                   Text(
                     'How can we help?',
                     style: TextStyle(
-                      color: Colors.black87,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+                      color: AppColor.title,
+                      fontSize: context.text20,
+                      fontWeight: FontWeight.w700
                     ),
                   ),
                 ],
@@ -109,15 +107,11 @@ class HelpSupportScreen extends StatelessWidget {
 
             // Cards area
             Expanded(
-              child: Container(
+              child: AppCard(
+                color: AppColor.surface,
                 width: double.infinity,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF2F2F7),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(28),
-                    topRight: Radius.circular(28),
-                  ),
-                ),
+                margin: EdgeInsets.zero,
+                borderRadius: 40,
                 child: GridView.count(
                   crossAxisCount: 2,
                   crossAxisSpacing: 14,
@@ -225,40 +219,35 @@ class _SupportCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: iconBgColor,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
+                  AppCard(
+                    width: context.sHeight*0.05,
+                    height:context.sHeight*0.05,
+                    color: iconBgColor,
+                    margin: EdgeInsets.zero,
                     child: useWhatsApp
-                        ? Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Image.network(
-                        'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg',
-                        errorBuilder: (_, __, ___) => Icon(
-                          Icons.phone_in_talk_rounded,
-                          color: iconColor,
-                          size: 26,
-                        ),
-                      ),
-                    )
-                        : Icon(icon, color: iconColor, size: 26),
+                        ? Image.network(
+                          'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg',
+                          errorBuilder: (_, __, ___) => Icon(
+                            Icons.phone_in_talk_rounded,
+                            color: iconColor,
+                            size: context.sHeight*0.03,
+                          ),
+                        )
+                        : Icon(icon, color: iconColor, size: context.sHeight*0.03,),
                   ),
-                  const Icon(
+                   Icon(
                     Icons.chevron_right,
-                    color: Color(0xFFBDBDBD),
-                    size: 20,
+                    color: Colors.grey.shade300,
+                    size: context.sHeight*0.03,
                   ),
                 ],
               ),
               const Spacer(),
               Text(
                 title,
-                style: const TextStyle(
-                  color: Color(0xFF212121),
-                  fontSize: 13.5,
+                style: TextStyle(
+                  color: AppColor.subtitle,
+                  fontSize: context.text14,
                   fontWeight: FontWeight.w600,
                   height: 1.4,
                 ),
