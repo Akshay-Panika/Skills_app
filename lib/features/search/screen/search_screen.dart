@@ -21,24 +21,24 @@ class SearchScreen extends StatelessWidget {
     'Flutter development',
   ];
 
-  final List<Map<String, dynamic>> recommendations = const [
+  final List<Map<String, dynamic>> recommendations =  [
     {
       'title': 'Top-rated Python & Machine Learning courses near you',
       'icon': Icons.code,
-      'color': C.chipBg,
-      'iconColor': C.primary,
+      'color': AppColor.primary.withOpacity(0.3),
+      'iconColor': AppColor.primary,
     },
     {
       'title': 'Explore Graphic Design skills from expert tutors',
       'icon': Icons.brush,
-      'color': C.chipBg,
-      'iconColor': C.success,
+      'color': AppColor.primary.withOpacity(0.3),
+      'iconColor': AppColor.primary,
     },
     {
       'title': 'Find local & online English Speaking coaches',
       'icon': Icons.record_voice_over,
-      'color': C.chipBg,
-      'iconColor': C.accent,
+      'color': AppColor.primary.withOpacity(0.3),
+      'iconColor': AppColor.primary,
     },
   ];
 
@@ -80,7 +80,7 @@ class SearchScreen extends StatelessWidget {
           width: 5,
           height: 16,
           decoration: BoxDecoration(
-            color: C.primary,
+            color: AppColor.primary,
             borderRadius: BorderRadius.circular(5),
           ),
         ),
@@ -182,9 +182,9 @@ class SearchScreen extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 12),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        border: Border.all(color: C.primary, width: 0.3),
+        border: Border.all(color: AppColor.primary, width: 0.3),
         borderRadius: BorderRadius.circular(6),
-        color: C.primary,
+        color: AppColor.primary,
       ),
       child: Row(
         children: [
@@ -212,7 +212,7 @@ class SearchScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: context.text10,
                 fontWeight: FontWeight.w600,
-                color: C.textDark,
+                color: AppColor.title,
               ),
             ),
           ),
@@ -236,7 +236,7 @@ class SearchScreen extends StatelessWidget {
                 "Clear all",
                 style: TextStyle(
                   fontSize: context.text12,
-                  color: C.primary,
+                  color: AppColor.primary,
                 ),
               )
             ],
@@ -258,19 +258,19 @@ class SearchScreen extends StatelessWidget {
       padding:
       const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
       decoration: BoxDecoration(
-        border: Border.all(color: C.textLight),
+        border: Border.all(color: AppColor.surface),
         borderRadius: BorderRadius.circular(20),
-        color: AppColor.white,
+        color: AppColor.surface,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           const Icon(Icons.history,
-              size: 14, color: C.textLight),
+              size: 14, color: AppColor.subtitle),
           const SizedBox(width: 6),
           Text(label,
               style:
-              const TextStyle(color: C.textDark)),
+              const TextStyle(color: AppColor.title)),
         ],
       ),
     );
@@ -289,7 +289,7 @@ class SearchScreen extends StatelessWidget {
             'Based on your learning interests',
             style: TextStyle(
                 fontSize: context.text12,
-                color: C.textLight),
+                color: AppColor.title),
           ),
           SizedBox(height: context.sHeight * 0.015),
           SizedBox(
@@ -312,7 +312,7 @@ class SearchScreen extends StatelessWidget {
     return Container(
       width: 150,
       decoration: BoxDecoration(
-        border: Border.all(color: C.chipBg),
+        border: Border.all(color: AppColor.surface),
         borderRadius: BorderRadius.circular(8),
         color: AppColor.white,
       ),
@@ -335,7 +335,7 @@ class SearchScreen extends StatelessWidget {
             child: Text(
               rec['title'],
               style: const TextStyle(
-                  fontSize: 11.5, color: C.textDark),
+                  fontSize: 11.5, color: AppColor.title),
             ),
           )
         ],

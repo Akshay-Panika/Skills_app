@@ -35,7 +35,11 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
   void initState() {
     super.initState();
     serviceController = Get.put(ServiceDetailsController());
-    serviceController.fetchServiceDetails(int.parse(widget.serviceId));
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      serviceController.fetchServiceDetails(int.parse(widget.serviceId));
+    });
+
     loadUser();
   }
 

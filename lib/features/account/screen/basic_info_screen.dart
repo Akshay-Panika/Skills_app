@@ -184,12 +184,15 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                     _genderSelector(context),
                     const SizedBox(height: 18),
                     _fieldLabel(context, "Short Bio"),
-                    _inputField(
-                      context,
-                      controller: bioController,
-                      hint: "Write something about yourself…",
-                      icon: Icons.note_alt_outlined,
-                    ),
+                    // _inputField(
+                    //   context,
+                    //   controller: bioController,
+                    //   hint: "Write something about yourself…",
+                    //   // icon: Icons.note_alt_outlined,
+                    //
+                    // ),
+                    _mxgBox(controller: bioController),
+
                     const SizedBox(height: 30),
                   ],
                 ),
@@ -301,7 +304,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
         TextEditingController? controller,
         String? initialValue,
         required String hint,
-        required IconData icon,
+        IconData? icon,
         TextInputType keyboardType = TextInputType.text,
         bool readOnly = false,
         int maxLines = 1,
@@ -341,6 +344,32 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
     );
   }
 
+  Widget _mxgBox({
+    TextEditingController? controller,
+}){
+    final border = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: AppColor.primary.withOpacity(.1), width: 1.2),
+    );
+    return TextField(
+      maxLines: 4,
+      minLines: 3,
+      keyboardType: TextInputType.multiline,
+      controller: bioController,
+      style: TextStyle(color: AppColor.title, fontSize: context.text14),
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: AppColor.surface,
+        hintText: "Enter description...",
+        alignLabelWithHint: true,
+        contentPadding: const EdgeInsets.all(12),
+        border: border,
+        enabledBorder: border,
+        focusedBorder: border,
+        hintStyle: TextStyle(color: AppColor.subtitle, fontSize: context.text14),
+      ),
+    );
+  }
   Widget _genderSelector(BuildContext context) {
     return Row(
       children: genderList.map((gender) {

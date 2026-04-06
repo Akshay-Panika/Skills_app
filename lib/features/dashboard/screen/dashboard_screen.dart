@@ -81,10 +81,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   _scrollStatusController.status.value == "Scrolling Down";
 
               return Container(
-                height: context.sHeight * 0.08,
+                height: context.sHeight * 0.09,
                 color: Colors.transparent,
                 child: Row(
                   spacing: 10,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Left nav bar
                     Expanded(
@@ -102,6 +103,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             color: Colors.white,
                             border: Border.all(color: Colors.grey, width: 0.3),
                           ),
+                          padding: EdgeInsets.symmetric(vertical: context.sWidth * 0.01),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
@@ -117,7 +119,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                     // Right "Add" button always visible
                     Container(
-                      padding: EdgeInsets.only(left: context.sWidth * 0.02),
+                      padding: EdgeInsets.only(left: context.sWidth * 0.03, right: context.sWidth * 0.03,top: context.sWidth * 0.01,bottom: context.sWidth * 0.01),
                       decoration: const BoxDecoration(
                         color: Color(0xFF0D6E6E),
                         borderRadius: BorderRadius.only(

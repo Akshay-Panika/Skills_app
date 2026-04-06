@@ -206,24 +206,18 @@ class _CreateAddScreenState extends State<CreateAddScreen>
                 _buildTypeToggle(),
                 SizedBox(height: context.sHeight*0.01),
                 _fieldLabel(context, "Category"),
-
                 _dropdownCard(),
 
                 const SizedBox(height: 16),
                 _fieldLabel(context, "Service Title"),
-                const SizedBox(height: 8),
                 _inputField(context,
                     controller: titleController,
                     hint: "Enter service title",
                     icon: Icons.title_rounded),
                 const SizedBox(height: 16),
                 _fieldLabel(context, "Description"),
-                const SizedBox(height: 8),
-                _inputField(context,
-                    controller: descController,
-                    hint: "Describe your service…",
-                    icon: Icons.notes_rounded,
-                    maxLines: 4),
+                _mxgBox(controller: descController),
+
                 AnimatedSize(
                   duration: const Duration(milliseconds: 350),
                   curve: Curves.easeInOut,
@@ -605,6 +599,34 @@ class _CreateAddScreenState extends State<CreateAddScreen>
       readOnly: readOnly,
       maxLines: maxLines,
       style: TextStyle(color: AppColor.title, fontSize: context.text14),
+    );
+  }
+
+  Widget _mxgBox({
+    TextEditingController? controller,
+  }){
+    final border = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: AppColor.primary.withOpacity(.1), width: 1.2),
+    );
+
+    return TextField(
+      maxLines: 4,
+      minLines: 3,
+      keyboardType: TextInputType.multiline,
+      controller: descController,
+      style: TextStyle(color: AppColor.title, fontSize: context.text14),
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: AppColor.surface,
+        hintText: "Enter description...",
+        alignLabelWithHint: true,
+        contentPadding: const EdgeInsets.all(12),
+        border: border,
+        enabledBorder: border,
+        focusedBorder: border,
+        hintStyle: TextStyle(color: AppColor.subtitle, fontSize: context.text14),
+      ),
     );
   }
 }
