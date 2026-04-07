@@ -13,8 +13,11 @@ import '../../location/controller/location_controller.dart';
 import '../../subcategory/controller/subategory_controller.dart';
 import '../../subcategory/repository/subcategory_repository.dart';
 import '../controller/add_service_by_user_controller.dart';
+import '../controller/service_list_by_user_controller.dart';
 import '../repository/add_service_by_user_repository.dart';
 import 'package:skills_app/core/constant/app_color.dart';
+
+import '../repository/service_list_byuser_repository.dart';
 
 class AddSkillScreen extends StatefulWidget {
   final bool isEdit;
@@ -41,6 +44,7 @@ class _AddSkillScreenState extends State<AddSkillScreen>
   final AddServiceByUserController serviceController = Get.put(
     AddServiceByUserController(repository: AddServiceByUserRepository()),
   );
+  final serviceListByUserController = Get.put(ServiceListByUserController(repository: ServiceListByUserRepository()));
 
   File? selectedImage;
   String? networkImage;
@@ -351,31 +355,51 @@ class _AddSkillScreenState extends State<AddSkillScreen>
                 children: categoryItems.map((cat) {
                   return ListTile(
                     contentPadding: EdgeInsets.zero,
+                    leading: AppCard(
+                      height: context.sHeight*0.07,
+                      padding: EdgeInsets.all(8),
+                      margin: EdgeInsets.only(bottom: 5),
+                      color: AppColor.surface,
+                      hasBorder: true,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.network(
+                          cat.categoryImage ?? "",
+                          fit: BoxFit.fill,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Center(
+                              child: Icon(
+                                Icons.image_not_supported_outlined,
+                                color: Colors.grey,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
                     title: Text(
                       cat.categoryName ?? '',
                       style: TextStyle(
-                        fontSize: context.text14,
+                        fontSize: context.text12,
                         fontWeight: selectedCategoryId  == cat.id.toString()?FontWeight.w600:FontWeight.w500,
                         color: selectedCategoryId  == cat.id.toString()
                             ? AppColor.title
                             : AppColor.subtitle,
                       ),
-                    ),                    trailing: Radio<String>(
+                    ),
+                    trailing: Radio<String>(
                       value: cat.id.toString(),
                       groupValue: selectedCategoryId,
                       onChanged: (value) async {
                         selectedCategoryId = value;
                         selectedSubcategoryId = null;
                         await subController.fetchSubCategories(int.parse(value!));
-                        showCategoryList.value = false;
+
+                        Future.delayed(Duration(milliseconds: 200), () {
+                          showCategoryList.value = false;
+                        });
                       },
                     ),
-                    onTap: () async {
-                      selectedCategoryId = cat.id.toString();
-                      selectedSubcategoryId = null;
-                      await subController.fetchSubCategories(cat.id!);
-                      showCategoryList.value = false;
-                    },
                   );
                 }).toList(),
               ),
@@ -401,10 +425,32 @@ class _AddSkillScreenState extends State<AddSkillScreen>
                 children: subcategoryItems.map((sub) {
                   return ListTile(
                     contentPadding: EdgeInsets.zero,
+                    leading: AppCard(
+                      height: context.sHeight*0.07,
+                      padding: EdgeInsets.all(8),
+                      margin: EdgeInsets.only(bottom: 5),
+                      color: AppColor.surface,
+                      hasBorder: true,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.network(
+                          sub.subcategoryImage ?? "",
+                          fit: BoxFit.fill,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Center(
+                              child: Icon(
+                                Icons.image_not_supported_outlined,
+                                color: Colors.grey,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
                     title: Text(
                       sub.subcategoryName ?? '',
                       style: TextStyle(
-                        fontSize: context.text14,
+                        fontSize: context.text12,
                         color: selectedSubcategoryId == sub.id.toString()
                             ? AppColor.title
                             : AppColor.subtitle,
@@ -416,13 +462,11 @@ class _AddSkillScreenState extends State<AddSkillScreen>
                       groupValue: selectedSubcategoryId,
                       onChanged: (value) {
                         selectedSubcategoryId = value;
-                        showSubcategoryList.value = false;
+                        Future.microtask(() {
+                          showSubcategoryList.value = false;
+                        });
                       },
                     ),
-                    onTap: () {
-                      selectedSubcategoryId = sub.id.toString();
-                      showSubcategoryList.value = false;
-                    },
                   );
                 }).toList(),
               ),

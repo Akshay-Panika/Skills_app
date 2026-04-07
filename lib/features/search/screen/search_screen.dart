@@ -166,7 +166,7 @@ class SearchScreen extends StatelessWidget {
           title,
           style: TextStyle(
             fontSize: context.text14,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w600,
             color: AppColor.title,
           ),
         ),

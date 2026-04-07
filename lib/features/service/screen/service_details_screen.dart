@@ -138,78 +138,76 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Expanded(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(flex: 2,
-                              child: Text(
-                                service.serviceName,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: context.text16),
-                              ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(flex: 2,
+                            child: Text(
+                              service.serviceName,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: context.text16),
                             ),
-                            Expanded(
-                              child: Column(
-                                spacing: 10,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    service.serviceAmount != null
-                                        ? "₹${double.tryParse(service.serviceAmount!)?.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '') ?? service.serviceAmount!}"
-                                        : "Free",
-                                    style: TextStyle(
-                                        color: service.serviceAmount != null ? Colors.green: AppColor.primary,
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: context.text16),
-                                  ),
-                                  Row(
-                                    spacing: 2,
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Icon(Icons.location_on, size: context.sHeight*0.02, color: Colors.green),
+                          ),
+                          Expanded(
+                            child: Column(
+                              spacing: 10,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  service.serviceAmount != null
+                                      ? "₹${double.tryParse(service.serviceAmount!)?.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '') ?? service.serviceAmount!}"
+                                      : "Free",
+                                  style: TextStyle(
+                                      color: service.serviceAmount != null ? Colors.green: AppColor.primary,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: context.text16),
+                                ),
+                                Row(
+                                  spacing: 2,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Icon(Icons.location_on, size: context.sHeight*0.02, color: Colors.green),
 
-                                      Obx(() {
-                                        final lat = locationController.latitude.value;
-                                        final lon = locationController.longitude.value;
+                                    Obx(() {
+                                      final lat = locationController.latitude.value;
+                                      final lon = locationController.longitude.value;
 
-                                        if (service.latitude == null || service.longitude == null) {
-                                          return Text(
-                                            "N/A",
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w500,
-                                              color: AppColor.subtitle,
-                                              fontSize: context.text14,
-                                            ),
-                                          );
-                                        }
-
-                                        final distanceText = getDistanceText(
-                                          lat,
-                                          lon,
-                                          service.latitude!,
-                                          service.longitude!,
-                                        );
-
+                                      if (service.latitude == null || service.longitude == null) {
                                         return Text(
-                                          distanceText,
+                                          "N/A",
                                           style: TextStyle(
                                             fontWeight: FontWeight.w500,
                                             color: AppColor.subtitle,
                                             fontSize: context.text14,
                                           ),
                                         );
-                                      }),
-                                    ],
-                                  ),
-                                ],
-                              ),
+                                      }
+
+                                      final distanceText = getDistanceText(
+                                        lat,
+                                        lon,
+                                        service.latitude!,
+                                        service.longitude!,
+                                      );
+
+                                      return Text(
+                                        distanceText,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          color: AppColor.subtitle,
+                                          fontSize: context.text14,
+                                        ),
+                                      );
+                                    }),
+                                  ],
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
