@@ -16,21 +16,21 @@ import '../controller/add_service_by_user_controller.dart';
 import '../repository/add_service_by_user_repository.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 
-class CreateAddScreen extends StatefulWidget {
+class AddSkillScreen extends StatefulWidget {
   final bool isEdit;
   final dynamic serviceData;
 
-  const CreateAddScreen({
+  const AddSkillScreen({
     super.key,
     this.isEdit = false,
     this.serviceData,
   });
 
   @override
-  State<CreateAddScreen> createState() => _CreateAddScreenState();
+  State<AddSkillScreen> createState() => _AddSkillScreenState();
 }
 
-class _CreateAddScreenState extends State<CreateAddScreen>
+class _AddSkillScreenState extends State<AddSkillScreen>
     with SingleTickerProviderStateMixin {
 
   final LocationController locationController = Get.find<LocationController>();
@@ -186,7 +186,7 @@ class _CreateAddScreenState extends State<CreateAddScreen>
     return Scaffold(
       backgroundColor: AppColor.white,
       appBar: myAppBar(
-          title: 'Add Service',
+          title: widget.isEdit ? "Edit Your Skill" : "Add New Skill",
           showBackButton: true,
           backgroundColor: AppColor.primary,
           buttonColor: Colors.white,
@@ -201,6 +201,16 @@ class _CreateAddScreenState extends State<CreateAddScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text(
+                  widget.isEdit
+                      ? "Update your service details"
+                      : "Share your skills and start earning",
+                  style: TextStyle(
+                    fontSize: context.text16,
+                    color: AppColor.subtitle,
+                  ),
+                ),
+                SizedBox(height: context.sHeight*0.01),
                 _buildImagePicker(context),
                 SizedBox(height: context.sHeight*0.04),
                 _buildTypeToggle(),
@@ -227,7 +237,6 @@ class _CreateAddScreenState extends State<CreateAddScreen>
                     children: [
                       const SizedBox(height: 16),
                       _fieldLabel(context, "Price"),
-                      const SizedBox(height: 8),
                       _inputField(context,
                           controller: priceController,
                           hint: "0",
@@ -241,7 +250,7 @@ class _CreateAddScreenState extends State<CreateAddScreen>
                 Obx(() {
                   final loading = serviceController.isLoading.value;
                   return AppButton(
-                    text: 'Post Service',
+                    text: widget.isEdit ? "Update Skill" : "Publish Skill",
                     isLoading: loading,
                     onPressed: postService,
                   );
@@ -424,76 +433,78 @@ class _CreateAddScreenState extends State<CreateAddScreen>
   }
 
   Widget _buildImagePicker(BuildContext context) {
-    return AppCard(
-      height: context.sHeight*0.25,
-      width: double.infinity,
-      color: AppColor.surface,
-      margin: EdgeInsets.zero,
-      hasBorder: true,
-      padding:selectedImage != null ? EdgeInsets.zero:EdgeInsets.all(16),
-      onTap: pickImage,
-      child: selectedImage != null
-          ? Stack(
-        alignment: Alignment.center,
-        children: [
-          Image.file(selectedImage!, fit: BoxFit.fill),
-          Positioned(
-            bottom: 0,
-            right: 0,
-            child: AppCard(
-              color: AppColor.surface,
-              margin: EdgeInsets.zero,
-              child: Row(
-                children: [
-                  Icon(Icons.edit, size: 18, color: AppColor.primary),
-                  const SizedBox(width: 4),
-                  Text("Change", style: TextStyle(color: AppColor.primary)),
-                ],
+    return Center(
+      child: AppCard(
+        height: context.sWidth*0.5,
+        width: double.infinity,
+        color: AppColor.surface,
+        margin: EdgeInsets.zero,
+        hasBorder: true,
+        padding:selectedImage != null ? EdgeInsets.zero:EdgeInsets.all(16),
+        onTap: pickImage,
+        child: selectedImage != null
+            ? Stack(
+          alignment: Alignment.center,
+          children: [
+            Image.file(selectedImage!, fit: BoxFit.fill),
+            Positioned(
+              bottom: 0,
+              right: 0,
+              child: AppCard(
+                color: AppColor.surface,
+                margin: EdgeInsets.zero,
+                child: Row(
+                  children: [
+                    Icon(Icons.edit, size: 18, color: AppColor.primary),
+                    const SizedBox(width: 4),
+                    Text("Change", style: TextStyle(color: AppColor.primary)),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
-      )
-          : (networkImage != null && networkImage!.isNotEmpty)
-          ? Stack(
-        alignment: Alignment.center,
-        children: [
-          Image.network(networkImage!, fit: BoxFit.fill),
-          Positioned(
-            bottom: 0,
-            right: 0,
-            child: AppCard(
-              color: AppColor.surface,
-              margin: EdgeInsets.zero,
-              child: Row(
-                children: [
-                  Icon(Icons.edit, size: 18, color: AppColor.primary),
-                  const SizedBox(width: 4),
-                  Text("Change", style: TextStyle(color: AppColor.primary)),
-                ],
+          ],
+        )
+            : (networkImage != null && networkImage!.isNotEmpty)
+            ? Stack(
+          alignment: Alignment.center,
+          children: [
+            Image.network(networkImage!, fit: BoxFit.fill),
+            Positioned(
+              bottom: 0,
+              right: 0,
+              child: AppCard(
+                color: AppColor.surface,
+                margin: EdgeInsets.zero,
+                child: Row(
+                  children: [
+                    Icon(Icons.edit, size: 18, color: AppColor.primary),
+                    const SizedBox(width: 4),
+                    Text("Change", style: TextStyle(color: AppColor.primary)),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
-      )
-          : Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.add_a_photo_outlined,
-              color: AppColor.primary,
-              size: context.sHeight * 0.04),
-          const SizedBox(height: 20),
-          Text("Upload Service Image",
-              style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: AppColor.subtitle,
-                  fontSize: context.text14)),
-          const SizedBox(height: 4),
-          Text("Tap to choose from gallery",
-              style: TextStyle(
-                  fontSize: context.text12,
-                  color: AppColor.subtitle)),
-        ],
+          ],
+        )
+            : Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.add_a_photo_outlined,
+                color: AppColor.primary,
+                size: context.sHeight * 0.04),
+            const SizedBox(height: 20),
+            Text("Upload Service Image",
+                style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: AppColor.subtitle,
+                    fontSize: context.text14)),
+            const SizedBox(height: 4),
+            Text("Tap to choose from gallery",
+                style: TextStyle(
+                    fontSize: context.text12,
+                    color: AppColor.subtitle)),
+          ],
+        ),
       ),
     );
   }

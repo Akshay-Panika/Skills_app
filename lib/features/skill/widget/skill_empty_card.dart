@@ -5,54 +5,48 @@ import '../../../core/constant/app_color.dart';
 import '../../../core/constant/app_size.dart';
 
 class SkillEmptyCard extends StatelessWidget {
-  final String title;
-  final String subtitle;
-
-  const SkillEmptyCard({
-    super.key,
-    required this.title,
-    required this.subtitle,
-  });
+  const SkillEmptyCard({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: context.sWidth * 0.1),
+        padding: EdgeInsets.symmetric(horizontal: context.sWidth * 0.12),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            /// Skills Share Icon
             FaIcon(
               FontAwesomeIcons.chalkboardTeacher,
-              size: context.sWidth * 0.4,
-              color: AppColor.primary,
+              size: context.sWidth * 0.12,
+              color: AppColor.primary.withOpacity(0.4),
             ),
 
-            SizedBox(height: context.sHeight * 0.02),
+            SizedBox(height: context.sHeight * 0.025),
 
-            /// Title
             Text(
-              title,
+              "Share Your Skills",
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: context.text16,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w700,
                 color: AppColor.title,
               ),
             ),
 
-            SizedBox(height: 6),
+            SizedBox(height: 8),
 
-            /// Subtitle
             Text(
-              subtitle,
+              "Start posting your skills and connect with people",
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: context.text14,
+                fontSize: context.text12,
                 color: AppColor.subtitle,
+                height: 1.4,
               ),
             ),
+
+            SizedBox(height: context.sHeight * 0.03),
+
           ],
         ),
       ),

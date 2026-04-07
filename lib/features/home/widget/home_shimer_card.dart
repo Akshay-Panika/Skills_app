@@ -50,6 +50,14 @@ class HomeShimmerCard extends StatelessWidget {
             baseColor: Colors.white24,
             highlightColor: Colors.white70,
             child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: width * 0.03),
+              child: Icon(Icons.bookmark, color: Colors.white),
+            ),
+          ),
+          Shimmer.fromColors(
+            baseColor: Colors.white24,
+            highlightColor: Colors.white70,
+            child: Padding(
               padding: EdgeInsets.symmetric(horizontal: width * 0.04),
               child: Icon(Icons.notifications, color: Colors.white),
             ),

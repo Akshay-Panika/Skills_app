@@ -10,7 +10,7 @@ import '../../service/screen/service_details_screen.dart';
 import '../controller/service_list_by_user_controller.dart';
 import '../repository/service_list_byuser_repository.dart';
 import '../widget/skill_empty_card.dart';
-import 'create_add_screen.dart';
+import 'add_skill_screen.dart';
 
 class AdsScreen extends StatefulWidget {
   const AdsScreen({super.key});
@@ -175,16 +175,10 @@ class _AdsScreenState extends State<AdsScreen> {
       final list = controller.serviceList;
 
       if (list.isEmpty) {
-        return const SkillEmptyCard(
-          title: "No Ads Yet",
-          subtitle: "Your posted services will appear here",
-        );
+        return const SkillEmptyCard();
       }
-      if (_filter != "All") {
-        return const SkillEmptyCard(
-          title: "No Ads Yet",
-          subtitle: "Your posted services will appear here",
-        );
+      if (_filter == "Inactive") {
+        return const SkillEmptyCard();
       }
       return ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -247,7 +241,7 @@ class SkillCard extends StatelessWidget {
             spacing: 10,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-             
+
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: image.isNotEmpty
@@ -262,7 +256,7 @@ class SkillCard extends StatelessWidget {
                     : _placeholder(context),
               ),
 
-             
+
               Expanded(
                 child: Column(
                   spacing: 20,
@@ -295,7 +289,7 @@ class SkillCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                
+
                     Row(
                       spacing: 10,
                       children: [
@@ -351,7 +345,6 @@ class SkillCard extends StatelessWidget {
             MaterialPageRoute(
               builder: (_) => ServiceDetailsScreen(
                 serviceId: serviceId.toString(),
-                distanceText: serviceDescription,
               ),
             ),
           ),
@@ -401,7 +394,7 @@ class SkillCard extends StatelessWidget {
           if (confirm == true) {
             final service = listController.serviceList
                 .firstWhere((e) => e.id == serviceId);
-            Get.to(() => CreateAddScreen(isEdit: true, serviceData: service));
+            Get.to(() => AddSkillScreen(isEdit: true, serviceData: service));
           }
         }
 

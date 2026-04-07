@@ -4,7 +4,7 @@ import 'package:skills_app/core/constant/app_size.dart';
 import 'package:skills_app/core/widget/app_card.dart';
 import 'package:skills_app/core/widget/my_appbar.dart';
 
-import '../../ads/widget/skill_empty_card.dart';
+import '../../skill/widget/skill_empty_card.dart';
 
 class ChatItem {
   final String image;
@@ -90,21 +90,9 @@ class ChatScreen extends StatelessWidget {
             Expanded(
               child: TabBarView(
                 children: [
-                  // _ChatList(chats: dummyChats),
-                  // _ChatList(chats: sellingChats),
-                  // _ChatList(chats: buyingChats),
-                  SkillEmptyCard(
-                    title: "No Purchases Yet",
-                    subtitle: "Services you book will appear here",
-                  ),
-                  SkillEmptyCard(
-                    title: "No Purchases Yet",
-                    subtitle: "Services you book will appear here",
-                  ),
-                  SkillEmptyCard(
-                    title: "No Purchases Yet",
-                    subtitle: "Services you book will appear here",
-                  )
+                  _ChatList(chats: dummyChats),
+                  _ChatList(chats: sellingChats),
+                  _ChatList(chats: buyingChats),
                 ],
               ),
             ),

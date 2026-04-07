@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:skills_app/core/widget/flutter_toast.dart';
-import 'package:skills_app/features/ads/controller/service_list_by_user_controller.dart';
+import 'package:skills_app/features/skill/controller/service_list_by_user_controller.dart';
 import '../../auth/helper/auth_preferences.dart';
 import '../../service/controller/service_list_controller.dart';
 import '../repository/add_service_by_user_repository.dart';

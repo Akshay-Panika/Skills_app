@@ -4,13 +4,14 @@ import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/constant/app_size.dart';
 import '../../../core/widget/app_dilog.dart';
 import '../../account/screen/account_screen.dart';
-import '../../ads/screen/ads_screen.dart';
 import '../../chat/screen/chat_screen.dart';
 import '../../home/controller/home_screen_controller.dart';
 import '../../home/screen/home_screen.dart';
-import '../../ads/screen/create_add_screen.dart';
 import '../../location/controller/location_controller.dart';
 import 'package:get/get.dart';
+
+import '../../skill/screen/skill_screen.dart';
+import '../../skill/screen/add_skill_screen.dart';
 
 
 class DashboardScreen extends StatefulWidget {
@@ -97,7 +98,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             children: [
                               _navIcon(FontAwesomeIcons.home, 0),
                               _navIcon(FontAwesomeIcons.comment, 1),
-                              _navIcon(FontAwesomeIcons.ad, 2),
+                              _navIcon(FontAwesomeIcons.chalkboardTeacher, 2),
                               _navIcon(FontAwesomeIcons.user, 3),
                             ],
                           ),
@@ -116,7 +117,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                       ),
                       child: IconButton(
-                        onPressed: () => Get.to(() => CreateAddScreen()),
+                        onPressed: () => Get.to(() => AddSkillScreen()),
                         icon: const FaIcon(FontAwesomeIcons.plus, color: Colors.white),
                       ),
                     ),

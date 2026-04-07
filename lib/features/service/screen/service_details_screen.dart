@@ -1,6 +1,7 @@
 // servicedetails/view/service_details_screen.dart
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:skills_app/core/widget/app_card.dart';
 import 'package:skills_app/core/widget/app_contact.dart';
@@ -9,16 +10,14 @@ import '../../../core/constant/app_color.dart';
 import '../../../core/constant/app_size.dart';
 import '../../account/controller/user_profile_controller.dart';
 import '../../account/model/user_profile_model.dart';
+import '../../location/controller/location_controller.dart';
 import '../controller/service_details_controller.dart';
 import '../widget/service_details_shimmer.dart';
 
 class ServiceDetailsScreen extends StatefulWidget {
   final String serviceId;
-  final String distanceText;
-
   const ServiceDetailsScreen({
     super.key,
-    required this.distanceText,
     required this.serviceId,
   });
 
@@ -27,6 +26,7 @@ class ServiceDetailsScreen extends StatefulWidget {
 }
 
 class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
+  final locationController = Get.find<LocationController>();
   late final ServiceDetailsController serviceController;
   final UserProfileController userProfileController = Get.put(UserProfileController());
 
@@ -134,26 +134,25 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                           : _imagePlaceholder(),
                     ),
                   ),
+                  SliverToBoxAdapter(child: SizedBox(height: context.sWidth*0.06,),),
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // TITLE & PRICE
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  service.serviceName,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: context.text16),
-                                ),
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(flex: 2,
+                              child: Text(
+                                service.serviceName,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: context.text16),
                               ),
-                              Column(
+                            ),
+                            Expanded(
+                              child: Column(
                                 spacing: 10,
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
@@ -168,62 +167,107 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                                   ),
                                   Row(
                                     spacing: 2,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       Icon(Icons.location_on, size: context.sHeight*0.02, color: Colors.green),
-              
-                                      Text(
-                                        widget.distanceText,
-                                        style: TextStyle(
+
+                                      Obx(() {
+                                        final lat = locationController.latitude.value;
+                                        final lon = locationController.longitude.value;
+
+                                        if (service.latitude == null || service.longitude == null) {
+                                          return Text(
+                                            "N/A",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              color: AppColor.subtitle,
+                                              fontSize: context.text14,
+                                            ),
+                                          );
+                                        }
+
+                                        final distanceText = getDistanceText(
+                                          lat,
+                                          lon,
+                                          service.latitude!,
+                                          service.longitude!,
+                                        );
+
+                                        return Text(
+                                          distanceText,
+                                          style: TextStyle(
                                             fontWeight: FontWeight.w500,
-                                            color: AppColor.subtitle, fontSize: context.text14),
-                                      ),
+                                            color: AppColor.subtitle,
+                                            fontSize: context.text14,
+                                          ),
+                                        );
+                                      }),
                                     ],
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                           Text(
                             "Description",
                             style: TextStyle(
                                 color: Colors.grey,
                                 fontWeight: FontWeight.w500, fontSize: context.text16),
                           ),
-                          SizedBox(height: context.sHeight * 0.008),
+                          SizedBox(height: context.sHeight * 0.002),
                           Text(
                             service.serviceDescription,
                             style:
                             TextStyle(color: AppColor.subtitle, fontSize: context.text16),
                           ),
-                          SizedBox(height: context.sHeight * 0.02),
-                          AppCard(
-                            height: context.sWidth * 0.6,
-                            margin: EdgeInsets.zero,
-                            // hasBorder: true,
-                            child: const Center(
-                              child: FaIcon(FontAwesomeIcons.ad,
-                                  color: Colors.grey, size: 30),
-                            ),
-                          ),
-                          SizedBox(height: context.sHeight * 0.02),
-                          // SELLER INFO
-                          Obx(() {
-                            if (userProfileController.isLoading.value) {
-                              return _sellerShimmer();
-                            }
-              
-                            final UserProfileModel? profile =
-                                userProfileController.userProfile.value;
-              
-                            if (profile == null) return _sellerShimmer();
-              
-                            return AppCard(
-                              padding: const EdgeInsets.all(16),
-                              margin: EdgeInsets.zero,
-                              child: Row(
+                        ],
+                      ),
+                    ),
+                  ),
+                  SliverToBoxAdapter(child:AppCard(
+                    height: context.sWidth * 0.6,
+                    margin: EdgeInsets.all(16),
+                    child: const Center(
+                      child: FaIcon(FontAwesomeIcons.ad,
+                          color: Colors.grey, size: 30),
+                    ),
+                  ),),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child:Obx(() {
+                        if (userProfileController.isLoading.value) {
+                          return _sellerShimmer();
+                        }
+
+                        final UserProfileModel? profile =
+                            userProfileController.userProfile.value;
+
+                        if (profile == null) return _sellerShimmer();
+
+                        return AppCard(
+                          padding: const EdgeInsets.all(14),
+                          margin: EdgeInsets.zero,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              /// TOP ROW
+                              Row(
                                 children: [
+                                  /// Profile Image
                                   CircleAvatar(
-                                    radius: 32,
+                                    radius: 26,
                                     backgroundColor: Colors.grey.withOpacity(.15),
                                     backgroundImage: (profile.userImage != null &&
                                         profile.userImage!.isNotEmpty)
@@ -233,41 +277,106 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                                         profile.userImage!.isEmpty)
                                         ? const Icon(
                                       Icons.image_not_supported_outlined,
-                                      size: 32,
+                                      size: 26,
                                       color: Colors.grey,
                                     )
                                         : null,
                                   ),
-                                  const SizedBox(width: 12),
+
+                                  const SizedBox(width: 10),
+
+                                  /// Info
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
+                                        /// Name
                                         Text(
                                           profile.userName ?? '',
                                           style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: context.text16),
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: context.text14,
+                                          ),
                                         ),
-                                        SizedBox(height: context.sHeight * 0.005),
+
+                                        SizedBox(height: 2),
+
+                                        /// Bio
                                         Text(
                                           profile.userBio ?? '',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
-                                              color: Colors.grey,
-                                              fontSize: context.text14),
+                                            color: AppColor.subtitle,
+                                            fontSize: context.text12,
+                                          ),
                                         ),
                                       ],
                                     ),
                                   ),
+
+
+                                  Column(
+                                    spacing: 5,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      AppCard(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                        color: AppColor.primary.withOpacity(0.15),
+                                        margin: EdgeInsets.zero,
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.star, size: 14, color: Colors.amber),
+                                            const SizedBox(width: 2),
+                                            Text(
+                                              "4.8",
+                                              style: TextStyle(
+                                                fontSize: context.text12,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Text(
+                                        "120 reviews",
+                                        style: TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: context.text12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ],
                               ),
-                            );
-                          }),
-                          SizedBox(height: context.sHeight * 0.03),
-                        ],
-                      ),
+
+
+                              SizedBox(height: context.sHeight * 0.012),
+
+                              /// Divider
+                              Divider(height: 1, color: Colors.grey.withOpacity(0.2)),
+
+                              SizedBox(height: context.sHeight * 0.03),
+
+                              /// 🚩 Report Button (full width feel)
+                              Center(
+                                child: Text(
+                                  "Report this skill",
+                                  style: TextStyle(
+                                    color: Colors.red.withOpacity(0.7),
+                                    fontSize: context.text12,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }),
                     ),
                   ),
+                  SliverToBoxAdapter(child: SizedBox(height: context.sWidth*0.06,),),
+
                 ],
               ),
             ),
@@ -359,5 +468,20 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
         borderRadius: BorderRadius.circular(radius),
       ),
     );
+  }
+}
+
+String getDistanceText(double lat1, double lon1, double lat2, double lon2) {
+  final distanceKm = Geolocator.distanceBetween(
+    lat1,
+    lon1,
+    lat2,
+    lon2,
+  ) / 1000;
+
+  if (distanceKm < 1) {
+    return "${(distanceKm * 1000).round()} m";
+  } else {
+    return "${distanceKm.toStringAsFixed(1)} km";
   }
 }

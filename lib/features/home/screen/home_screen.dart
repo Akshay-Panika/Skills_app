@@ -11,6 +11,7 @@ import '../../notification/screen/notification_screen.dart';
 import '../../search/screen/search_screen.dart';
 import '../../service/controller/service_list_controller.dart';
 import '../../service/repository/service_list_repository.dart';
+import '../../service/screen/service_details_screen.dart';
 import '../controller/home_screen_controller.dart';
 import '../widget/home_shimer_card.dart';
 import '../widget/invite_friend_card.dart';
@@ -54,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final CategoryController _categoryController = Get.put(CategoryController());
   final ServiceListController _serviceListController = Get.put(ServiceListController(ServiceListRepository()));
-  bool  _isPaid = false;
+  bool  _isFree = false;
 
   final ScrollController _scrollController = ScrollController();
   double _lastOffset = 0.0;
@@ -223,7 +224,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Transform.scale(
                           scale: 0.8,
                           child: Switch(
-                            value: _isPaid,
+                            value: _isFree,
             
                             /// 👇 ₹ ICON BOTH STATES
                             thumbIcon: MaterialStateProperty.resolveWith<Icon?>(
@@ -257,7 +258,7 @@ class _HomeScreenState extends State<HomeScreen> {
             
                             onChanged: (value) {
                               setState(() {
-                                _isPaid = value;
+                                _isFree = value;
                               });
                             },
                           ),
@@ -331,95 +332,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   }),
                 ),
                 SliverToBoxAdapter(child: SizedBox(height: context.sHeight*0.02,),),
-            
-                // SliverToBoxAdapter(
-                //   child: Obx(() {
-                //     final lat = _getLocationController.latitude.value;
-                //     final lon = _getLocationController.longitude.value;
-                //     final services = _serviceListController.services;
-                //
-                //     final nearby = services.where((s) {
-                //       if (s.latitude == null) return false;
-                //       double d = Geolocator.distanceBetween(lat, lon, s.latitude!, s.longitude!) / 1000;
-                //       bool matchesPaidFilter = _isPaid ? (s.serviceStatus == true) : true;
-                //       return d <= 20 && matchesPaidFilter;
-                //     }).toList();
-                //
-                //     if (nearby.isEmpty) {
-                //       debugPrint("No services Near You");
-                //       return Padding(
-                //         padding:  EdgeInsets.only(top: _categoryController.categoryList.isNotEmpty ?0:100),
-                //         child: EmptyServiceWidget(),
-                //       );
-                //     }
-                //
-                //     return Column(
-                //       crossAxisAlignment: CrossAxisAlignment.start,
-                //       children: [
-                //         Padding(
-                //           padding: EdgeInsets.symmetric(horizontal: 16),
-                //           child: Row(
-                //             spacing: 10,
-                //             children: [
-                //               Container(
-                //                 width: 5,
-                //                 height: 16,
-                //                 decoration: BoxDecoration(
-                //                   color: Color(0xFF0D6E6E),
-                //                   borderRadius: BorderRadius.circular(5)
-                //                 ),
-                //               ),
-                //               Text(
-                //                 "Recent View Services",
-                //                 style: TextStyle(
-                //                   fontSize: 14,
-                //                   color: Colors.black87,
-                //                   fontWeight: FontWeight.w700,
-                //                 ),
-                //               ),
-                //             ],
-                //           ),
-                //         ),
-                //         SizedBox(height: 10),
-                //
-                //         SizedBox(
-                //           height: context.sHeight*0.2,
-                //           child: ListView.builder(
-                //             scrollDirection: Axis.horizontal,
-                //             itemCount: nearby.length,
-                //             padding: EdgeInsets.zero,
-                //             itemBuilder: (context, index) {
-                //               final service = nearby[index];
-                //               double distanceKm = Geolocator.distanceBetween(
-                //                 lat,
-                //                 lon,
-                //                 service.latitude!,
-                //                 service.longitude!,
-                //               ) / 1000;
-                //
-                //               String distanceText;
-                //
-                //               if (distanceKm < 1) {
-                //                 distanceText = "${(distanceKm * 1000).round()} m";
-                //               } else {
-                //                 distanceText = "${distanceKm.toStringAsFixed(2)} km";
-                //               }
-                //               return Padding(
-                //                 padding:  EdgeInsets.only(left: 10,  right: index == nearby.length - 1 ? 10 : 0, ),
-                //                 child: RServiceCard(
-                //                   service: service,
-                //                   serviceDistance:distanceText,
-                //                 ),
-                //               );
-                //             },
-                //           ),
-                //         ),
-                //       ],
-                //     );
-                //   }),
-                // ),
-                // SliverToBoxAdapter(child: SizedBox(height: context.sHeight*0.02,),),
-            
+
                 SliverToBoxAdapter(
                   child: Obx(() {
                     final lat = _getLocationController.latitude.value;
@@ -427,10 +340,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     final services = _serviceListController.services;
 
                     final nearby = services.where((s) {
-                      if (s.latitude == null) return false;
-                      double d = Geolocator.distanceBetween(lat, lon, s.latitude!, s.longitude!) / 1000;
-                      bool matchesPaidFilter = _isPaid ? (s.serviceStatus == true) : true;
-                      return d <= 20 && matchesPaidFilter;
+                      if (s.latitude == null || s.longitude == null) return false;
+
+                      final distance = Geolocator.distanceBetween(
+                        lat,
+                        lon,
+                        s.latitude!,
+                        s.longitude!,
+                      ) / 1000;
+
+                      final matchesFree = _isFree ? s.serviceStatus == false : true;
+
+                      return distance <= 20 && matchesFree;
                     }).toList();
 
                     if (nearby.isEmpty) {
@@ -483,28 +404,19 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           itemBuilder: (context, index) {
                             final service = nearby[index];
-
-                            double distanceKm = Geolocator.distanceBetween(
+                            final distance = getDistanceText(
                               lat,
                               lon,
                               service.latitude!,
                               service.longitude!,
-                            ) / 1000;
-
-                            String distanceText;
-
-                            if (distanceKm < 1) {
-                              distanceText = "${(distanceKm * 1000).round()} m";
-                            } else {
-                              distanceText = "${distanceKm.toStringAsFixed(2)} km";
-                            }
+                            );
             
                             return Container(
                               height: 200,
                               padding: EdgeInsets.only(bottom: 10),
                               child: ServiceCard(
                                 service: service,
-                                serviceDistance: distanceText,
+                                serviceDistance: distance,
                               ),
                             );
                           },
