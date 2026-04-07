@@ -10,12 +10,6 @@ class ServiceDetailsController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxString errorMessage = ''.obs;
 
-  @override
-  void onInit() {
-    super.onInit();
-    fetchServiceDetails(23); // pass your service id
-  }
-
   Future<void> fetchServiceDetails(int id) async {
     try {
       isLoading(true);

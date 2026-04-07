@@ -265,7 +265,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
             
-                 SliverToBoxAdapter(child: SizedBox(height: context.sHeight*0.03,),),
+                 SliverToBoxAdapter(child: SizedBox(height: context.sHeight*0.02,),),
             
                 SliverToBoxAdapter(
                   child: Obx((){
@@ -388,7 +388,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 //             padding: EdgeInsets.zero,
                 //             itemBuilder: (context, index) {
                 //               final service = nearby[index];
-                //
                 //               double distanceKm = Geolocator.distanceBetween(
                 //                 lat,
                 //                 lon,
@@ -401,14 +400,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 //               if (distanceKm < 1) {
                 //                 distanceText = "${(distanceKm * 1000).round()} m";
                 //               } else {
-                //                 distanceText = "${distanceKm.toStringAsFixed(2)} km"; // more stable
+                //                 distanceText = "${distanceKm.toStringAsFixed(2)} km";
                 //               }
-                //
                 //               return Padding(
                 //                 padding:  EdgeInsets.only(left: 10,  right: index == nearby.length - 1 ? 10 : 0, ),
                 //                 child: RServiceCard(
                 //                   service: service,
-                //                   serviceDistance: distanceText,
+                //                   serviceDistance:distanceText,
                 //                 ),
                 //               );
                 //             },
@@ -424,20 +422,21 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Obx(() {
                     final lat = _getLocationController.latitude.value;
                     final lon = _getLocationController.longitude.value;
-            
                     final services = _serviceListController.services;
 
                     final nearby = services.where((s) {
                       if (s.latitude == null) return false;
                       double d = Geolocator.distanceBetween(lat, lon, s.latitude!, s.longitude!) / 1000;
-
                       bool matchesPaidFilter = _isPaid ? (s.serviceStatus == true) : true;
                       return d <= 20 && matchesPaidFilter;
                     }).toList();
-            
+
                     if (nearby.isEmpty) {
                       debugPrint("No services Near You");
-                      return SizedBox.shrink();
+                      return Padding(
+                        padding:  EdgeInsets.only(top: _categoryController.categoryList.isNotEmpty ?0:100),
+                        child: EmptyServiceWidget(),
+                      );
                     }
             
                     return Column(
@@ -457,7 +456,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ),
                               Text(
-                                "Trending Courses For You",
+                                "Trending Courses",
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.black87,
@@ -482,20 +481,20 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           itemBuilder: (context, index) {
                             final service = nearby[index];
-            
+
                             double distanceKm = Geolocator.distanceBetween(
                               lat,
                               lon,
                               service.latitude!,
                               service.longitude!,
                             ) / 1000;
-            
+
                             String distanceText;
-            
+
                             if (distanceKm < 1) {
                               distanceText = "${(distanceKm * 1000).round()} m";
                             } else {
-                              distanceText = "${distanceKm.toStringAsFixed(2)} km"; // more stable
+                              distanceText = "${distanceKm.toStringAsFixed(2)} km";
                             }
             
                             return Container(
