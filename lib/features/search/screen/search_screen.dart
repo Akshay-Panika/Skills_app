@@ -7,6 +7,7 @@ import 'package:skills_app/core/constant/app_size.dart';
 import 'package:skills_app/core/widget/app_card.dart';
 
 import '../../category/controller/category_controller.dart';
+import '../../home/screen/home_screen.dart';
 import '../../home/widget/category_card.dart';
 import '../../home/widget/service_card.dart';
 import '../../location/controller/location_controller.dart';
@@ -48,91 +49,98 @@ class SearchScreen extends StatelessWidget {
                   _buildLocationBar(context),
                   SizedBox(height: context.sHeight * 0.02),
                   _buildRecentSearches(context),
-                  SizedBox(height: context.sHeight * 0.02),
-                  Obx(() {
-                    final lat = _getLocationController.latitude.value;
-                    final lon = _getLocationController.longitude.value;
-                    final services = _serviceListController.services;
 
-                    final nearby = services.where((s) {
-                      if (s.latitude == null || s.longitude == null) return false;
+                  /// default data
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: context.sHeight * 0.02),
+                      Obx(() {
+                        final lat = _getLocationController.latitude.value;
+                        final lon = _getLocationController.longitude.value;
+                        final services = _serviceListController.services;
 
-                      final distance = Geolocator.distanceBetween(
-                        lat,
-                        lon,
-                        s.latitude!,
-                        s.longitude!,
-                      ) / 1000;
+                        final nearby = services.where((s) {
+                          if (s.latitude == null || s.longitude == null) return false;
 
-                      // final matchesFree = _isFree ? s.serviceStatus == false : true;
+                          final distance = Geolocator.distanceBetween(
+                            lat,
+                            lon,
+                            s.latitude!,
+                            s.longitude!,
+                          ) / 1000;
 
-                      return distance <= 20;
-                    }).toList();
+                          // final matchesFree = _isFree ? s.serviceStatus == false : true;
 
-                    if (nearby.isEmpty) {
-                      debugPrint("No services Near You");
-                    }
+                          return distance <= 20;
+                        }).toList();
 
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+                        if (nearby.isEmpty) {
+                          debugPrint("No services Near You");
+                          return SizedBox.shrink();
+                        }
 
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _sectionTitle("Resent View", context),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Based on your learning interests',
-                                style: TextStyle(
-                                    fontSize: context.text12,
-                                    color: AppColor.title),
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _sectionTitle("Resent View", context),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Based on your learning interests',
+                                    style: TextStyle(
+                                        fontSize: context.text12,
+                                        color: AppColor.title),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 10),
+                            ),
+                            SizedBox(height: 10),
 
-                        GridView.builder(
-                          shrinkWrap: true,
-                          padding: const EdgeInsets.symmetric(horizontal: 10,),
-                          physics: NeverScrollableScrollPhysics(),
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                            childAspectRatio: 0.8,
-                            // crossAxisCount: nearbyServices.length,
-                          ),
-                          itemBuilder: (context, index) {
-                            final service = nearby[index];
-                            final distance = getDistanceText(
-                              lat,
-                              lon,
-                              service.latitude!,
-                              service.longitude!,
-                            );
-
-                            return Container(
-                              height: 200,
-                              padding: EdgeInsets.only(bottom: 10),
-                              child: ServiceCard(
-                                service: service,
-                                serviceDistance: distance,
+                            GridView.builder(
+                              shrinkWrap: true,
+                              padding: const EdgeInsets.symmetric(horizontal: 10,),
+                              physics: NeverScrollableScrollPhysics(),
+                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 10,
+                                childAspectRatio: 0.8,
+                                // crossAxisCount: nearbyServices.length,
                               ),
-                            );
-                          },
-                          itemCount: nearby.length,
-                        ),
+                              itemBuilder: (context, index) {
+                                final service = nearby[index];
+                                final distance = getDistanceText(
+                                  lat,
+                                  lon,
+                                  service.latitude!,
+                                  service.longitude!,
+                                );
 
-                      ],
-                    );
-                  }),
-                  // SizedBox(height: context.sHeight * 0.02),
-                  _buildCategories(context),
-                  SizedBox(height: context.sHeight * 0.03),
+                                return Container(
+                                  height: 200,
+                                  padding: EdgeInsets.only(bottom: 10),
+                                  child: ServiceCard(
+                                    service: service,
+                                    serviceDistance: distance,
+                                  ),
+                                );
+                              },
+                              itemCount: nearby.length,
+                            ),
+
+                          ],
+                        );
+                      }),
+                      _buildCategories(context),
+                      SizedBox(height: context.sHeight * 0.03),
+                    ],
+                  )
                 ],
               ),
             ),
@@ -315,8 +323,8 @@ class SearchScreen extends StatelessWidget {
           ),
           SizedBox(height: context.sHeight * 0.015),
           Wrap(
-            spacing: 8,
-            runSpacing: 8,
+            spacing: 3,
+            runSpacing: 6,
             children:
             recentSearches.map(_buildTag).toList(),
           ),
@@ -327,9 +335,9 @@ class SearchScreen extends StatelessWidget {
 
   Widget _buildTag(String label) {
     return AppCard(
-      color: AppColor.surface,
-       margin: EdgeInsets.zero,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      color: AppColor.primary.withOpacity(.1),
+      margin: EdgeInsets.zero,
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -350,7 +358,10 @@ class SearchScreen extends StatelessWidget {
       if (_categoryController.isLoading.value) {
         return const SizedBox();
       }
-
+      if (_categoryController.categoryList.isEmpty) {
+        debugPrint("No services Near You");
+        return SizedBox.shrink();
+      }
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
