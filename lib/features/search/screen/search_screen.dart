@@ -1,17 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/constant/app_size.dart';
+import 'package:skills_app/core/widget/app_card.dart';
 
 import '../../category/controller/category_controller.dart';
 import '../../home/widget/category_card.dart';
+import '../../home/widget/service_card.dart';
+import '../../location/controller/location_controller.dart';
+import '../../service/controller/service_list_controller.dart';
+import '../../service/repository/service_list_repository.dart';
+import '../../service/screen/service_details_screen.dart';
 
 class SearchScreen extends StatelessWidget {
   SearchScreen({super.key});
+  final LocationController _locationController = Get.put(LocationController());
+  final LocationController _getLocationController = Get.find<LocationController>();
 
-  final CategoryController _categoryController =
-  Get.put(CategoryController());
+  final CategoryController _categoryController = Get.put(CategoryController());
+  final ServiceListController _serviceListController = Get.put(ServiceListController(ServiceListRepository()));
+
 
   final List<String> recentSearches = const [
     'Python for beginners',
@@ -21,26 +31,6 @@ class SearchScreen extends StatelessWidget {
     'Flutter development',
   ];
 
-  final List<Map<String, dynamic>> recommendations =  [
-    {
-      'title': 'Top-rated Python & Machine Learning courses near you',
-      'icon': Icons.code,
-      'color': AppColor.primary.withOpacity(0.3),
-      'iconColor': AppColor.primary,
-    },
-    {
-      'title': 'Explore Graphic Design skills from expert tutors',
-      'icon': Icons.brush,
-      'color': AppColor.primary.withOpacity(0.3),
-      'iconColor': AppColor.primary,
-    },
-    {
-      'title': 'Find local & online English Speaking coaches',
-      'icon': Icons.record_voice_over,
-      'color': AppColor.primary.withOpacity(0.3),
-      'iconColor': AppColor.primary,
-    },
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -59,8 +49,88 @@ class SearchScreen extends StatelessWidget {
                   SizedBox(height: context.sHeight * 0.02),
                   _buildRecentSearches(context),
                   SizedBox(height: context.sHeight * 0.02),
-                  _buildRecommendations(context),
-                  SizedBox(height: context.sHeight * 0.02),
+                  Obx(() {
+                    final lat = _getLocationController.latitude.value;
+                    final lon = _getLocationController.longitude.value;
+                    final services = _serviceListController.services;
+
+                    final nearby = services.where((s) {
+                      if (s.latitude == null || s.longitude == null) return false;
+
+                      final distance = Geolocator.distanceBetween(
+                        lat,
+                        lon,
+                        s.latitude!,
+                        s.longitude!,
+                      ) / 1000;
+
+                      // final matchesFree = _isFree ? s.serviceStatus == false : true;
+
+                      return distance <= 20;
+                    }).toList();
+
+                    if (nearby.isEmpty) {
+                      debugPrint("No services Near You");
+                    }
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _sectionTitle("Resent View", context),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Based on your learning interests',
+                                style: TextStyle(
+                                    fontSize: context.text12,
+                                    color: AppColor.title),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 10),
+
+                        GridView.builder(
+                          shrinkWrap: true,
+                          padding: const EdgeInsets.symmetric(horizontal: 10,),
+                          physics: NeverScrollableScrollPhysics(),
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: 0.8,
+                            // crossAxisCount: nearbyServices.length,
+                          ),
+                          itemBuilder: (context, index) {
+                            final service = nearby[index];
+                            final distance = getDistanceText(
+                              lat,
+                              lon,
+                              service.latitude!,
+                              service.longitude!,
+                            );
+
+                            return Container(
+                              height: 200,
+                              padding: EdgeInsets.only(bottom: 10),
+                              child: ServiceCard(
+                                service: service,
+                                serviceDistance: distance,
+                              ),
+                            );
+                          },
+                          itemCount: nearby.length,
+                        ),
+
+                      ],
+                    );
+                  }),
+                  // SizedBox(height: context.sHeight * 0.02),
                   _buildCategories(context),
                   SizedBox(height: context.sHeight * 0.03),
                 ],
@@ -72,7 +142,6 @@ class SearchScreen extends StatelessWidget {
     );
   }
 
-  // 🔹 Common Title Row (Reusable)
   Widget _sectionTitle(String title, BuildContext context) {
     return Row(
       children: [
@@ -175,52 +244,55 @@ class SearchScreen extends StatelessWidget {
       ),
     );
   }
-
-  // 🔹 LOCATION BAR
   Widget _buildLocationBar(BuildContext context) {
     return Container(
+
       margin: const EdgeInsets.symmetric(horizontal: 12),
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 2),
       decoration: BoxDecoration(
         border: Border.all(color: AppColor.primary, width: 0.3),
         borderRadius: BorderRadius.circular(6),
         color: AppColor.primary,
       ),
-      child: Row(
-        children: [
-          const Icon(Icons.location_on,
-              color: AppColor.white),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              'Hadapsar, Pune',
-              style: TextStyle(
-                fontSize: context.text12,
-                color: AppColor.white,
+      child: Obx(() {
+        // Show spinner while loading
+        final isLoading = !_locationController.isLocationLoaded.value;
+
+        final locationText = isLoading
+            ? 'Fetching location...'
+            : '${_locationController.city.value}, ${_locationController.state.value}';
+
+        return Row(
+          children: [
+            const Icon(Icons.location_on, color: AppColor.white),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                locationText,
+                style: TextStyle(
+                  fontSize: context.text12,
+                  color: AppColor.white,
+                  fontWeight: FontWeight.w500
+                ),
               ),
             ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(
-                horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: AppColor.white,
-              borderRadius: BorderRadius.circular(12),
+
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: InkWell(
+                  onTap:() => _locationController.fetchLocation(),
+                  child: isLoading ?
+                  SizedBox(
+                      height: 22,width: 22,
+                      child: CircularProgressIndicator(color: Colors.white,strokeWidth: 3,))
+                  :FaIcon(FontAwesomeIcons.refresh, color: Colors.white, size: 22,)),
             ),
-            child: Text(
-              '🌐 Online & Offline',
-              style: TextStyle(
-                fontSize: context.text10,
-                fontWeight: FontWeight.w600,
-                color: AppColor.title,
-              ),
-            ),
-          ),
-        ],
-      ),
+
+          ],
+        );
+      }),
     );
   }
-
   // 🔹 RECENT SEARCHES
   Widget _buildRecentSearches(BuildContext context) {
     return Padding(
@@ -254,14 +326,10 @@ class SearchScreen extends StatelessWidget {
   }
 
   Widget _buildTag(String label) {
-    return Container(
-      padding:
-      const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColor.surface),
-        borderRadius: BorderRadius.circular(20),
-        color: AppColor.surface,
-      ),
+    return AppCard(
+      color: AppColor.surface,
+       margin: EdgeInsets.zero,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -270,74 +338,7 @@ class SearchScreen extends StatelessWidget {
           const SizedBox(width: 6),
           Text(label,
               style:
-              const TextStyle(color: AppColor.title)),
-        ],
-      ),
-    );
-  }
-
-  // 🔹 RECOMMENDATIONS
-  Widget _buildRecommendations(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _sectionTitle("Recommended for You", context),
-          const SizedBox(height: 4),
-          Text(
-            'Based on your learning interests',
-            style: TextStyle(
-                fontSize: context.text12,
-                color: AppColor.title),
-          ),
-          SizedBox(height: context.sHeight * 0.015),
-          SizedBox(
-            height: context.sHeight * 0.2,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: recommendations.length,
-              separatorBuilder: (_, __) =>
-              const SizedBox(width: 10),
-              itemBuilder: (_, i) =>
-                  _buildRecCard(recommendations[i]),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRecCard(Map<String, dynamic> rec) {
-    return Container(
-      width: 150,
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColor.surface),
-        borderRadius: BorderRadius.circular(8),
-        color: AppColor.white,
-      ),
-      child: Column(
-        children: [
-          Container(
-            height: 90,
-            decoration: BoxDecoration(
-              color: rec['color'],
-              borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(8)),
-            ),
-            child: Center(
-              child: Icon(rec['icon'],
-                  size: 40, color: rec['iconColor']),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: Text(
-              rec['title'],
-              style: const TextStyle(
-                  fontSize: 11.5, color: AppColor.title),
-            ),
-          )
+               TextStyle(color: AppColor.title,fontSize: 12)),
         ],
       ),
     );
