@@ -94,17 +94,14 @@ class ChatScreen extends StatelessWidget {
                   // _ChatList(chats: sellingChats),
                   // _ChatList(chats: buyingChats),
                   SkillEmptyCard(
-                    icon: Icons.shopping_bag_outlined,
                     title: "No Purchases Yet",
                     subtitle: "Services you book will appear here",
                   ),
                   SkillEmptyCard(
-                    icon: Icons.shopping_bag_outlined,
                     title: "No Purchases Yet",
                     subtitle: "Services you book will appear here",
                   ),
                   SkillEmptyCard(
-                    icon: Icons.shopping_bag_outlined,
                     title: "No Purchases Yet",
                     subtitle: "Services you book will appear here",
                   )

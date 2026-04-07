@@ -114,15 +114,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 SliverToBoxAdapter(
                   child: Container(
                     color: AppColor.primary,
-                    padding: EdgeInsets.all(8),
+                    padding: EdgeInsets.all(context.sWidth*0.02),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
                           children:  [
                             Padding(
-                              padding:  EdgeInsets.symmetric(horizontal: 10.0),
-                              child: FaIcon(FontAwesomeIcons.chalkboardTeacher, color: Colors.white, size: 30),
+                              padding:  EdgeInsets.symmetric(horizontal: context.sWidth*0.02),
+                              child: FaIcon(FontAwesomeIcons.chalkboardTeacher, color: Colors.white, size: context.sWidth*0.08),
                             ),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -132,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   children: [
                                     // Icon(Icons.location_on,size: 10,color: Colors.green.shade700,),
                                     Text(" Skills Share",
-                                        style: TextStyle(fontSize: 12, color: Colors.white,fontWeight: FontWeight.w500)),
+                                        style: TextStyle(fontSize: context.text12, color: Colors.white,fontWeight: FontWeight.w500)),
                                   ],
                                 ),
                                 SizedBox(height: 2),
@@ -146,13 +146,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                   }
             
                                   return Row(
+                                    spacing: 2,
                                     children: [
-                                      Icon(Icons.location_on,size: 14,color: Colors.white,),
+                                      Icon(Icons.location_on,size: context.sWidth*0.03,color: Colors.white,),
                                       Text(
                                         "$userCity, $userState",
                                         style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w700,
+                                          fontSize: context.text10,
+                                          fontWeight: FontWeight.w500,
                                           color: Colors.white,
                                         ),
                                       ),
@@ -187,15 +188,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 SliverPersistentHeader(
                   pinned: true,
                   delegate: _SliverSearchBarDelegate(
-                    height: context.sHeight*0.06,
+                    height: context.sWidth*0.14,
                     child: Row(
-                      spacing: 10,
+                      spacing: context.sWidth*.02,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Expanded(
                           child: InkWell(
                             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SearchScreen(),)),
                             child: Container(
-                              height: 40,
+                              height:  context.sWidth*0.09,
                               padding: const EdgeInsets.symmetric(horizontal: 14),
                               decoration: BoxDecoration(
                                 color: AppColor.white,
