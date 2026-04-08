@@ -10,7 +10,6 @@ import '../../location/controller/location_controller.dart';
 import '../../notification/screen/notification_screen.dart';
 import '../../search/screen/search_screen.dart';
 import '../../service/controller/service_list_controller.dart';
-import '../../service/repository/service_list_repository.dart';
 import '../../service/screen/service_details_screen.dart';
 import '../controller/home_screen_controller.dart';
 import '../widget/home_shimer_card.dart';
@@ -53,21 +52,22 @@ class _HomeScreenState extends State<HomeScreen> {
   String get userCity => _getLocationController.city.value;
   String get userState => _getLocationController.state.value;
 
-  final CategoryController _categoryController = Get.put(CategoryController());
-  final ServiceListController _serviceListController = Get.put(ServiceListController(ServiceListRepository()));
+  final CategoryController _categoryController = Get.find<CategoryController>();
+  final ServiceListController _serviceListController = Get.find<ServiceListController>();
   bool  _isFree = false;
 
   final ScrollController _scrollController = ScrollController();
   double _lastOffset = 0.0;
 
-  final HomeScreenController homeController = Get.put(HomeScreenController());
+  final HomeScreenController homeController = Get.find<HomeScreenController>();
 
 
   @override
   void initState() {
     super.initState();
-    _getLocationController.fetchLocation();
-
+    if (!_getLocationController.isLocationLoaded.value) {
+      _getLocationController.fetchLocation();
+    }
     _scrollController.addListener(() {
       double offset = _scrollController.offset;
 

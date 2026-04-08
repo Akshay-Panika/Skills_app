@@ -4,15 +4,16 @@ import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/constant/app_size.dart';
 import '../../../core/widget/app_dilog.dart';
 import '../../account/screen/account_screen.dart';
+import '../../category/controller/category_controller.dart';
 import '../../chat/screen/chat_screen.dart';
 import '../../home/controller/home_screen_controller.dart';
 import '../../home/screen/home_screen.dart';
 import '../../location/controller/location_controller.dart';
+import '../../service/controller/service_list_controller.dart';
+import '../../service/repository/service_list_repository.dart';
 import 'package:get/get.dart';
-
 import '../../skill/screen/skill_screen.dart';
 import '../../skill/screen/add_skill_screen.dart';
-
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -22,22 +23,31 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  final LocationController _locationController = Get.put(LocationController());
-  final ScrollStatusController _scrollStatusController =
-  Get.put(ScrollStatusController());
+
+  final LocationController _locationController = Get.put(LocationController(), permanent: true);
+  final ScrollStatusController _scrollStatusController = Get.put(ScrollStatusController(), permanent: true);
 
   int _currentIndex = 0;
-  final _screens = [
-    HomeScreen(),
-    ChatScreen(),
-    AdsScreen(),
-    AccountScreen(),
-  ];
+
+  late final List<Widget> _screens;
 
   @override
   void initState() {
     super.initState();
-    _locationController.fetchLocation();
+    Get.put(CategoryController(), permanent: true);
+    Get.put(ServiceListController(ServiceListRepository()), permanent: true);
+    Get.put(HomeScreenController(), permanent: true);
+
+    _screens = [
+      HomeScreen(),
+      ChatScreen(),
+      AdsScreen(),
+      AccountScreen(),
+    ];
+
+    if (!_locationController.isLocationLoaded.value) {
+      _locationController.fetchLocation();
+    }
   }
 
   Future<bool> _onWillPop() async {
@@ -76,7 +86,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   spacing: 10,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Left nav bar
                     Expanded(
                       child: AnimatedSlide(
                         duration: const Duration(milliseconds: 300),
@@ -92,7 +101,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             color: Colors.white,
                             border: Border.all(color: Colors.grey, width: 0.3),
                           ),
-                          padding: EdgeInsets.symmetric(vertical: context.sWidth * 0.01),
+                          padding: EdgeInsets.symmetric(
+                              vertical: context.sWidth * 0.01),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
@@ -105,10 +115,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                       ),
                     ),
-
-                    // Right "Add" button always visible
                     Container(
-                      padding: EdgeInsets.only(left: context.sWidth * 0.03, right: context.sWidth * 0.03,top: context.sWidth * 0.01,bottom: context.sWidth * 0.01),
+                      padding: EdgeInsets.only(
+                          left: context.sWidth * 0.03,
+                          right: context.sWidth * 0.03,
+                          top: context.sWidth * 0.01,
+                          bottom: context.sWidth * 0.01),
                       decoration: const BoxDecoration(
                         color: Color(0xFF0D6E6E),
                         borderRadius: BorderRadius.only(
@@ -118,7 +130,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       child: IconButton(
                         onPressed: () => Get.to(() => AddSkillScreen()),
-                        icon: const FaIcon(FontAwesomeIcons.plus, color: Colors.white),
+                        icon: const FaIcon(FontAwesomeIcons.plus,
+                            color: Colors.white),
                       ),
                     ),
                   ],
@@ -130,15 +143,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
   }
+
   Widget _navIcon(FaIconData icon, int index) {
     return IconButton(
       onPressed: () => setState(() => _currentIndex = index),
       icon: FaIcon(
         icon,
-        color: _currentIndex == index ? const Color(0xFF0D6E6E) : Colors.grey,
+        color: _currentIndex == index
+            ? const Color(0xFF0D6E6E)
+            : Colors.grey,
       ),
     );
   }
 }
-
-
