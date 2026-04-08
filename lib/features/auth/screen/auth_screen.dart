@@ -150,7 +150,7 @@ class _AuthScreenState extends State<AuthScreen> {
               child: Center(
                 child: FaIcon(
                   FontAwesomeIcons.chalkboardTeacher,
-                  size: context.height * 0.08,
+                  size: context.sWidth * 0.4,
                   color: AppColor.primary,
                 ),
               ),
@@ -159,7 +159,8 @@ class _AuthScreenState extends State<AuthScreen> {
             /// CONTENT
             Expanded(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
 
                   /// TITLE
@@ -288,7 +289,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     );
                   }),
 
-                  const SizedBox(height: 10),
+                  // const SizedBox(height: 10),
                 ],
               ),
             ),

@@ -31,6 +31,8 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
   final UserProfileController userProfileController = Get.put(UserProfileController());
 
   bool _bookmark = false;
+  bool _isMSG = false;
+  final descController = TextEditingController();
 
   @override
   void initState() {
@@ -45,6 +47,8 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
       final service = serviceController.serviceDetails.value;
       if (service != null) {
         await userProfileController.fetchUserProfile(service.user);
+        descController.text =
+        "Hi, I came across your \"${service.serviceName}\" skill and would like to connect with you. I'm interested in learning more about this.";
       }
     });
   }
@@ -100,329 +104,402 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
 
       return Scaffold(
         backgroundColor: AppColor.surface,
-        body: Column(
+        body: Stack(
+          alignment: Alignment.bottomCenter,
           children: [
-            Expanded(
-              child: CustomScrollView(
-                slivers: [
-                  SliverAppBar(
-                    expandedHeight:  context.sWidth*0.7,
-                    pinned: true,
-                    backgroundColor: Colors.transparent,
-                    automaticallyImplyLeading: false,
-                    leading: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: InkWell(
-                        onTap: () => Get.back(),
-                        child: const CircleAvatar(
-                          backgroundColor: Colors.white,
-                          child: Padding(
-                            padding: EdgeInsets.only(left: 8.0),
-                            child: Icon(Icons.arrow_back_ios, color: Colors.black),
-                          ),
+            CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  expandedHeight:  context.sWidth*0.7,
+                  pinned: true,
+                  backgroundColor: Colors.transparent,
+                  automaticallyImplyLeading: false,
+                  leading: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: InkWell(
+                      onTap: () => Get.back(),
+                      child: const CircleAvatar(
+                        backgroundColor: Colors.white,
+                        child: Padding(
+                          padding: EdgeInsets.only(left: 8.0),
+                          child: Icon(Icons.arrow_back_ios, color: Colors.black),
                         ),
                       ),
                     ),
-                    flexibleSpace: FlexibleSpaceBar(
-                      background: (service.serviceImage != null &&
-                          service.serviceImage!.isNotEmpty)
-                          ? Image.network(
-                        service.serviceImage!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => _imagePlaceholder(),
-                      )
-                          : _imagePlaceholder(),
-                    ),
                   ),
-                  SliverToBoxAdapter(child: SizedBox(height: context.sWidth*0.06,),),
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(flex: 2,
-                            child: Text(
-                              service.serviceName,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: context.text16),
-                            ),
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: (service.serviceImage != null &&
+                        service.serviceImage!.isNotEmpty)
+                        ? Image.network(
+                      service.serviceImage!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => _imagePlaceholder(),
+                    )
+                        : _imagePlaceholder(),
+                  ),
+                ),
+                SliverToBoxAdapter(child: SizedBox(height: context.sWidth*0.06,),),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(flex: 2,
+                          child: Text(
+                            service.serviceName,
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: context.text16),
                           ),
-                          Expanded(
-                            child: Column(
-                              spacing: 10,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text(
-                                  service.serviceAmount != null
-                                      ? "₹${double.tryParse(service.serviceAmount!)?.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '') ?? service.serviceAmount!}"
-                                      : "Free",
-                                  style: TextStyle(
-                                      color: service.serviceAmount != null ? Colors.green: AppColor.primary,
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: context.text16),
-                                ),
-                                Row(
-                                  spacing: 2,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Icon(Icons.location_on, size: context.sHeight*0.02, color: Colors.green),
+                        ),
+                        Expanded(
+                          child: Column(
+                            spacing: 10,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                service.serviceAmount != null
+                                    ? "₹${double.tryParse(service.serviceAmount!)?.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '') ?? service.serviceAmount!}"
+                                    : "Free",
+                                style: TextStyle(
+                                    color: service.serviceAmount != null ? Colors.green: AppColor.primary,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: context.text16),
+                              ),
+                              Row(
+                                spacing: 2,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Icon(Icons.location_on, size: context.sHeight*0.02, color: Colors.green),
 
-                                    Obx(() {
-                                      final lat = locationController.latitude.value;
-                                      final lon = locationController.longitude.value;
+                                  Obx(() {
+                                    final lat = locationController.latitude.value;
+                                    final lon = locationController.longitude.value;
 
-                                      if (service.latitude == null || service.longitude == null) {
-                                        return Text(
-                                          "N/A",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                            color: AppColor.subtitle,
-                                            fontSize: context.text14,
-                                          ),
-                                        );
-                                      }
-
-                                      final distanceText = getDistanceText(
-                                        lat,
-                                        lon,
-                                        service.latitude!,
-                                        service.longitude!,
-                                      );
-
+                                    if (service.latitude == null || service.longitude == null) {
                                       return Text(
-                                        distanceText,
+                                        "N/A",
                                         style: TextStyle(
                                           fontWeight: FontWeight.w500,
                                           color: AppColor.subtitle,
                                           fontSize: context.text14,
                                         ),
                                       );
-                                    }),
-                                  ],
+                                    }
+
+                                    final distanceText = getDistanceText(
+                                      lat,
+                                      lon,
+                                      service.latitude!,
+                                      service.longitude!,
+                                    );
+
+                                    return Text(
+                                      distanceText,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColor.subtitle,
+                                        fontSize: context.text14,
+                                      ),
+                                    );
+                                  }),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Description",
+                          style: TextStyle(
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w500, fontSize: context.text16),
+                        ),
+                        SizedBox(height: context.sHeight * 0.002),
+                        Text(
+                          service.serviceDescription,
+                          style:
+                          TextStyle(color: AppColor.subtitle, fontSize: context.text16),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SliverToBoxAdapter(child:AppCard(
+                  height: context.sWidth * 0.6,
+                  margin: EdgeInsets.all(16),
+                  child: const Center(
+                    child: FaIcon(FontAwesomeIcons.ad,
+                        color: Colors.grey, size: 30),
+                  ),
+                ),),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child:Obx(() {
+                      if (userProfileController.isLoading.value) {
+                        return _sellerShimmer();
+                      }
+
+                      final UserProfileModel? profile =
+                          userProfileController.userProfile.value;
+
+                      if (profile == null) return _sellerShimmer();
+
+                      return AppCard(
+                        padding: const EdgeInsets.all(14),
+                        margin: EdgeInsets.zero,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            /// TOP ROW
+                            Row(
+                              children: [
+                                /// Profile Image
+                                CircleAvatar(
+                                  radius: 26,
+                                  backgroundColor: Colors.grey.withOpacity(.15),
+                                  backgroundImage: (profile.userImage != null &&
+                                      profile.userImage!.isNotEmpty)
+                                      ? NetworkImage(profile.userImage!)
+                                      : null,
+                                  child: (profile.userImage == null ||
+                                      profile.userImage!.isEmpty)
+                                      ? const Icon(
+                                    Icons.image_not_supported_outlined,
+                                    size: 26,
+                                    color: Colors.grey,
+                                  )
+                                      : null,
                                 ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Description",
-                            style: TextStyle(
-                                color: Colors.grey,
-                                fontWeight: FontWeight.w500, fontSize: context.text16),
-                          ),
-                          SizedBox(height: context.sHeight * 0.002),
-                          Text(
-                            service.serviceDescription,
-                            style:
-                            TextStyle(color: AppColor.subtitle, fontSize: context.text16),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SliverToBoxAdapter(child:AppCard(
-                    height: context.sWidth * 0.6,
-                    margin: EdgeInsets.all(16),
-                    child: const Center(
-                      child: FaIcon(FontAwesomeIcons.ad,
-                          color: Colors.grey, size: 30),
-                    ),
-                  ),),
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child:Obx(() {
-                        if (userProfileController.isLoading.value) {
-                          return _sellerShimmer();
-                        }
 
-                        final UserProfileModel? profile =
-                            userProfileController.userProfile.value;
+                                const SizedBox(width: 10),
 
-                        if (profile == null) return _sellerShimmer();
-
-                        return AppCard(
-                          padding: const EdgeInsets.all(14),
-                          margin: EdgeInsets.zero,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              /// TOP ROW
-                              Row(
-                                children: [
-                                  /// Profile Image
-                                  CircleAvatar(
-                                    radius: 26,
-                                    backgroundColor: Colors.grey.withOpacity(.15),
-                                    backgroundImage: (profile.userImage != null &&
-                                        profile.userImage!.isNotEmpty)
-                                        ? NetworkImage(profile.userImage!)
-                                        : null,
-                                    child: (profile.userImage == null ||
-                                        profile.userImage!.isEmpty)
-                                        ? const Icon(
-                                      Icons.image_not_supported_outlined,
-                                      size: 26,
-                                      color: Colors.grey,
-                                    )
-                                        : null,
-                                  ),
-
-                                  const SizedBox(width: 10),
-
-                                  /// Info
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        /// Name
-                                        Text(
-                                          profile.userName ?? '',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: context.text14,
-                                          ),
-                                        ),
-
-                                        SizedBox(height: 2),
-
-                                        /// Bio
-                                        Text(
-                                          profile.userBio ?? '',
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                            color: AppColor.subtitle,
-                                            fontSize: context.text12,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-
-
-                                  Column(
-                                    spacing: 5,
-                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                /// Info
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      AppCard(
-                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                        color: AppColor.primary.withOpacity(0.15),
-                                        margin: EdgeInsets.zero,
-                                        child: Row(
-                                          children: [
-                                            Icon(Icons.star, size: 14, color: Colors.amber),
-                                            const SizedBox(width: 2),
-                                            Text(
-                                              "4.8",
-                                              style: TextStyle(
-                                                fontSize: context.text12,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                          ],
+                                      /// Name
+                                      Text(
+                                        profile.userName ?? '',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: context.text14,
                                         ),
                                       ),
+
+                                      SizedBox(height: 2),
+
+                                      /// Bio
                                       Text(
-                                        "120 reviews",
+                                        profile.userBio ?? '',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
-                                          color: Colors.grey,
+                                          color: AppColor.subtitle,
                                           fontSize: context.text12,
                                         ),
                                       ),
                                     ],
                                   ),
-                                ],
-                              ),
+                                ),
 
 
-                              SizedBox(height: context.sHeight * 0.012),
+                                Column(
+                                  spacing: 5,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    AppCard(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                      color: AppColor.primary.withOpacity(0.15),
+                                      margin: EdgeInsets.zero,
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.star, size: 14, color: Colors.amber),
+                                          const SizedBox(width: 2),
+                                          Text(
+                                            "4.8",
+                                            style: TextStyle(
+                                              fontSize: context.text12,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Text(
+                                      "120 reviews",
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: context.text12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
 
-                              /// Divider
-                              Divider(height: 1, color: Colors.grey.withOpacity(0.2)),
 
-                              SizedBox(height: context.sHeight * 0.03),
+                            SizedBox(height: context.sHeight * 0.012),
 
-                              /// 🚩 Report Button (full width feel)
-                              Center(
-                                child: Text(
-                                  "Report this skill",
-                                  style: TextStyle(
-                                    color: Colors.red.withOpacity(0.7),
-                                    fontSize: context.text12,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                            /// Divider
+                            Divider(height: 1, color: Colors.grey.withOpacity(0.2)),
+
+                            SizedBox(height: context.sHeight * 0.03),
+
+                            /// 🚩 Report Button (full width feel)
+                            Center(
+                              child: Text(
+                                "Report this skill",
+                                style: TextStyle(
+                                  color: Colors.red.withOpacity(0.7),
+                                  fontSize: context.text12,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ),
+                ),
+                SliverToBoxAdapter(child: SizedBox(height: context.sWidth*0.06,),),
+
+              ],
+            ),
+            Positioned(
+              bottom:  context.sWidth*0.06,
+              left: 0,
+              right: 0,
+              child: Obx(() {
+                final UserProfileModel? profile = userProfileController.userProfile.value;
+                return  Column(
+                  children: [
+
+                    if(_isMSG)
+                    Stack(
+                      children: [
+                        AppCard(
+                          padding: EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _fieldLabel(context, "Chat With Mentor"),
+                              _mxgBox(controller: descController)
                             ],
                           ),
-                        );
-                      }),
+                        ),
+                        Positioned(
+                            top: 0,right: 16,
+                            child: IconButton(onPressed: () {
+                          setState(() {
+                            _isMSG = false;
+                          });
+                        }, icon: Icon(Icons.close, color: Colors.red,)))
+                      ],
                     ),
-                  ),
-                  SliverToBoxAdapter(child: SizedBox(height: context.sWidth*0.06,),),
-
-                ],
-              ),
-            ),
-
-            Obx(() {
-              final UserProfileModel? profile = userProfileController.userProfile.value;
-              return  Row(
-                children: [
-                  Expanded(
-                    child: AppCard(
-                      height: context.sWidth*0.12,
-                      color: AppColor.primary,
-                      onTap: () => AppContact.whatsapp(profile!.userPhone, 'Hello Sir, I want to this course!'),
-                      child: Row(
-                        spacing: 10,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.chat, color: Colors.white),
-                          Text(
-                            "Chat With Mentor",
-                            style: TextStyle(color: Colors.white, fontSize: context.text14),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: AppCard(
+                            height: context.sWidth*0.12,
+                            color: AppColor.primary,
+                            onTap: () {
+                              setState(() {
+                                _isMSG = true;
+                              });
+                            },
+                            // onTap: () => AppContact.whatsapp(profile!.userPhone, 'Hello Sir, I want to this course!'),
+                            child: Row(
+                              spacing: 10,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.chat, color: Colors.white),
+                                Text(
+                                  _isMSG ? "Sent Mentor":"Chat With Mentor",
+                                  style: TextStyle(color: Colors.white, fontSize: context.text14),
+                                ),
+                              ],
+                            ),
                           ),
-                        ],
-                      ),
+                        ),
+                    
+                        AppCard(
+                          color: AppColor.primary,
+                          height: context.sWidth*0.12,
+                          width: context.sWidth*0.12,
+                          onTap: () => setState(() => _bookmark = !_bookmark),
+                          child: Icon(
+                            _bookmark ? Icons.bookmark : Icons.bookmark_border,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-
-                  AppCard(
-                    color: AppColor.primary,
-                    height: context.sWidth*0.12,
-                    width: context.sWidth*0.12,
-                    onTap: () => setState(() => _bookmark = !_bookmark),
-                    child: Icon(
-                      _bookmark ? Icons.bookmark : Icons.bookmark_border,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              );
-            }),
-            SizedBox(height: context.sHeight*0.03,)
+                  ],
+                );
+              }),
+            ),
           ],
         ),
       );
     });
   }
+  Widget _fieldLabel(BuildContext context, String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontWeight: FontWeight.w500,
+          fontSize: context.text14,
+          color: AppColor.subtitle,
+        ),
+      ),
+    );
+  }
+  Widget _mxgBox({
+    TextEditingController? controller,
+  }){
+    final border = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: AppColor.primary.withOpacity(.1), width: 1.2),
+    );
 
+    return TextField(
+      maxLines: 4,
+      minLines: 3,
+      keyboardType: TextInputType.multiline,
+      controller: descController,
+      style: TextStyle(color: AppColor.title, fontSize: context.text14),
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: AppColor.surface,
+        hintText: "Enter description...",
+        alignLabelWithHint: true,
+        contentPadding: const EdgeInsets.all(12),
+        border: border,
+        enabledBorder: border,
+        focusedBorder: border,
+        hintStyle: TextStyle(color: AppColor.subtitle, fontSize: context.text14),
+      ),
+    );
+  }
   Widget _imagePlaceholder() => Container(
     decoration: BoxDecoration(color: Colors.grey.withOpacity(0.16)),
     child: const Center(
