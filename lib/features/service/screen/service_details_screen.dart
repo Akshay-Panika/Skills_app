@@ -360,7 +360,6 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
 
                             SizedBox(height: context.sHeight * 0.03),
 
-                            /// 🚩 Report Button (full width feel)
                             Center(
                               child: Text(
                                 "Report this skill",
@@ -377,7 +376,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                     }),
                   ),
                 ),
-                SliverToBoxAdapter(child: SizedBox(height: context.sWidth*0.06,),),
+                SliverToBoxAdapter(child: SizedBox(height: context.sWidth*0.3,),),
 
               ],
             ),
@@ -408,6 +407,9 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                             child: IconButton(onPressed: () {
                           setState(() {
                             _isMSG = false;
+                            descController.text =
+                            "Hi, I came across your \"${service.serviceName}\" skill and would like to connect with you. I'm interested in learning more about this.";
+
                           });
                         }, icon: Icon(Icons.close, color: Colors.red,)))
                       ],
@@ -420,7 +422,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                             color: AppColor.primary,
                             onTap: () {
                               setState(() {
-                                _isMSG = true;
+                                _isMSG = !_isMSG;
                               });
                             },
                             // onTap: () => AppContact.whatsapp(profile!.userPhone, 'Hello Sir, I want to this course!'),
