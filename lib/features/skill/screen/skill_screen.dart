@@ -4,6 +4,7 @@ import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/widget/app_card.dart';
 import '../../../core/constant/app_size.dart';
 import '../../../core/widget/flutter_toast.dart';
+import '../../notification/screen/notification_screen.dart';
 import '../../service/controller/service_delete_controller.dart';
 import '../../service/controller/service_list_controller.dart';
 import '../../service/screen/service_details_screen.dart';
@@ -31,6 +32,10 @@ class _AdsScreenState extends State<AdsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColor.surface,
+      appBar: AppBar(
+        backgroundColor: AppColor.primary,
+        toolbarHeight: 10,
+      ),
       body: Column(
         children: [
           _buildDarkHeader(context),
@@ -44,7 +49,8 @@ class _AdsScreenState extends State<AdsScreen> {
   Widget _buildDarkHeader(BuildContext context) {
     return Container(
       color: AppColor.primary,
-      padding: EdgeInsets.only(top: context.sWidth*0.16,
+      padding: EdgeInsets.only(
+        // top: context.sWidth*0.16,
         left: context.sWidth*0.04,
         right: context.sWidth*0.04,
         bottom: context.sWidth*0.04,
@@ -72,11 +78,28 @@ class _AdsScreenState extends State<AdsScreen> {
                     'Skills Dashboard',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: context.text20,
+                      fontSize: context.text16,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
+              ),
+              InkWell(
+                onTap: () => Get.to(() => NotificationScreen()),
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  margin: EdgeInsets.only(right: 0),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.notifications_none_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
               ),
             ],
           ),

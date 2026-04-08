@@ -50,32 +50,62 @@ class _AccountScreenState extends State<AccountScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColor.surface,
-      appBar: myAppBar(
-        title: 'My Account',
+      appBar : AppBar(
         backgroundColor: AppColor.primary,
-        titleColor: AppColor.white,
-          centerTitle: false,
-          actions: [
-          InkWell(
-            onTap: () => Get.to(() => NotificationScreen()),
-            child: Container(
-              width: 36,
-              height: 36,
-              margin: EdgeInsets.only(right: 16),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                Icons.notifications_none_rounded,
-                color: Colors.white,
-                size: 20,
+        title:  Text(
+          'Skills Dashboard',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: context.text16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        actions: [
+        InkWell(
+              onTap: () => Get.to(() => NotificationScreen()),
+              child: Container(
+                width: 36,
+                height: 36,
+                margin: EdgeInsets.only(right: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.notifications_none_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
               ),
             ),
-          ),
-
-        ]
+        ],
       ),
+      // appBar: myAppBar(
+      //   title: 'My Account',
+      //   backgroundColor: AppColor.primary,
+      //   titleColor: AppColor.white,
+      //     centerTitle: false,
+      //     actions: [
+      //     InkWell(
+      //       onTap: () => Get.to(() => NotificationScreen()),
+      //       child: Container(
+      //         width: 36,
+      //         height: 36,
+      //         margin: EdgeInsets.only(right: 16),
+      //         decoration: BoxDecoration(
+      //           color: Colors.white.withOpacity(0.15),
+      //           borderRadius: BorderRadius.circular(10),
+      //         ),
+      //         child: const Icon(
+      //           Icons.notifications_none_rounded,
+      //           color: Colors.white,
+      //           size: 20,
+      //         ),
+      //       ),
+      //     ),
+      //
+      //   ]
+      // ),
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(child: _buildHeader(context)),
@@ -134,6 +164,7 @@ class _AccountScreenState extends State<AccountScreen> {
       ),
     );
   }
+
 
   Widget _buildHeader(BuildContext context) {
     return Container(

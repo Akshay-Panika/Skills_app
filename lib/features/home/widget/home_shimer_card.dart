@@ -133,10 +133,8 @@ class HomeShimmerCard extends StatelessWidget {
                 ],
               ),
             ),
-
             // SizedBox(height: height * 0.01),
 
-            /// Banner
             Container(
               height: height * 0.12,
               decoration: BoxDecoration(
@@ -146,8 +144,6 @@ class HomeShimmerCard extends StatelessWidget {
             ),
 
             SizedBox(height: height * 0.03),
-
-            /// Section title
             Container(
               width: width * 0.4,
               height: height * 0.02,
@@ -158,33 +154,49 @@ class HomeShimmerCard extends StatelessWidget {
             ),
 
             SizedBox(height: height * 0.02),
-
-            /// Horizontal cards
             SizedBox(
               height: height * 0.28,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: 3,
-                itemBuilder: (_, __) => Padding(
-                  padding: EdgeInsets.only(right: width * 0.04),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: width * 0.6,
-                        height: height * 0.18,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
+              child: Row(
+                spacing: 10,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          height: height * 0.22,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                         ),
-                      ),
-                      SizedBox(height: height * 0.01),
-                      Container(width: width * 0.35, height: height * 0.018, color: Colors.white),
-                      SizedBox(height: height * 0.005),
-                      Container(width: width * 0.25, height: height * 0.015, color: Colors.white),
-                    ],
+                        SizedBox(height: height * 0.01),
+                        Container(width: width * 0.35, height: height * 0.018, color: Colors.white),
+                        SizedBox(height: height * 0.005),
+                        Container(width: width * 0.25, height: height * 0.015, color: Colors.white),
+                      ],
+                    ),
                   ),
-                ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // ✅ height add karo
+                        Container(
+                          height: height * 0.22,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        SizedBox(height: height * 0.01),
+                        Container(width: width * 0.35, height: height * 0.018, color: Colors.white),
+                        SizedBox(height: height * 0.005),
+                        Container(width: width * 0.25, height: height * 0.015, color: Colors.white),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

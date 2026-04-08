@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/constant/app_size.dart';
 import 'package:skills_app/core/widget/app_card.dart';
 import 'package:skills_app/core/widget/my_appbar.dart';
+
+import '../../notification/screen/notification_screen.dart';
 
 class ChatItem {
   final String image;
@@ -96,14 +100,45 @@ class _ChatScreenState extends State<ChatScreen> {
       length: 3,
       child: Scaffold(
         backgroundColor: AppColor.surface,
-        appBar: myAppBar(
-          title: 'Chats',
-          showBackButton: false,
-          titleColor: AppColor.white,
+        appBar : AppBar(
           backgroundColor: AppColor.primary,
+          title:  Text(
+            'Chats',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: context.text16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           actions: [
+            InkWell(
+              onTap: () => Get.to(() => NotificationScreen()),
+              child: Container(
+                width: 36,
+                height: 36,
+                margin: EdgeInsets.only(right: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.notifications_none_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+            ),
           ],
         ),
+        // appBar: myAppBar(
+        //   title: 'Chats',
+        //   showBackButton: false,
+        //   titleColor: AppColor.white,
+        //   backgroundColor: AppColor.primary,
+        //   centerTitle: false,
+        //   actions: [
+        //   ],
+        // ),
         body: Column(
           children: [
             _buildTabBar(context),
