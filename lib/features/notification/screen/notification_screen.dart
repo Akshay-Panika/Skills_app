@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skills_app/core/constant/app_size.dart';
 
 // ─── Design Tokens ─────────────────────────────────────────────
 class _C {
@@ -117,12 +118,12 @@ class NotificationScreen extends StatelessWidget {
                     color: Colors.white, size: 20),
               ),
               const SizedBox(width: 12),
-              const Text(
+               Text(
                 "Notifications",
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
+                  fontSize: context.text16,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],
