@@ -1,4 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:skills_app/core/widget/app_card.dart';
 
 import '../../../core/constant/app_color.dart';
@@ -22,19 +24,23 @@ class CategoryCard extends StatelessWidget {
           margin: EdgeInsets.zero,
           color: AppColor.surface,
           hasBorder: true,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Image.network(
-              category.categoryImage ?? "",
-              fit: BoxFit.fill,
-              errorBuilder: (context, error, stackTrace) {
-                return const Center(
-                  child: Icon(
-                    Icons.image_not_supported_outlined,
-                    color: Colors.grey,
-                  ),
-                );
-              },
+          child: CachedNetworkImage(
+            imageUrl: category.categoryImage.toString(),
+            fit: BoxFit.cover,
+            width: context.sHeight*0.1,
+            height: context.sHeight*0.1,
+            placeholder: (context, url) => Container(
+              color: Colors.grey[100],
+              alignment: Alignment.center,
+              child: FaIcon(
+                FontAwesomeIcons.chalkboardTeacher,
+                color: Colors.grey[400],
+                size: 25,
+              ),
+            ),
+            errorWidget: (context, url, error) => Container(
+              color: Colors.grey[200],
+              child: const Icon(Icons.broken_image_outlined, color: Colors.grey, size: 25),
             ),
           ),
           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => CategoryScreen(categoryId: category.id.toString(),category: category.categoryName.toString()),)),

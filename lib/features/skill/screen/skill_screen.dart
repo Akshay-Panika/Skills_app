@@ -1,4 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/widget/app_card.dart';
@@ -264,21 +266,28 @@ class SkillCard extends StatelessWidget {
             spacing: 10,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
-                child: image.isNotEmpty
-                    ? Image.network(
-                  image,
+                child: CachedNetworkImage(
+                  imageUrl: image,
+                  fit: BoxFit.cover,
                   width: context.sHeight*0.1,
                   height: context.sHeight*0.1,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) =>
-                      _placeholder(context),
-                )
-                    : _placeholder(context),
+                  placeholder: (context, url) => Container(
+                    color: Colors.grey[100],
+                    alignment: Alignment.center,
+                    child: FaIcon(
+                      FontAwesomeIcons.chalkboardTeacher,
+                      color: Colors.grey[400],
+                      size: 25,
+                    ),
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    color: Colors.grey[200],
+                    child: const Icon(Icons.broken_image_outlined, color: Colors.grey, size: 25),
+                  ),
+                ),
               ),
-
 
               Expanded(
                 child: Column(

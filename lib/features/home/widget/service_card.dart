@@ -1,9 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:skills_app/core/constant/app_size.dart';
 import 'package:transparent_image/transparent_image.dart';
-
 import '../../../core/constant/app_color.dart';
 import '../../service/model/service_list_model.dart';
 import '../../service/screen/service_details_screen.dart';
@@ -40,14 +40,25 @@ class ServiceCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: ClipRRect(
-                    borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(14)),
-                    child: FadeInImage.memoryNetwork(
-                      placeholder: kTransparentImage,
-                      image: service.serviceImage, // fallback
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+                    child: CachedNetworkImage(
+                      imageUrl: service.serviceImage,
                       fit: BoxFit.cover,
                       width: double.infinity,
                       height: double.infinity,
+                      placeholder: (context, url) => Container(
+                        color: Colors.grey[100],
+                        alignment: Alignment.center,
+                        child: FaIcon(
+                          FontAwesomeIcons.chalkboardTeacher,
+                          color: Colors.grey[400],
+                          size: 40,
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        color: Colors.grey[200],
+                        child: const Icon(Icons.broken_image_outlined, color: Colors.grey, size: 40),
+                      ),
                     ),
                   ),
                 ),

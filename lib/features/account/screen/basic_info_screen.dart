@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/constant/app_size.dart';
@@ -232,32 +234,78 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 3),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColor.secondary.withOpacity(0.3),
-                        blurRadius: 16,
-                        offset: const Offset(0, 6),
-                      ),
-                    ],
                   ),
-                  child: CircleAvatar(
-                    radius: context.sHeight * 0.048,
-                    backgroundColor: AppColor.surface,
-                    backgroundImage: selectedImage != null
-                        ? FileImage(selectedImage!) as ImageProvider
-                        : (networkImage != null && networkImage!.isNotEmpty)
-                        ? NetworkImage(networkImage!)
-                        : null,
-                    child: (selectedImage == null &&
-                        (networkImage == null || networkImage!.isEmpty))
-                        ? const Icon(
-                      Icons.person_outline_rounded,
-                      size: 44,
-                      color: AppColor.primary,
-                    )
-                        : null,
+                  child: ClipOval(
+                    child: Container(
+                      width: context.sHeight * 0.096,
+                      height: context.sHeight * 0.096,
+                      color: AppColor.surface,
+                      child: selectedImage != null
+                          ? Image.file(
+                        selectedImage!,
+                        fit: BoxFit.cover,
+                      )
+                          : (networkImage != null && networkImage!.isNotEmpty)
+                          ? Image.network(
+                        networkImage!,
+                        fit: BoxFit.cover,
+                        // 1. Loading state (replaces placeholder)
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Center(
+                            child: FaIcon(
+                              FontAwesomeIcons.image,
+                              color: Colors.grey[400],
+                              size: 25,
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(
+                            Icons.broken_image_outlined,
+                            color: Colors.grey,
+                            size: 25,
+                          );
+                        },
+                      )
+                          : const Icon(
+                        Icons.person_outline_rounded,
+                        size: 44,
+                        color: AppColor.primary,
+                      ),
+                    ),
                   ),
                 ),
+                // Container(
+                //   decoration: BoxDecoration(
+                //     shape: BoxShape.circle,
+                //     border: Border.all(color: Colors.white, width: 3),
+                //     boxShadow: [
+                //       BoxShadow(
+                //         color: AppColor.secondary.withOpacity(0.3),
+                //         blurRadius: 16,
+                //         offset: const Offset(0, 6),
+                //       ),
+                //     ],
+                //   ),
+                //   child: CircleAvatar(
+                //     radius: context.sHeight * 0.048,
+                //     backgroundColor: AppColor.surface,
+                //     backgroundImage: selectedImage != null
+                //         ? FileImage(selectedImage!) as ImageProvider
+                //         : (networkImage != null && networkImage!.isNotEmpty)
+                //         ? NetworkImage(networkImage!)
+                //         : null,
+                //     child: (selectedImage == null &&
+                //         (networkImage == null || networkImage!.isEmpty))
+                //         ? const Icon(
+                //       Icons.person_outline_rounded,
+                //       size: 44,
+                //       color: AppColor.primary,
+                //     )
+                //         : null,
+                //   ),
+                // ),
                 Container(
                   width: context.sHeight * 0.03,
                   height: context.sHeight * 0.03,

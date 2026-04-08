@@ -1,4 +1,5 @@
 // servicedetails/view/service_details_screen.dart
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -128,14 +129,25 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                     ),
                   ),
                   flexibleSpace: FlexibleSpaceBar(
-                    background: (service.serviceImage != null &&
-                        service.serviceImage!.isNotEmpty)
-                        ? Image.network(
-                      service.serviceImage!,
+                    background: CachedNetworkImage(
+                      imageUrl: service.serviceImage.toString(),
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => _imagePlaceholder(),
-                    )
-                        : _imagePlaceholder(),
+                      width: double.infinity,
+                      height: double.infinity,
+                      placeholder: (context, url) => Container(
+                        color: Colors.grey[100],
+                        alignment: Alignment.center,
+                        child: FaIcon(
+                          FontAwesomeIcons.chalkboardTeacher,
+                          color: Colors.grey[400],
+                          size: 40,
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        color: Colors.grey[200],
+                        child: const Icon(Icons.broken_image_outlined, color: Colors.grey, size: 40),
+                      ),
+                    ),
                   ),
                 ),
                 SliverToBoxAdapter(child: SizedBox(height: context.sWidth*0.06,),),
@@ -269,20 +281,30 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                               children: [
                                 /// Profile Image
                                 CircleAvatar(
-                                  radius: 26,
-                                  backgroundColor: Colors.grey.withOpacity(.15),
-                                  backgroundImage: (profile.userImage != null &&
-                                      profile.userImage!.isNotEmpty)
-                                      ? NetworkImage(profile.userImage!)
-                                      : null,
-                                  child: (profile.userImage == null ||
-                                      profile.userImage!.isEmpty)
-                                      ? const Icon(
-                                    Icons.image_not_supported_outlined,
-                                    size: 26,
-                                    color: Colors.grey,
-                                  )
-                                      : null,
+                                  radius: context.sHeight*0.036,
+                                  backgroundColor: AppColor.white,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(context.sHeight*0.036,),
+                                    child: CachedNetworkImage(
+                                      imageUrl: profile!.userImage!,
+                                      fit: BoxFit.cover,
+                                      width: context.sHeight*0.068,
+                                      height: context.sHeight*0.068,
+                                      placeholder: (context, url) => Container(
+                                        color: Colors.grey[100],
+                                        alignment: Alignment.center,
+                                        child: FaIcon(
+                                          FontAwesomeIcons.image,
+                                          color: Colors.grey[400],
+                                          size: 25,
+                                        ),
+                                      ),
+                                      errorWidget: (context, url, error) => Container(
+                                        color: Colors.grey[200],
+                                        child: const Icon(Icons.broken_image_outlined, color: Colors.grey, size: 25),
+                                      ),
+                                    ),
+                                  ),
                                 ),
 
                                 const SizedBox(width: 10),

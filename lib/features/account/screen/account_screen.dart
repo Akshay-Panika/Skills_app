@@ -1,4 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skills_app/core/constant/app_color.dart';
@@ -80,32 +82,6 @@ class _AccountScreenState extends State<AccountScreen> {
             ),
         ],
       ),
-      // appBar: myAppBar(
-      //   title: 'My Account',
-      //   backgroundColor: AppColor.primary,
-      //   titleColor: AppColor.white,
-      //     centerTitle: false,
-      //     actions: [
-      //     InkWell(
-      //       onTap: () => Get.to(() => NotificationScreen()),
-      //       child: Container(
-      //         width: 36,
-      //         height: 36,
-      //         margin: EdgeInsets.only(right: 16),
-      //         decoration: BoxDecoration(
-      //           color: Colors.white.withOpacity(0.15),
-      //           borderRadius: BorderRadius.circular(10),
-      //         ),
-      //         child: const Icon(
-      //           Icons.notifications_none_rounded,
-      //           color: Colors.white,
-      //           size: 20,
-      //         ),
-      //       ),
-      //     ),
-      //
-      //   ]
-      // ),
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(child: _buildHeader(context)),
@@ -177,19 +153,31 @@ class _AccountScreenState extends State<AccountScreen> {
         return Row(
           spacing: 10,
           children: [
+
             CircleAvatar(
               radius: context.sHeight*0.036,
               backgroundColor: AppColor.white,
-              child: ClipOval(
-                child: profile?.userImage?.isNotEmpty == true
-                    ? FadeInImage.memoryNetwork(
-                  placeholder: kTransparentImage,
-                  image: profile!.userImage!,
-                  width: context.sHeight*0.065,
-                  height: context.sHeight*0.065,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(context.sHeight*0.036,),
+                child: CachedNetworkImage(
+                  imageUrl: profile!.userImage!,
                   fit: BoxFit.cover,
-                )
-                    : const Icon(Icons.person_outline_rounded, size: 34, color: Colors.white),
+                  width: context.sHeight*0.068,
+                  height: context.sHeight*0.068,
+                  placeholder: (context, url) => Container(
+                    color: Colors.grey[100],
+                    alignment: Alignment.center,
+                    child: FaIcon(
+                      FontAwesomeIcons.image,
+                      color: Colors.grey[400],
+                      size: 25,
+                    ),
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    color: Colors.grey[200],
+                    child: const Icon(Icons.broken_image_outlined, color: Colors.grey, size: 25),
+                  ),
+                ),
               ),
             ),
 
