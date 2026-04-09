@@ -1,10 +1,10 @@
-import '../../../core/network/dio_client.dart';
+import '../../../core/network/api_client.dart';
 import '../model/subcategory_model.dart';
 
 class SubCategoryRepository {
   Future<SubCategoryResponse> getSubCategoriesByCategoryId(int categoryId) async {
     try {
-      final response = await DioClient.dio.get("subcategory/$categoryId/");
+      final response = await ApiClient.dio.get("subcategory/$categoryId/");
 
       if (response.statusCode == 200) {
         return SubCategoryResponse.fromJson(response.data);

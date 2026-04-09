@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
 
-import '../../../core/network/dio_client.dart';
+import '../../../core/network/api_client.dart';
 
 class ServiceDeleteRepository {
-  final Dio _dio = DioClient.dio;
+  final Dio _dio = ApiClient.dio;
 
   Future<String?> deleteService({required int userId, required int serviceId}) async {
     try {

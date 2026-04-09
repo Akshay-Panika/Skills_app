@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
 
-import '../../../core/network/dio_client.dart';
+import '../../../core/network/api_client.dart';
 import '../model/service_list_model.dart';
 
 class ServiceListRepository {
-  final Dio _dio = DioClient.dio;
+  final Dio _dio = ApiClient.dio;
 
   Future<ServiceListResponse> getServiceList() async {
     try {

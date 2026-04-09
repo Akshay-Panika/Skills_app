@@ -146,24 +146,64 @@ class _AccountScreenState extends State<AccountScreen> {
     return Container(
        color: AppColor.primary,
       padding: EdgeInsets.all(16),
-      child:  Obx(() {
+      child: Obx(() {
         final bool loading = controller.isLoading.value;
         final UserProfileModel? profile = controller.userProfile.value;
+
+        // 👉 Null / loading handle
+        if (loading || profile == null) {
+          return Row(
+            spacing: 10,
+            children: [
+              CircleAvatar(
+                radius: context.sHeight * 0.036,
+                backgroundColor: Colors.grey[300],
+                child:  FaIcon(
+                  FontAwesomeIcons.image,
+                  color: Colors.grey[400],
+                  size: 25,
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Guest User",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: context.text14,
+                        color: AppColor.white,
+                      ),
+                    ),
+
+                    Text("Bio",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: context.text12,
+                        color: AppColor.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        }
 
         return Row(
           spacing: 10,
           children: [
-
             CircleAvatar(
-              radius: context.sHeight*0.036,
+              radius: context.sHeight * 0.036,
               backgroundColor: AppColor.white,
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(context.sHeight*0.036,),
+                borderRadius: BorderRadius.circular(context.sHeight * 0.036),
                 child: CachedNetworkImage(
-                  imageUrl: profile!.userImage!,
+                  imageUrl: profile.userImage ?? "",
                   fit: BoxFit.cover,
-                  width: context.sHeight*0.068,
-                  height: context.sHeight*0.068,
+                  width: context.sHeight * 0.068,
+                  height: context.sHeight * 0.068,
+
                   placeholder: (context, url) => Container(
                     color: Colors.grey[100],
                     alignment: Alignment.center,
@@ -173,9 +213,11 @@ class _AccountScreenState extends State<AccountScreen> {
                       size: 25,
                     ),
                   ),
+
                   errorWidget: (context, url, error) => Container(
                     color: Colors.grey[200],
-                    child: const Icon(Icons.broken_image_outlined, color: Colors.grey, size: 25),
+                    alignment: Alignment.center,
+                    child: const Icon(Icons.person, color: Colors.grey, size: 25),
                   ),
                 ),
               ),
@@ -186,12 +228,10 @@ class _AccountScreenState extends State<AccountScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    loading
-                        ? "Loading…"
-                        : ((profile?.userName?.isNotEmpty ?? false)
-                        ? profile!.userName
-                        : "Guest User"),
-                    style:  TextStyle(
+                    (profile.userName?.isNotEmpty ?? false)
+                        ? profile.userName!
+                        : "Guest User",
+                    style: TextStyle(
                       fontWeight: FontWeight.w800,
                       fontSize: context.text14,
                       color: AppColor.white,
@@ -199,8 +239,8 @@ class _AccountScreenState extends State<AccountScreen> {
                   ),
 
                   Text(
-                    loading ? "" : (profile?.userBio ?? ""),
-                    style:  TextStyle(
+                    profile.userBio ?? "",
+                    style: TextStyle(
                       fontWeight: FontWeight.w500,
                       fontSize: context.text12,
                       color: AppColor.white,

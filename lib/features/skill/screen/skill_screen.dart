@@ -7,11 +7,10 @@ import 'package:skills_app/core/widget/app_card.dart';
 import '../../../core/constant/app_size.dart';
 import '../../../core/widget/flutter_toast.dart';
 import '../../notification/screen/notification_screen.dart';
-import '../../service/controller/service_delete_controller.dart';
+import '../controller/service_delete_controller.dart';
 import '../../service/controller/service_list_controller.dart';
 import '../../service/screen/service_details_screen.dart';
 import '../controller/service_list_by_user_controller.dart';
-import '../repository/service_list_byuser_repository.dart';
 import '../widget/skill_empty_card.dart';
 import 'add_skill_screen.dart';
 
@@ -23,11 +22,14 @@ class AdsScreen extends StatefulWidget {
 }
 
 class _AdsScreenState extends State<AdsScreen> {
-  final controller = Get.put(
-    ServiceListByUserController(repository: ServiceListByUserRepository()),
-  );
-  final deleteController = Get.put(ServiceDeleteController());
-
+  late final ServiceListByUserController controller;
+  late final ServiceDeleteController deleteController;
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.find<ServiceListByUserController>();
+    deleteController = Get.find<ServiceDeleteController>();
+  }
   String _filter = 'All';
 
   @override
@@ -48,18 +50,19 @@ class _AdsScreenState extends State<AdsScreen> {
     );
   }
 
+  /// ================= HEADER =================
   Widget _buildDarkHeader(BuildContext context) {
     return Container(
       color: AppColor.primary,
       padding: EdgeInsets.only(
-        // top: context.sWidth*0.16,
-        left: context.sWidth*0.04,
-        right: context.sWidth*0.04,
-        bottom: context.sWidth*0.04,
+        left: context.sWidth * 0.04,
+        right: context.sWidth * 0.04,
+        bottom: context.sWidth * 0.04,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          /// Top Row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -91,7 +94,6 @@ class _AdsScreenState extends State<AdsScreen> {
                 child: Container(
                   width: 36,
                   height: 36,
-                  margin: EdgeInsets.only(right: 0),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(10),
@@ -105,7 +107,10 @@ class _AdsScreenState extends State<AdsScreen> {
               ),
             ],
           ),
+
           const SizedBox(height: 20),
+
+          /// Stats
           Obx(() {
             final list = controller.serviceList;
             final total = list.length;
@@ -113,11 +118,10 @@ class _AdsScreenState extends State<AdsScreen> {
             final inactive = list.where((s) => !s.serviceStatus).length;
 
             return Row(
-              spacing: 10,
               children: [
                 _statBox(context, label: 'All', value: '$total'),
-                _statBox(context, label: 'Active', value: '$total'),
-                _statBox(context, label: 'Inactive', value: '${0}')
+                _statBox(context, label: 'Active', value: '$active'),
+                _statBox(context, label: 'Inactive', value: '$inactive'),
               ],
             );
           }),
@@ -125,9 +129,12 @@ class _AdsScreenState extends State<AdsScreen> {
       ),
     );
   }
-  Widget _statBox(BuildContext context, {required String label, required String value}) {
+
+  Widget _statBox(BuildContext context,
+      {required String label, required String value}) {
     return Expanded(
       child: Container(
+        margin: const EdgeInsets.only(right: 8),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.07),
@@ -137,8 +144,8 @@ class _AdsScreenState extends State<AdsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(label,
-                style: TextStyle(
-                    color: Colors.white, fontSize: context.text12)),
+                style:
+                TextStyle(color: Colors.white, fontSize: context.text12)),
             const SizedBox(height: 4),
             Text(value,
                 style: TextStyle(
@@ -151,6 +158,7 @@ class _AdsScreenState extends State<AdsScreen> {
     );
   }
 
+  /// ================= FILTER =================
   Widget _buildFilterRow(BuildContext context) {
     return Container(
       color: AppColor.white,
@@ -167,16 +175,28 @@ class _AdsScreenState extends State<AdsScreen> {
             ),
           ),
           Row(
-            spacing: 10,
             children: ['All', 'Active', 'Inactive'].map((filter) {
               final selected = _filter == filter;
-              return AppCard(
-                onTap: () => setState(() => _filter = filter),
-                color: selected ? AppColor.primary : AppColor.surface,
-                padding: EdgeInsets.symmetric(horizontal: context.sWidth*0.04,vertical: context.sWidth*0.01),
-                margin: EdgeInsets.zero,
-                child: Text(filter,
-                  style: TextStyle(fontSize: context.text12, fontWeight: FontWeight.w500, color: selected ? Colors.white : AppColor.subtitle,),
+              return Padding(
+                padding: const EdgeInsets.only(left: 8),
+                child: AppCard(
+                  onTap: () => setState(() => _filter = filter),
+                  color:
+                  selected ? AppColor.primary : AppColor.surface,
+                  padding: EdgeInsets.symmetric(
+                      horizontal: context.sWidth * 0.04,
+                      vertical: context.sWidth * 0.01),
+                  margin: EdgeInsets.zero,
+                  child: Text(
+                    filter,
+                    style: TextStyle(
+                      fontSize: context.text12,
+                      fontWeight: FontWeight.w500,
+                      color: selected
+                          ? Colors.white
+                          : AppColor.subtitle,
+                    ),
+                  ),
                 ),
               );
             }).toList(),
@@ -186,30 +206,39 @@ class _AdsScreenState extends State<AdsScreen> {
     );
   }
 
+  /// ================= LIST =================
   Widget _buildList() {
     return Obx(() {
       if (controller.isLoading.value) {
         return Column(
           children: [
-            LinearProgressIndicator(color: AppColor.primary, minHeight: 2),
+            LinearProgressIndicator(
+                color: AppColor.primary, minHeight: 2),
             const Expanded(child: SizedBox()),
           ],
         );
       }
 
-      final list = controller.serviceList;
+      final allList = controller.serviceList;
 
-      if (list.isEmpty) {
+      /// 🔥 FILTER LOGIC
+      final filteredList = _filter == "All"
+          ? allList
+          : _filter == "Active"
+          ? allList.where((s) => s.serviceStatus).toList()
+          : allList.where((s) => !s.serviceStatus).toList();
+
+      if (filteredList.isEmpty) {
         return const SkillEmptyCard();
       }
-      if (_filter == "Inactive") {
-        return const SkillEmptyCard();
-      }
+
       return ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        itemCount: list.length,
+        padding:
+        const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        itemCount: filteredList.length,
         itemBuilder: (context, index) {
-          final s = list[index];
+          final s = filteredList[index];
+
           return SkillCard(
             title: s.serviceName,
             price: s.serviceAmount != null
@@ -372,14 +401,19 @@ class SkillCard extends StatelessWidget {
               SizedBox(width: 10,),
             ],
           ),
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => ServiceDetailsScreen(
-                serviceId: serviceId.toString(),
-              ),
-            ),
-          ),
+          // onTap: () => Navigator.push(
+          //   context,
+          //   MaterialPageRoute(
+          //     builder: (_) => ServiceDetailsScreen(
+          //       serviceId: serviceId.toString(),
+          //     ),
+          //   ),
+          // ),
+          onTap: () {
+            Get.toNamed('/service-details', parameters: {
+              'id': serviceId.toString(),
+            });
+          },
         ),
 
         Positioned(

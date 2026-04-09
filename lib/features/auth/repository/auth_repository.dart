@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:skills_app/core/network/dio_client.dart';
+import 'package:skills_app/core/network/api_client.dart';
 
 class AuthRepository {
 
@@ -7,7 +7,7 @@ class AuthRepository {
 
     try {
 
-      final response = await DioClient.dio.post(
+      final response = await ApiClient.dio.post(
         "auth/send-otp/",
         data: {
           "user_phone": phone,
@@ -44,7 +44,7 @@ class AuthRepository {
 
     try {
 
-      final response = await DioClient.dio.post(
+      final response = await ApiClient.dio.post(
         "auth/verify-otp/",
         data: {
           "user_phone": phone,

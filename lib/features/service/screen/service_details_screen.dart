@@ -27,9 +27,9 @@ class ServiceDetailsScreen extends StatefulWidget {
 }
 
 class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
-  final locationController = Get.find<LocationController>();
   late final ServiceDetailsController serviceController;
-  final UserProfileController userProfileController = Get.put(UserProfileController());
+  late final UserProfileController userProfileController;
+  final locationController = Get.find<LocationController>();
 
   bool _bookmark = false;
   bool _isMSG = false;
@@ -38,18 +38,18 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    serviceController = Get.put(ServiceDetailsController());
+    serviceController = Get.find();
+    userProfileController = Get.find();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      // 1. Fetch service details
       await serviceController.fetchServiceDetails(int.parse(widget.serviceId));
 
-      // 2. Fetch seller profile after service is loaded
       final service = serviceController.serviceDetails.value;
       if (service != null) {
         await userProfileController.fetchUserProfile(service.user);
+
         descController.text =
-        "Hi, I came across your \"${service.serviceName}\" skill and would like to connect with you. I'm interested in learning more about this.";
+        "Hi, I came across your \"${service.serviceName}\" skill and would like to connect...";
       }
     });
   }
@@ -64,6 +64,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
       }
 
       if (serviceController.errorMessage.isNotEmpty) {
+        debugPrint("Error ${serviceController.errorMessage.value}");
         return Scaffold(
           body: Center(
             child: Column(
@@ -173,7 +174,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                             children: [
                               Text(
                                 service.serviceAmount != null
-                                    ? "₹${double.tryParse(service.serviceAmount!)?.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '') ?? service.serviceAmount!}"
+                                    ? "₹${double.tryParse(service.serviceAmount.toString())?.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '') ?? service.serviceAmount!}"
                                     : "Free",
                                 style: TextStyle(
                                     color: service.serviceAmount != null ? Colors.green: AppColor.primary,
@@ -569,6 +570,8 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
     );
   }
 }
+
+
 
 String getDistanceText(double lat1, double lon1, double lat2, double lon2) {
   final distanceKm = Geolocator.distanceBetween(

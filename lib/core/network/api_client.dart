@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 
-class DioClient {
+class ApiClient {
 
   static final Dio dio = Dio(
     BaseOptions(

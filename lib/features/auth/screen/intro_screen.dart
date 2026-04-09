@@ -43,7 +43,7 @@ class _IntroScreenState extends State<IntroScreen> {
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('intro_seen', true);
-    Get.off(() => AuthScreen());
+    Get.offAllNamed('/auth');
   }
 
   @override

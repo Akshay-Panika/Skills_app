@@ -81,7 +81,7 @@ class _AuthScreenState extends State<AuthScreen> {
       );
 
       if (success) {
-        Get.offAll(() => const DashboardScreen());
+        Get.offAllNamed('/dashboard');
       }
     }
   }

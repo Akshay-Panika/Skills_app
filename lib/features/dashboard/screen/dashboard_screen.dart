@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/constant/app_size.dart';
+import 'package:skills_app/features/skill/repository/service_list_byuser_repository.dart';
 import '../../../core/widget/app_dilog.dart';
 import '../../account/screen/account_screen.dart';
 import '../../category/controller/category_controller.dart';
@@ -12,6 +13,8 @@ import '../../location/controller/location_controller.dart';
 import '../../service/controller/service_list_controller.dart';
 import '../../service/repository/service_list_repository.dart';
 import 'package:get/get.dart';
+import '../../skill/controller/service_delete_controller.dart';
+import '../../skill/controller/service_list_by_user_controller.dart';
 import '../../skill/screen/skill_screen.dart';
 import '../../skill/screen/add_skill_screen.dart';
 
@@ -37,6 +40,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     Get.put(CategoryController(), permanent: true);
     Get.put(ServiceListController(ServiceListRepository()), permanent: true);
     Get.put(HomeScreenController(), permanent: true);
+    Get.put(ServiceListByUserController(repository: ServiceListByUserRepository()), permanent: true);
+    Get.put(ServiceDeleteController(), permanent: true);
 
     _screens = [
       HomeScreen(),

@@ -2,14 +2,14 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:skills_app/core/network/dio_client.dart';
+import 'package:skills_app/core/network/api_client.dart';
 import 'package:skills_app/features/account/model/user_profile_model.dart';
 
 class UserProfileRepository {
 
   static Future<UserProfileModel?> getUserProfile(int userId) async {
     try {
-      final response = await DioClient.dio.get("profiles/$userId/");
+      final response = await ApiClient.dio.get("profiles/$userId/");
 
       if (response.statusCode == 200) {
         return UserProfileModel.fromJson(response.data);
@@ -48,7 +48,7 @@ class UserProfileRepository {
           ),
       });
 
-      final response = await DioClient.dio.put(
+      final response = await ApiClient.dio.put(
         "profiles/$userId/",
         data: formData, // ✅ IMPORTANT
         options: Options(

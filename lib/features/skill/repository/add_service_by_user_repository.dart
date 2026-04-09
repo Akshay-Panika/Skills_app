@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import '../../../core/network/dio_client.dart';
+import '../../../core/network/api_client.dart';
 import '../model/add_service_by_user_model.dart';
 
 class AddServiceByUserRepository {
@@ -36,7 +36,7 @@ class AddServiceByUserRepository {
         "longitude": longitude,
       });
 
-      final response = await DioClient.dio.post(
+      final response = await ApiClient.dio.post(
         "service/create/",
         data: formData,
       );
@@ -84,7 +84,7 @@ class AddServiceByUserRepository {
 
       FormData formData = FormData.fromMap(map);
 
-      final response = await DioClient.dio.put(
+      final response = await ApiClient.dio.put(
         "service/user/$userId/update/$serviceId/",
         data: formData,
         options: Options(

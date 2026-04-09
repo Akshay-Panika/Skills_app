@@ -1,15 +1,26 @@
-// servicedetails/repository/service_details_repository.dart
 import 'package:dio/dio.dart';
-import '../../../core/network/dio_client.dart';
+import '../../../core/network/api_client.dart';
 import '../model/service_details_model.dart';
 
 class ServiceDetailsRepository {
-  Future<ServiceDetailsModel> getServiceById(int id) async {
+  Future<ServiceDetailsModel> getServiceDetails(int id) async {
     try {
-      final Response response = await DioClient.dio.get('service/$id/');
-      return ServiceDetailsModel.fromJson(response.data);
+      final response = await ApiClient.dio.get('service/$id/');
+
+      if (response.statusCode == 200 && response.data != null) {
+        return ServiceDetailsModel.fromJson(
+          response.data as Map<String, dynamic>,
+        );
+      } else {
+        throw Exception('Failed: ${response.statusCode}');
+      }
     } on DioException catch (e) {
-      throw Exception(e.response?.data?['detail'] ?? e.message);
+      // 🔥 safe error handling
+      return Future.error(
+        e.response?.data?['message'] ?? 'Server error',
+      );
+    } catch (_) {
+      return Future.error('Something went wrong');
     }
   }
 }

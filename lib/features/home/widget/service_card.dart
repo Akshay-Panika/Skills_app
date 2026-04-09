@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:skills_app/core/constant/app_size.dart';
 import 'package:transparent_image/transparent_image.dart';
 import '../../../core/constant/app_color.dart';
@@ -17,14 +19,19 @@ class ServiceCard extends StatelessWidget {
   Widget build(BuildContext context) {
 
     return InkWell(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ServiceDetailsScreen(
-            serviceId: service.id.toString(),
-          ),
-        ),
-      ),
+      // onTap: () => Navigator.push(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) => ServiceDetailsScreen(
+      //       serviceId: service.id.toString(),
+      //     ),
+      //   ),
+      // ),
+      onTap: () {
+        Get.toNamed('/service-details', parameters: {
+          'id': service.id.toString(),
+        });
+      },
       child: Container(
         width: context.sWidth*0.48,
         decoration: BoxDecoration(

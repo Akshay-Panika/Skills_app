@@ -1,7 +1,7 @@
 class ServiceDetailsModel {
   final int id;
-  final String? serviceImage;
-  final String? serviceAmount;
+  final String serviceImage;
+  final double? serviceAmount;
   final bool swipeStatus;
   final String serviceName;
   final bool serviceStatus;
@@ -16,7 +16,7 @@ class ServiceDetailsModel {
 
   ServiceDetailsModel({
     required this.id,
-    this.serviceImage,
+    required this.serviceImage,
     this.serviceAmount,
     required this.swipeStatus,
     required this.serviceName,
@@ -33,20 +33,41 @@ class ServiceDetailsModel {
 
   factory ServiceDetailsModel.fromJson(Map<String, dynamic> json) {
     return ServiceDetailsModel(
-      id: json['id'],
-      serviceImage: json['service_image'],
-      serviceAmount: json["service_amount"]?.toString(),
-      swipeStatus: json['swipe_status'] ?? false,
-      serviceName: json['service_name'] ?? '',
-      serviceStatus: json['service_status'] ?? false,
-      serviceDescription: json['service_description'] ?? '',
-      latitude: (json['latitude'] ?? 0).toDouble(),
-      longitude: (json['longitude'] ?? 0).toDouble(),
-      createdAt: json['created_at'] ?? '',
-      updatedAt: json['updated_at'] ?? '',
-      user: json['user'] ?? 0,
-      category: json['category'] ?? 0,
-      subcategory: json['subcategory'] ?? 0,
+      id: json['id'] as int,
+      serviceImage: json['service_image'] as String,
+      serviceAmount: json['service_amount'] != null
+          ? (json['service_amount'] as num).toDouble()
+          : null,
+      swipeStatus: json['swipe_status'] as bool,
+      serviceName: json['service_name'] as String,
+      serviceStatus: json['service_status'] as bool,
+      serviceDescription: json['service_description'] as String,
+      latitude: (json['latitude'] as num).toDouble(),
+      longitude: (json['longitude'] as num).toDouble(),
+      createdAt: json['created_at'] as String,
+      updatedAt: json['updated_at'] as String,
+      user: json['user'] as int,
+      category: json['category'] as int,
+      subcategory: json['subcategory'] as int,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'service_image': serviceImage,
+      'service_amount': serviceAmount,
+      'swipe_status': swipeStatus,
+      'service_name': serviceName,
+      'service_status': serviceStatus,
+      'service_description': serviceDescription,
+      'latitude': latitude,
+      'longitude': longitude,
+      'created_at': createdAt,
+      'updated_at': updatedAt,
+      'user': user,
+      'category': category,
+      'subcategory': subcategory,
+    };
   }
 }
