@@ -1,11 +1,10 @@
-class ServiceListModel {
+class WishlistModel {
   final int id;
   final String serviceImage;
   final String? serviceAmount;
   final String serviceName;
   final bool serviceStatus;
   final bool swipeStatus;
-  bool isFavorite;
   final String serviceDescription;
   final double? latitude;
   final double? longitude;
@@ -15,14 +14,13 @@ class ServiceListModel {
   final int category;
   final int subcategory;
 
-  ServiceListModel({
+  WishlistModel({
     required this.id,
     required this.serviceImage,
     this.serviceAmount,
     required this.serviceName,
     required this.serviceStatus,
     required this.swipeStatus,
-    required this.isFavorite,
     required this.serviceDescription,
     this.latitude,
     this.longitude,
@@ -33,15 +31,14 @@ class ServiceListModel {
     required this.subcategory,
   });
 
-  factory ServiceListModel.fromJson(Map<String, dynamic> json) {
-    return ServiceListModel(
+  factory WishlistModel.fromJson(Map<String, dynamic> json) {
+    return WishlistModel(
       id: json['id'],
       serviceImage: json['service_image'] ?? "",
       serviceAmount: json['service_amount']?.toString(), // ✅ safe convert
       serviceName: json['service_name'] ?? "",
       serviceStatus: json['service_status'] ?? false,
       swipeStatus: json['swipe_status'] ?? false,
-      isFavorite: json['is_favorite'] ?? false,
       serviceDescription: json['service_description'] ?? "",
       latitude: json['latitude'] != null
           ? (json['latitude'] as num).toDouble()
@@ -61,20 +58,20 @@ class ServiceListModel {
     );
   }
 }
-class ServiceListResponse {
+class WishlistResponse {
   final int count;
-  final List<ServiceListModel> services;
+  final List<WishlistModel> services;
 
-  ServiceListResponse({
+  WishlistResponse({
     required this.count,
     required this.services,
   });
 
-  factory ServiceListResponse.fromJson(Map<String, dynamic> json) {
-    return ServiceListResponse(
+  factory WishlistResponse.fromJson(Map<String, dynamic> json) {
+    return WishlistResponse(
       count: json['count'] ?? 0,
-      services: (json['services'] as List? ?? [])
-          .map((e) => ServiceListModel.fromJson(e))
+      services: (json['favorites'] as List? ?? [])
+          .map((e) => WishlistModel.fromJson(e))
           .toList(),
     );
   }

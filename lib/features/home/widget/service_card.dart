@@ -3,12 +3,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:skills_app/core/constant/app_size.dart';
-import 'package:transparent_image/transparent_image.dart';
+import 'package:skills_app/features/wishlist/controller/wishlist_toggle_controller.dart';
 import '../../../core/constant/app_color.dart';
+import '../../service/controller/service_list_controller.dart';
 import '../../service/model/service_list_model.dart';
-import '../../service/screen/service_details_screen.dart';
+
 
 class ServiceCard extends StatelessWidget {
   final ServiceListModel service;
@@ -17,16 +20,9 @@ class ServiceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<WishlistToggleController>();
 
     return InkWell(
-      // onTap: () => Navigator.push(
-      //   context,
-      //   MaterialPageRoute(
-      //     builder: (context) => ServiceDetailsScreen(
-      //       serviceId: service.id.toString(),
-      //     ),
-      //   ),
-      // ),
       onTap: () {
         Get.toNamed('/service-details', parameters: {
           'id': service.id.toString(),
@@ -99,11 +95,27 @@ class ServiceCard extends StatelessWidget {
               ],
             ),
             Positioned(
-              top: 5,right: 5,
-              child: CircleAvatar(
-                radius: 14,
-                backgroundColor: Colors.white,
-                child: FaIcon(FontAwesomeIcons.bookmark,size: 14,color: Colors.grey,),
+              top: -2,
+              right: -2,
+              child: InkWell(
+                onTap: () async {
+                  await controller.toggleWishlist(serviceId: service.id);
+                  Get.find<ServiceListController>()
+                      .toggleLocalFavorite(service.id);
+                },
+                child: CircleAvatar(
+                  radius: 18,
+                  backgroundColor: Colors.white,
+                  child: Icon(
+                    service.isFavorite
+                        ? Icons.bookmark
+                        : Icons.bookmark_border,
+                    color: service.isFavorite
+                        ? Colors.red
+                        : Colors.grey,
+                    size: 25,
+                  ),
+                ),
               ),
             ),
           ],

@@ -23,6 +23,8 @@ class ServiceListController extends GetxController {
     try {
       isLoading.value = true;
       final response = await repository.getServiceList();
+      services.assignAll(response.services);
+
       services.value = response.services;
       count.value = response.count;
     } catch (e) {
@@ -30,4 +32,16 @@ class ServiceListController extends GetxController {
     } finally {
       isLoading.value = false;
     }
-  }}
+  }
+
+  void toggleLocalFavorite(int id) {
+    final index = services.indexWhere((e) => e.id == id);
+
+    if (index != -1) {
+      services[index].isFavorite = !services[index].isFavorite;
+
+      /// 🔥 THIS is required for UI update
+      services.refresh();
+    }
+  }
+}

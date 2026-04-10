@@ -9,6 +9,7 @@ import '../../service/repository/service_list_repository.dart';
 import '../../skill/controller/service_delete_controller.dart';
 import '../../skill/controller/service_list_by_user_controller.dart';
 import '../../skill/repository/service_list_byuser_repository.dart';
+import '../../wishlist/controller/wishlist_toggle_controller.dart';
 import '../controller/home_screen_controller.dart';
 import '../screen/home_screen.dart';
 
@@ -27,5 +28,9 @@ class DashboardBinding extends Bindings {
     ));
 
     Get.lazyPut(() => ServiceDeleteController());
+    Get.lazyPut<WishlistToggleController>(
+          () => WishlistToggleController(),
+      fenix: true,
+    );
   }
 }

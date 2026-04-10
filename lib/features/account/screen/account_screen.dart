@@ -8,6 +8,7 @@ import 'package:skills_app/core/constant/app_size.dart';
 import 'package:skills_app/core/widget/flutter_toast.dart';
 import 'package:skills_app/core/widget/my_appbar.dart';
 import 'package:skills_app/features/auth/screen/auth_screen.dart';
+import 'package:skills_app/features/wishlist/screen/wishlist_screen.dart';
 import 'package:transparent_image/transparent_image.dart';
 import '../../../core/widget/app_card.dart';
 import '../../../core/widget/app_dilog.dart';
@@ -104,10 +105,11 @@ class _AccountScreenState extends State<AccountScreen> {
                   subtitle: "Manage your listings",
                   onTap: () => Get.to(() => AdsScreen()),
                 ),
-                const _MenuTile(
+                _MenuTile(
                   icon: Icons.favorite_border_rounded,
                   title: "Wishlist",
                   subtitle: "Saved services",
+                  onTap: () => Get.to(() => WishlistScreen()),
                 ),
                 _MenuTile(
                   icon: Icons.headset_mic_outlined,
