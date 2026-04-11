@@ -56,13 +56,17 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
         int.parse(widget.serviceId),
       );
 
+      if (!mounted) return;
+
       final service = serviceController.serviceDetails.value;
 
       if (service != null) {
         await userProfileController.fetchUserProfile(service.user);
 
+        if (!mounted) return;
+
         descController.text =
-        "Hi, I came across your \"${service.serviceName}\" skill and would like to connect...";
+        "Hi, I came across your \"${service.serviceName}\" skill and would like to connect.";
       }
     });
   }
@@ -536,7 +540,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
       maxLines: 4,
       minLines: 3,
       keyboardType: TextInputType.multiline,
-      controller: descController,
+      controller: controller,
       style: TextStyle(color: AppColor.title, fontSize: context.text14),
       decoration: InputDecoration(
         filled: true,

@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/widget/app_card.dart';
 import '../../../core/constant/app_size.dart';
+import '../../../core/widget/app_dilog.dart';
 import '../../../core/widget/flutter_toast.dart';
 import '../../notification/screen/notification_screen.dart';
 import '../controller/service_delete_controller.dart';
@@ -435,14 +436,6 @@ class SkillCard extends StatelessWidget {
               SizedBox(width: 10,),
             ],
           ),
-          // onTap: () => Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (_) => ServiceDetailsScreen(
-          //       serviceId: serviceId.toString(),
-          //     ),
-          //   ),
-          // ),
           onTap: () {
             Get.toNamed('/service-details', parameters: {
               'id': serviceId.toString(),
@@ -471,15 +464,11 @@ class SkillCard extends StatelessWidget {
       padding: EdgeInsets.zero,
       onSelected: (value) async {
         if (value == "edit") {
-          final bool? confirm = await _showDialog(
+          final confirm = await AppDialog.show(
             context,
-            icon: Icons.edit_outlined,
-            iconBg: AppColor.primary.withOpacity(0.1),
-            iconColor: AppColor.primary,
             title: "Edit Service?",
-            subtitle: "Do you want to update this service?",
-            confirmLabel: "Edit",
-            confirmColor: AppColor.primary,
+            message: "Do you want to update this service?",
+            confirmText: "Edit",
           );
           if (confirm == true) {
             final service = listController.serviceList
@@ -489,15 +478,11 @@ class SkillCard extends StatelessWidget {
         }
 
         if (value == "delete") {
-          final bool? confirm = await _showDialog(
+          final confirm = await AppDialog.show(
             context,
-            icon: Icons.delete_outline_rounded,
-            iconBg: AppColor.error.withOpacity(0.1),
-            iconColor: AppColor.error,
             title: "Delete Service?",
-            subtitle: "This action cannot be undone. Are you sure?",
-            confirmLabel: "Delete",
-            confirmColor: AppColor.error,
+            message: "This action cannot be undone. Are you sure?",
+            confirmText: "Delete",
           );
           if (confirm == true) {
             await deleteController.deleteService(
@@ -549,86 +534,4 @@ class SkillCard extends StatelessWidget {
     );
   }
 
-  Future<bool?> _showDialog(
-      BuildContext context, {
-        required IconData icon,
-        required Color iconBg,
-        required Color iconColor,
-        required String title,
-        required String subtitle,
-        required String confirmLabel,
-        required Color confirmColor,
-      }) {
-    return Get.dialog<bool>(
-      Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        backgroundColor: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                    color: iconBg, shape: BoxShape.circle),
-                child: Icon(icon, color: iconColor, size: 22),
-              ),
-              const SizedBox(height: 12),
-              Text(title,
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w700)),
-              const SizedBox(height: 6),
-              Text(subtitle,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontSize: 13,
-                      color: AppColor.subtitle,
-                      height: 1.5)),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Get.back(result: false),
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.grey.shade200),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                        padding:
-                        const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                      child: const Text("Cancel",
-                          style: TextStyle(
-                              color: Colors.black54,
-                              fontWeight: FontWeight.w600)),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => Get.back(result: true),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: confirmColor,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                        padding:
-                        const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                      child: Text(confirmLabel,
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700)),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }

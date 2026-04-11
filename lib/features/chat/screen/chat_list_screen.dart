@@ -5,14 +5,20 @@ import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/constant/app_size.dart';
 import 'package:skills_app/core/widget/app_card.dart';
 
+import '../../../core/widget/app_dilog.dart';
 import '../controller/booking_controller.dart';
 import '../../notification/screen/notification_screen.dart';
+import '../controller/booking_delete_controller.dart';
+import '../repository/booking_delete_repository.dart';
 import 'chat_screen.dart';
 
 class ChatListScreen extends StatelessWidget {
   ChatListScreen({super.key});
 
   final controller = Get.put(BookingController());
+  final deleteController = Get.put(
+    BookingDeleteController(BookingDeleteRepository()),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -125,8 +131,8 @@ class _ChatTabContent extends StatelessWidget {
 class ChatSkillCard extends StatelessWidget {
   final dynamic item;
 
-  const ChatSkillCard({super.key, required this.item});
-
+   ChatSkillCard({super.key, required this.item});
+  final deleteController = Get.find<BookingDeleteController>();
   @override
   Widget build(BuildContext context) {
     final service = item.service;
@@ -171,21 +177,21 @@ class ChatSkillCard extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-
-                        Text("Bio",
-                          style: TextStyle(
-                            fontSize: context.text12,
-                            color: AppColor.title,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text("${item.message}",
+                        Text("Flutter- Waidhan, Singrauli",
                           style: TextStyle(
                             fontSize: context.text12,
                             color: AppColor.subtitle,
                           ),
                           maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: 10,),
+                        Text("${item.message}",
+                          style: TextStyle(
+                            fontSize: context.text12,
+                            color: AppColor.title,
+                          ),
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
 
@@ -198,14 +204,18 @@ class ChatSkillCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Text("${service.serviceName}",
-                    style: TextStyle(
-                      fontSize: context.text12,
-                      fontWeight: FontWeight.w700,
-                      color: AppColor.title,
+                  AppCard(
+                    color: AppColor.surface,
+                    margin: EdgeInsets.zero,
+                    child: Text("${service.serviceName}",
+                      style: TextStyle(
+                        fontSize: context.text10,
+                        fontWeight: FontWeight.w500,
+                        color: AppColor.primary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -221,7 +231,23 @@ class ChatSkillCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Icon(Icons.more_vert),
+              InkWell(
+                onTap: () async {
+                  final confirm = await AppDialog.show(
+                    context,
+                    title: "Delete Chat",
+                    message: "Are you sure you want to delete this booking?",
+                    cancelText: "Cancel",
+                    confirmText: "Delete",
+                  );
+
+                  if (confirm) {
+                    await deleteController.deleteBooking(item.id);
+                    Get.find<BookingController>().fetchBookings();
+                  }
+                },
+                child: const Icon(Icons.delete, color: Colors.grey),
+              ),
               Text(
                 item.createdAt.toString().substring(0, 10),
                 style: const TextStyle(fontSize: 11, color: AppColor.subtitle),

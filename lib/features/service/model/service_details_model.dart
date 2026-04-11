@@ -1,7 +1,7 @@
 class ServiceDetailsModel {
   final int id;
   final String serviceImage;
-  final double? serviceAmount;
+  final String? serviceAmount;
   final bool swipeStatus;
   final String serviceName;
   final bool serviceStatus;
@@ -35,9 +35,7 @@ class ServiceDetailsModel {
     return ServiceDetailsModel(
       id: json['id'] as int,
       serviceImage: json['service_image'] as String,
-      serviceAmount: json['service_amount'] != null
-          ? (json['service_amount'] as num).toDouble()
-          : null,
+      serviceAmount: json['service_amount']?.toString(),
       swipeStatus: json['swipe_status'] as bool,
       serviceName: json['service_name'] as String,
       serviceStatus: json['service_status'] as bool,
