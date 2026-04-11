@@ -9,7 +9,6 @@ import '../../../core/widget/flutter_toast.dart';
 import '../../notification/screen/notification_screen.dart';
 import '../controller/service_delete_controller.dart';
 import '../../service/controller/service_list_controller.dart';
-import '../../service/screen/service_details_screen.dart';
 import '../controller/service_list_by_user_controller.dart';
 import '../widget/skill_empty_card.dart';
 import 'add_skill_screen.dart';
@@ -24,12 +23,18 @@ class AdsScreen extends StatefulWidget {
 class _AdsScreenState extends State<AdsScreen> {
   late final ServiceListByUserController controller;
   late final ServiceDeleteController deleteController;
+
+  final PageController _pageController = PageController();
+  int _currentIndex = 0;
+  final List<String> _filters = ['All', 'Active', 'Inactive'];
+
   @override
   void initState() {
     super.initState();
     controller = Get.find<ServiceListByUserController>();
     deleteController = Get.find<ServiceDeleteController>();
   }
+
   String _filter = 'All';
 
   @override
@@ -62,6 +67,7 @@ class _AdsScreenState extends State<AdsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+
           /// Top Row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -114,14 +120,19 @@ class _AdsScreenState extends State<AdsScreen> {
           Obx(() {
             final list = controller.serviceList;
             final total = list.length;
-            final active = list.where((s) => s.serviceStatus).length;
-            final inactive = list.where((s) => !s.serviceStatus).length;
+            final active = list
+                .where((s) => s.serviceStatus)
+                .length;
+            final inactive = list
+                .where((s) => !s.serviceStatus)
+                .length;
 
             return Row(
+              spacing: 12,
               children: [
                 _statBox(context, label: 'All', value: '$total'),
-                _statBox(context, label: 'Active', value: '$active'),
-                _statBox(context, label: 'Inactive', value: '$inactive'),
+                _statBox(context, label: 'Active', value: '${total}'),
+                _statBox(context, label: 'Inactive', value: '${0}'),
               ],
             );
           }),
@@ -133,13 +144,10 @@ class _AdsScreenState extends State<AdsScreen> {
   Widget _statBox(BuildContext context,
       {required String label, required String value}) {
     return Expanded(
-      child: Container(
-        margin: const EdgeInsets.only(right: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.07),
-          borderRadius: BorderRadius.circular(12),
-        ),
+      child: AppCard(
+        margin: EdgeInsets.zero,
+        padding: EdgeInsets.all(12),
+        color: Colors.white.withOpacity(0.07),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -158,7 +166,6 @@ class _AdsScreenState extends State<AdsScreen> {
     );
   }
 
-  /// ================= FILTER =================
   Widget _buildFilterRow(BuildContext context) {
     return Container(
       color: AppColor.white,
@@ -174,89 +181,116 @@ class _AdsScreenState extends State<AdsScreen> {
               color: AppColor.title,
             ),
           ),
+
           Row(
-            children: ['All', 'Active', 'Inactive'].map((filter) {
-              final selected = _filter == filter;
-              return Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: AppCard(
-                  onTap: () => setState(() => _filter = filter),
-                  color:
-                  selected ? AppColor.primary : AppColor.surface,
-                  padding: EdgeInsets.symmetric(
+            children: List.generate(_filters.length, (index) {
+              final filter = _filters[index];
+              final selected = _currentIndex == index;
+
+              return AnimatedScale(
+                duration: const Duration(milliseconds: 200),
+                scale: selected ? 1.05 : 1.0,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: AppCard(
+                    onTap: () {
+                      setState(() => _currentIndex = index);
+
+                      _pageController.animateToPage(
+                        index,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                    color:
+                    selected ? AppColor.primary : AppColor.surface,
+                    padding: EdgeInsets.symmetric(
                       horizontal: context.sWidth * 0.04,
-                      vertical: context.sWidth * 0.01),
-                  margin: EdgeInsets.zero,
-                  child: Text(
-                    filter,
-                    style: TextStyle(
-                      fontSize: context.text12,
-                      fontWeight: FontWeight.w500,
-                      color: selected
-                          ? Colors.white
-                          : AppColor.subtitle,
+                      vertical: context.sWidth * 0.01,
+                    ),
+                    margin: EdgeInsets.zero,
+                    child: Text(
+                      filter,
+                      style: TextStyle(
+                        fontSize: context.text12,
+                        fontWeight: FontWeight.w500,
+                        color: selected
+                            ? Colors.white
+                            : AppColor.subtitle,
+                      ),
                     ),
                   ),
                 ),
               );
-            }).toList(),
+            }),
           ),
         ],
       ),
     );
   }
 
-  /// ================= LIST =================
   Widget _buildList() {
     return Obx(() {
       if (controller.isLoading.value) {
         return Column(
           children: [
-            LinearProgressIndicator(
-                color: AppColor.primary, minHeight: 2),
+            LinearProgressIndicator(color: AppColor.primary, minHeight: 2),
             const Expanded(child: SizedBox()),
           ],
         );
       }
 
-      final allList = controller.serviceList;
+      return PageView.builder(
+        controller: _pageController,
 
-      /// 🔥 FILTER LOGIC
-      final filteredList = _filter == "All"
-          ? allList
-          : _filter == "Active"
-          ? allList.where((s) => s.serviceStatus).toList()
-          : allList.where((s) => !s.serviceStatus).toList();
+        onPageChanged: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
 
-      if (filteredList.isEmpty) {
-        return const SkillEmptyCard();
-      }
+        itemCount: _filters.length,
 
-      return ListView.builder(
-        padding:
-        const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        itemCount: filteredList.length,
-        itemBuilder: (context, index) {
-          final s = filteredList[index];
+        itemBuilder: (context, pageIndex) {
+          final allList = controller.serviceList;
 
-          return SkillCard(
-            title: s.serviceName,
-            price: s.serviceAmount != null
-                ? "₹${double.tryParse(s.serviceAmount!)?.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '') ?? s.serviceAmount!}"
-                : "Free",
-            serviceDescription: s.serviceDescription,
-            views: "0 views",
-            image: s.serviceImage,
-            status: s.serviceStatus ? "Active" : "Inactive",
-            serviceId: s.id,
-            userId: s.user,
+          final filteredList = pageIndex == 0
+              ? allList
+              : pageIndex == 1
+              ? allList.where((s) => !s.serviceStatus).toList()
+              : allList.where((s) => s.serviceStatus).toList();
+
+          if (filteredList.isEmpty) {
+            return const SkillEmptyCard();
+          }
+
+          return ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            itemCount: filteredList.length,
+            itemBuilder: (context, index) {
+              final s = filteredList[index];
+
+              return SkillCard(
+                title: s.serviceName,
+                price: s.serviceAmount != null
+                    ? "₹${double.tryParse(s.serviceAmount!)
+                    ?.toStringAsFixed(2)
+                    .replaceAll(RegExp(r'\.00$'), '') ?? s.serviceAmount!}"
+                    : "Free",
+                serviceDescription: s.serviceDescription,
+                views: "0 views",
+                image: s.serviceImage,
+                status: s.serviceStatus ? "Active" : "Inactive",
+                serviceId: s.id,
+                userId: s.user,
+              );
+            },
           );
         },
       );
     });
   }
 }
-
 class SkillCard extends StatelessWidget {
   final int serviceId;
   final int userId;
@@ -423,16 +457,6 @@ class SkillCard extends StatelessWidget {
     );
   }
 
-  Widget _placeholder(BuildContext context) {
-    return Container(
-      width: 64,
-      height: 64,
-      color: AppColor.surface,
-      child: Icon(Icons.image_not_supported_outlined,
-          size: 24, color: AppColor.subtitle.withOpacity(0.5)),
-    );
-  }
-
   Widget _popupMenu(
       BuildContext context,
       ServiceDeleteController deleteController,
@@ -482,6 +506,7 @@ class SkillCard extends StatelessWidget {
               listController.removeService(serviceId);
               FlutterToast.success(deleteController.message.value);
               Get.find<ServiceListController>().fetchServiceList();
+              Get.find<ServiceListByUserController>().fetchMyServices();
             } else {
               FlutterToast.error("Service not found");
             }

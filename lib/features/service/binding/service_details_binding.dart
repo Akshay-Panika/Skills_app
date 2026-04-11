@@ -6,20 +6,8 @@ import '../../location/controller/location_controller.dart';
 class ServiceDetailsBinding extends Bindings {
   @override
   void dependencies() {
-
-    /// Service Details Controller
-    Get.lazyPut<ServiceDetailsController>(
-          () => ServiceDetailsController(),
-    );
-
-    /// User Profile Controller
-    Get.lazyPut<UserProfileController>(
-          () => UserProfileController(),
-    );
-
-    /// Location Controller (agar already global nahi hai)
-    Get.lazyPut<LocationController>(
-          () => LocationController(),
-    );
+    Get.lazyPut<ServiceDetailsController>(() => ServiceDetailsController());
+    Get.lazyPut<UserProfileController>(() => UserProfileController());
+    Get.lazyPut<LocationController>(() => LocationController());
   }
 }

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:skills_app/core/constant/app_size.dart';
 
+import '../../../core/constant/app_color.dart';
+import '../../../core/widget/my_appbar.dart';
+
 // ─── Design Tokens ─────────────────────────────────────────────
 class _C {
   static const primary     = Color(0xFF0D6E6E);
@@ -73,10 +76,16 @@ class NotificationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: _C.surface,
+      appBar: myAppBar(
+        title: "Notifications",
+        centerTitle: false,
+        showBackButton: true,
+        backgroundColor: AppColor.primary,
+        titleColor: AppColor.white,
+        buttonColor: AppColor.white,
+      ),
       body: Column(
         children: [
-          _buildHeader(context),
-
           Expanded(
             child: ListView(
               padding: const EdgeInsets.all(16),
@@ -96,45 +105,8 @@ class NotificationScreen extends StatelessWidget {
     );
   }
 
-  // ─── Header ────────────────────────────────────────────────
-  Widget _buildHeader(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [_C.primaryDark, _C.primary],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-          child: Row(
-            children: [
-              InkWell(
-                onTap: () => Navigator.pop(context),
-                child: const Icon(Icons.arrow_back_ios_new,
-                    color: Colors.white, size: 20),
-              ),
-              const SizedBox(width: 12),
-               Text(
-                "Notifications",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: context.text16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }
 
-// ─── Section Title ─────────────────────────────────────────────
 class _SectionTitle extends StatelessWidget {
   final String title;
   const _SectionTitle({required this.title});

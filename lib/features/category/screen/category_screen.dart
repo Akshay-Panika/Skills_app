@@ -77,6 +77,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
       appBar: myAppBar(
         title: 'Categories',
         showBackButton: true,
+          backgroundColor: AppColor.primary,
+          titleColor: AppColor.white,
+          buttonColor: AppColor.white,
       ),
       body: Row(
         children: [

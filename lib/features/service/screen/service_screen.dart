@@ -32,7 +32,9 @@ class _ServiceScreenState extends State<ServiceScreen> {
       appBar: myAppBar(
         title: "Service",
         showBackButton: true,
-        backgroundColor: AppColor.white,
+        backgroundColor: AppColor.primary,
+        titleColor: AppColor.white,
+        buttonColor: AppColor.white,
         actions: [
           Transform.scale(
             scale: 0.8,

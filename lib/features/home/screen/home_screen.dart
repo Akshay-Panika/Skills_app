@@ -132,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Row(
                                   children: [
                                     // Icon(Icons.location_on,size: 10,color: Colors.green.shade700,),
-                                    Text(" Skills Share",
+                                    Text(" Skill Daan",
                                         style: TextStyle(fontSize: context.text12, color: Colors.white,fontWeight: FontWeight.w500)),
                                   ],
                                 ),

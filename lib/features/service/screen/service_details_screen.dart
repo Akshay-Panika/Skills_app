@@ -1,4 +1,3 @@
-// servicedetails/view/service_details_screen.dart
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -6,13 +5,17 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:skills_app/core/widget/app_card.dart';
 import 'package:skills_app/core/widget/app_contact.dart';
+import 'package:skills_app/features/chat/screen/chat_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constant/app_color.dart';
 import '../../../core/constant/app_size.dart';
 import '../../account/controller/user_profile_controller.dart';
 import '../../account/model/user_profile_model.dart';
 import '../../location/controller/location_controller.dart';
+import '../controller/booking_check_controller.dart';
+import '../controller/booking_create_controller.dart';
 import '../controller/service_details_controller.dart';
+import '../repository/booking_create_repository.dart';
 import '../widget/service_details_shimmer.dart';
 
 class ServiceDetailsScreen extends StatefulWidget {
@@ -27,24 +30,34 @@ class ServiceDetailsScreen extends StatefulWidget {
 }
 
 class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
-  late final ServiceDetailsController serviceController;
-  late final UserProfileController userProfileController;
+  final ServiceDetailsController serviceController = Get.find();
+  final UserProfileController userProfileController = Get.find();
   final locationController = Get.find<LocationController>();
+  final checkBookingController = Get.put(BookingCheckController());
+  final bookingCreateController = Get.put(
+    BookingCreateController(BookingCreateRepository()),
+  );
 
   bool _bookmark = false;
   bool _isMSG = false;
   final descController = TextEditingController();
 
+
   @override
   void initState() {
     super.initState();
-    serviceController = Get.find();
-    userProfileController = Get.find();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await serviceController.fetchServiceDetails(int.parse(widget.serviceId));
+      checkBookingController.checkServiceBooking(
+        int.parse(widget.serviceId),
+      );
+
+      await serviceController.fetchServiceDetails(
+        int.parse(widget.serviceId),
+      );
 
       final service = serviceController.serviceDetails.value;
+
       if (service != null) {
         await userProfileController.fetchUserProfile(service.user);
 
@@ -55,9 +68,15 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
   }
 
   @override
+  void dispose() {
+    descController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Obx(() {
-      if (serviceController.isLoading.value) {
+      if (serviceController.isLoading.value || checkBookingController.isLoading.value) {
         return const Scaffold(
           body: ServiceDetailsShimmer(),
         );
@@ -404,77 +423,84 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
               ],
             ),
             Positioned(
-              bottom:  context.sWidth*0.06,
+              bottom: context.sWidth * 0.06,
               left: 0,
               right: 0,
               child: Obx(() {
-                final UserProfileModel? profile = userProfileController.userProfile.value;
-                return  Column(
+
+                final alreadyBooked = checkBookingController.alreadyBooked.value;
+
+                if (alreadyBooked) {
+                  return _actionButton(
+                    context,
+                    text: "Skill Booked",
+                    onChatTap: () => Get.to(() => ChatScreen()),
+                    bookmark: _bookmark,
+                    onBookmarkTap: () {
+                      setState(() {
+                        _bookmark = !_bookmark;
+                      });
+                    },
+                  );
+                }
+
+                return Column(
                   children: [
 
-                    if(_isMSG)
-                    Stack(
-                      children: [
-                        AppCard(
-                          padding: EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _fieldLabel(context, "Chat With Mentor"),
-                              _mxgBox(controller: descController)
-                            ],
-                          ),
-                        ),
-                        Positioned(
-                            top: 0,right: 16,
-                            child: IconButton(onPressed: () {
-                          setState(() {
-                            _isMSG = false;
-                            descController.text =
-                            "Hi, I came across your \"${service.serviceName}\" skill and would like to connect with you. I'm interested in learning more about this.";
-
-                          });
-                        }, icon: Icon(Icons.close, color: Colors.red,)))
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: AppCard(
-                            height: context.sWidth*0.12,
-                            color: AppColor.primary,
-                            onTap: () {
-                              setState(() {
-                                _isMSG = !_isMSG;
-                              });
-                            },
-                            // onTap: () => AppContact.whatsapp(profile!.userPhone, 'Hello Sir, I want to this course!'),
-                            child: Row(
-                              spacing: 10,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
+                    if (_isMSG)
+                      Stack(
+                        children: [
+                          AppCard(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Icon(Icons.chat, color: Colors.white),
-                                Text(
-                                  _isMSG ? "Sent Mentor":"Chat With Mentor",
-                                  style: TextStyle(color: Colors.white, fontSize: context.text14),
-                                ),
+                                _fieldLabel(context, "Chat With Mentor"),
+                                _mxgBox(controller: descController),
                               ],
                             ),
                           ),
-                        ),
-                    
-                        AppCard(
-                          color: AppColor.primary,
-                          height: context.sWidth*0.12,
-                          width: context.sWidth*0.12,
-                          onTap: () => setState(() => _bookmark = !_bookmark),
-                          child: Icon(
-                            _bookmark ? Icons.bookmark : Icons.bookmark_border,
-                            color: Colors.white,
+
+                          Positioned(
+                            top: 0,
+                            right: 16,
+                            child: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  _isMSG = false;
+                                  descController.text =
+                                  "Hi, I came across your \"${service.serviceName}\" skill and would like to connect with you.";
+                                });
+                              },
+                              icon: const Icon(Icons.close, color: Colors.red),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
+
+                    _actionButton(
+                      context,
+                      text: _isMSG ? "Send Message" : "Chat With Mentor",
+                      onChatTap: () {
+                        if (!_isMSG) {
+                          setState(() {
+                            _isMSG = true;
+                          });
+                          return;
+                        }
+
+                        bookingCreateController.createBooking(
+                          serviceId: service.id,
+                          message: descController.text,
+                        );
+                      },
+
+                      bookmark: _bookmark,
+                      onBookmarkTap: () {
+                        setState(() {
+                          _bookmark = !_bookmark;
+                        });
+                      },
                     ),
                   ],
                 );
@@ -525,13 +551,6 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
       ),
     );
   }
-  Widget _imagePlaceholder() => Container(
-    decoration: BoxDecoration(color: Colors.grey.withOpacity(0.16)),
-    child: const Center(
-      child: Icon(Icons.image_not_supported_outlined,
-          size: 100, color: Colors.white),
-    ),
-  );
 
   Widget _sellerShimmer() =>  Container(
     padding: const EdgeInsets.all(16),
@@ -571,7 +590,53 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
   }
 }
 
+Widget _actionButton(
+    BuildContext context, {
+      required String text,
+      required bool bookmark,
+      required VoidCallback onBookmarkTap,
+      VoidCallback? onChatTap,
+    }) {
+  return Row(
+    children: [
+      Expanded(
+        child: AppCard(
+          height: context.sWidth * 0.12,
+          color: AppColor.primary,
+          onTap: onChatTap,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Icon(Icons.chat, color: Colors.white),
+              SizedBox(width: 10),
+              Text(
+                text,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: context.text14,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
 
+      SizedBox(width: 10),
+
+      AppCard(
+        color: AppColor.primary,
+        height: context.sWidth * 0.12,
+        width: context.sWidth * 0.12,
+        onTap: onBookmarkTap,
+        child: Icon(
+          bookmark ? Icons.bookmark : Icons.bookmark_border,
+          color: Colors.white,
+        ),
+      ),
+    ],
+  );
+}
 
 String getDistanceText(double lat1, double lon1, double lat2, double lon2) {
   final distanceKm = Geolocator.distanceBetween(

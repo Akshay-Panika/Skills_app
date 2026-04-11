@@ -90,7 +90,7 @@ class SearchScreen extends StatelessWidget {
             children: [
               FaIcon(FontAwesomeIcons.chalkboardTeacher, color: AppColor.white),
               const SizedBox(width: 8),
-              Text('SkillHub', style: TextStyle(color: AppColor.white, fontSize: context.text16, fontWeight: FontWeight.w700)),
+              Text('Skill Daan', style: TextStyle(color: AppColor.white, fontSize: context.text16, fontWeight: FontWeight.w700)),
             ],
           ),
           SizedBox(height: context.sHeight * 0.01),

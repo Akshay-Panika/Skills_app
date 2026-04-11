@@ -6,7 +6,7 @@ import 'package:skills_app/features/skill/repository/service_list_byuser_reposit
 import '../../../core/widget/app_dilog.dart';
 import '../../account/screen/account_screen.dart';
 import '../../category/controller/category_controller.dart';
-import '../../chat/screen/chat_screen.dart';
+import '../../chat/screen/chat_list_screen.dart';
 import '../../home/controller/home_screen_controller.dart';
 import '../../home/screen/home_screen.dart';
 import '../../location/controller/location_controller.dart';
@@ -45,7 +45,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     _screens = [
       HomeScreen(),
-      ChatScreen(),
+      ChatListScreen(),
       AdsScreen(),
       AccountScreen(),
     ];
