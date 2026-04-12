@@ -22,21 +22,13 @@ class AdsScreen extends StatefulWidget {
 }
 
 class _AdsScreenState extends State<AdsScreen> {
-  late final ServiceListByUserController controller;
-  late final ServiceDeleteController deleteController;
+
+  final serviceListController = Get.find<ServiceListByUserController>();
 
   final PageController _pageController = PageController();
+
   int _currentIndex = 0;
   final List<String> _filters = ['All', 'Active', 'Inactive'];
-
-  @override
-  void initState() {
-    super.initState();
-    controller = Get.find<ServiceListByUserController>();
-    deleteController = Get.find<ServiceDeleteController>();
-  }
-
-  String _filter = 'All';
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +48,6 @@ class _AdsScreenState extends State<AdsScreen> {
     );
   }
 
-  /// ================= HEADER =================
   Widget _buildDarkHeader(BuildContext context) {
     return Container(
       color: AppColor.primary,
@@ -119,7 +110,7 @@ class _AdsScreenState extends State<AdsScreen> {
 
           /// Stats
           Obx(() {
-            final list = controller.serviceList;
+            final list = serviceListController.serviceList;
             final total = list.length;
             final active = list
                 .where((s) => s.serviceStatus)
@@ -232,7 +223,7 @@ class _AdsScreenState extends State<AdsScreen> {
 
   Widget _buildList() {
     return Obx(() {
-      if (controller.isLoading.value) {
+      if (serviceListController.isLoading.value) {
         return Column(
           children: [
             LinearProgressIndicator(color: AppColor.primary, minHeight: 2),
@@ -253,7 +244,7 @@ class _AdsScreenState extends State<AdsScreen> {
         itemCount: _filters.length,
 
         itemBuilder: (context, pageIndex) {
-          final allList = controller.serviceList;
+          final allList = serviceListController.serviceList;
 
           final filteredList = pageIndex == 0
               ? allList
@@ -473,7 +464,13 @@ class SkillCard extends StatelessWidget {
           if (confirm == true) {
             final service = listController.serviceList
                 .firstWhere((e) => e.id == serviceId);
-            Get.to(() => AddSkillScreen(isEdit: true, serviceData: service));
+
+            Get.toNamed('/add-skill',
+              arguments: {"isEdit": true,
+                "serviceData": service,
+              },
+            );
+            // Get.to(() => AddSkillScreen(isEdit: true, serviceData: service));
           }
         }
 

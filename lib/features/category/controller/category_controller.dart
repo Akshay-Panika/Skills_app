@@ -11,8 +11,6 @@ class CategoryController extends GetxController {
     getCategories();
     super.onInit();
   }
-
-  // Yahan Future<void> likhna zaroori hai
   Future<void> getCategories() async {
     try {
       isLoading(true);

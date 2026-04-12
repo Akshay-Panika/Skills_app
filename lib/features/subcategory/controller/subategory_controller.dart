@@ -4,9 +4,8 @@ import '../model/subcategory_model.dart';
 import '../repository/subcategory_repository.dart';
 
 class SubCategoryController extends GetxController {
-  final SubCategoryRepository repository;
+  final SubCategoryRepository repository = SubCategoryRepository();
 
-  SubCategoryController({required this.repository});
 
   var subCategories = <SubCategory>[].obs;
   var isLoading = false.obs;

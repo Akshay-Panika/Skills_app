@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skills_app/routes/app_pages.dart';
 import 'features/auth/helper/auth_preferences.dart';
+import 'features/auth/helper/intro_preferences.dart';
 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final prefs = await SharedPreferences.getInstance();
+  await IntroPreferences.init();
+  await AuthPreferences.init();
 
-  final introSeen = prefs.getBool('intro_seen') ?? false;
-  final isLoggedIn = await AuthPreferences.isLoggedIn();
+  final introSeen = IntroPreferences.isIntroSeen();
+  final isLoggedIn =  AuthPreferences.isLoggedIn();
 
   String initialRoute;
 

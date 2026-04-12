@@ -37,12 +37,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
-    Get.put(CategoryController(), permanent: true);
-    Get.put(ServiceListController(ServiceListRepository()), permanent: true);
-    Get.put(HomeScreenController(), permanent: true);
-    Get.put(ServiceListByUserController(repository: ServiceListByUserRepository()), permanent: true);
-    Get.put(ServiceDeleteController(), permanent: true);
-
     _screens = [
       HomeScreen(),
       ChatListScreen(),
@@ -134,7 +128,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                       ),
                       child: IconButton(
-                        onPressed: () => Get.to(() => AddSkillScreen()),
+                        onPressed: () => Get.toNamed('/add-skill'),
                         icon: const FaIcon(FontAwesomeIcons.plus,
                             color: Colors.white),
                       ),

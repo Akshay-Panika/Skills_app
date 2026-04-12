@@ -5,9 +5,8 @@ import '../model/service_list_by_user_model.dart';
 import '../repository/service_list_byuser_repository.dart';
 
 class ServiceListByUserController extends GetxController {
-  final ServiceListByUserRepository repository;
+  final ServiceListByUserRepository repository = ServiceListByUserRepository();
 
-  ServiceListByUserController({required this.repository});
 
   var isLoading = false.obs;
   var serviceList = <Service>[].obs;

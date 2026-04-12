@@ -3,23 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:skills_app/core/constant/app_color.dart';
-import 'package:skills_app/core/widget/app_card.dart';
 import 'package:skills_app/core/widget/my_appbar.dart';
 import '../../../core/constant/app_size.dart';
 import '../../location/controller/location_controller.dart';
-import '../../service/model/service_list_model.dart';
 import '../../service/screen/service_details_screen.dart';
 import '../controller/wishlist_controller.dart';
 import '../controller/wishlist_remove_controller.dart';
-import '../controller/wishlist_toggle_controller.dart';
 import '../model/wishlist_model.dart';
 
 class WishlistScreen extends StatelessWidget {
   WishlistScreen({super.key});
-  final LocationController _getLocationController = Get.find<LocationController>();
 
-  final WishlistRemoveController removeController = Get.put(WishlistRemoveController());
-  final WishlistController controller = Get.put(WishlistController());
+  final _getLocationController = Get.find<LocationController>();
+  final wishlistController = Get.find<WishlistController>();
+  final removerWishlistController = Get.find<WishlistRemoveController>();
 
   @override
   Widget build(BuildContext context) {
@@ -36,11 +33,11 @@ class WishlistScreen extends StatelessWidget {
       body: Obx(() {
         final lat = _getLocationController.latitude.value;
         final lon = _getLocationController.longitude.value;
-        if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+        if (wishlistController.isLoading.value) {
+          return  Center(child: CircularProgressIndicator(color: AppColor.primary,));
         }
 
-        if (controller.services.isEmpty) {
+        if (wishlistController.services.isEmpty) {
           return const Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -83,7 +80,7 @@ class WishlistScreen extends StatelessWidget {
             // crossAxisCount: nearbyServices.length,
           ),
           itemBuilder: (context, index) {
-            final item = controller.services[index];
+            final item = wishlistController.services[index];
             final distance = getDistanceText(
               lat,
               lon,
@@ -94,18 +91,18 @@ class WishlistScreen extends StatelessWidget {
             return _ServiceCard(
               service: item,
               onRemove: () async {
-                await removeController.removeFromFavorite(
+                await removerWishlistController.removeFromFavorite(
                   userId: 1,
                   serviceId: item.id,
                 );
 
-                controller.services.removeWhere(
+                wishlistController.services.removeWhere(
                       (e) => e.id == item.id,
                 );
               }, serviceDistance: distance,
             );
           },
-          itemCount: controller.services.length,
+          itemCount: wishlistController.services.length,
         );
       }),
     );

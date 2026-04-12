@@ -170,7 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Row(
                           children: [
                             IconButton(
-                              onPressed: () {},
+                              onPressed: () => Get.toNamed('/wishlist'),
                               icon: const Icon(Icons.bookmark, color: Colors.white,),
                             ),
             

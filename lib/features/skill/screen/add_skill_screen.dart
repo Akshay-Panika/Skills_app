@@ -11,13 +11,9 @@ import '../../../core/constant/app_size.dart';
 import '../../category/controller/category_controller.dart';
 import '../../location/controller/location_controller.dart';
 import '../../subcategory/controller/subategory_controller.dart';
-import '../../subcategory/repository/subcategory_repository.dart';
 import '../controller/add_service_by_user_controller.dart';
-import '../controller/service_list_by_user_controller.dart';
-import '../repository/add_service_by_user_repository.dart';
-import 'package:skills_app/core/constant/app_color.dart';
 
-import '../repository/service_list_byuser_repository.dart';
+import 'package:skills_app/core/constant/app_color.dart';
 
 class AddSkillScreen extends StatefulWidget {
   final bool isEdit;
@@ -36,15 +32,10 @@ class AddSkillScreen extends StatefulWidget {
 class _AddSkillScreenState extends State<AddSkillScreen>
     with SingleTickerProviderStateMixin {
 
-  final LocationController locationController = Get.find<LocationController>();
-  final CategoryController categoryController = Get.put(CategoryController());
-  final SubCategoryController subController = Get.put(
-    SubCategoryController(repository: SubCategoryRepository()),
-  );
-  final AddServiceByUserController serviceController = Get.put(
-    AddServiceByUserController(repository: AddServiceByUserRepository()),
-  );
-  final serviceListByUserController = Get.put(ServiceListByUserController(repository: ServiceListByUserRepository()));
+  final locationController = Get.find<LocationController>();
+  final categoryController = Get.find<CategoryController>();
+  final subController = Get.find<SubCategoryController>();
+  final serviceController = Get.find<AddServiceByUserController>();
 
   File? selectedImage;
   String? networkImage;

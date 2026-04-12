@@ -6,7 +6,6 @@ import 'package:sms_autofill/sms_autofill.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/constant/app_size.dart';
 import 'package:skills_app/core/widget/app_button.dart';
-import 'package:skills_app/features/dashboard/screen/dashboard_screen.dart';
 import '../controller/auth_controller.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -19,7 +18,7 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen> {
 
   final phoneController = TextEditingController();
-  final AuthController controller = Get.put(AuthController());
+  final AuthController controller = Get.find<AuthController>();
 
   final List<TextEditingController> otpControllers = List.generate(6, (_) => TextEditingController());
 
@@ -32,7 +31,7 @@ class _AuthScreenState extends State<AuthScreen> {
     SmsAutoFill().code.listen((code) {
       if (code != null && code.length == 6) {
         fillOtp(code);
-        verifyOtpAuto();
+        // verifyOtpAuto();
       }
     });
   }
@@ -41,13 +40,13 @@ class _AuthScreenState extends State<AuthScreen> {
     await SmsAutoFill().listenForCode();
   }
 
-  /// 🔥 FILL OTP
   void fillOtp(String code) {
     if (code.length != 6) return;
 
     for (int i = 0; i < 6; i++) {
       otpControllers[i].text = code[i];
     }
+    // FocusScope.of(context).unfocus();
 
     setState(() {});
   }
@@ -65,12 +64,9 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
-  /// 🔥 GET OTP
   String getOtp() {
     return otpControllers.map((e) => e.text).join();
   }
-
-  /// 🔥 AUTO VERIFY
   void verifyOtpAuto() async {
     String otp = getOtp();
 
@@ -86,13 +82,6 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
-  @override
-  void dispose() {
-    SmsAutoFill().unregisterListener();
-    super.dispose();
-  }
-
-  /// 🔥 OTP BOX
   Widget buildOtpBox(BuildContext context,int index) {
     return Expanded(
       child: TextField(
@@ -102,8 +91,8 @@ class _AuthScreenState extends State<AuthScreen> {
         textAlign: TextAlign.center,
         maxLength: 1,
         onTap: () {
-          /// 🔥 CHECK PASTE ON TAP
           checkClipboardPaste();
+          FocusScope.of(context).requestFocus(focusNodes[index]);
         },
         decoration: InputDecoration(
           counterText: "",
@@ -124,14 +113,30 @@ class _AuthScreenState extends State<AuthScreen> {
             focusNodes[index - 1].requestFocus();
           }
 
-          /// 🔥 AUTO VERIFY
-          if (getOtp().length == 6) {
-            verifyOtpAuto();
-          }
+          // if (getOtp().length == 6) {
+          //   // FocusScope.of(context).unfocus();
+          //   verifyOtpAuto();
+          // }
         },
       ),
     );
   }
+
+
+  @override
+  void dispose() {
+    phoneController.dispose();
+    for (var c in otpControllers) {
+      c.dispose();
+    }
+    for (var f in focusNodes) {
+      f.dispose();
+    }
+    SmsAutoFill().unregisterListener();
+
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -277,7 +282,6 @@ class _AuthScreenState extends State<AuthScreen> {
                       isLoading: controller.loading.value,
                       text: controller.isOtpSent.value ? "Verify OTP" : "Continue",
                       onPressed: () async {
-
                         if (controller.isOtpSent.value) {
                           verifyOtpAuto();
                         } else {

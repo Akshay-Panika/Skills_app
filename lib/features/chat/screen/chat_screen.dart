@@ -1,185 +1,336 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-
+import 'package:shimmer/shimmer.dart';
 import '../../../core/constant/app_color.dart';
+import '../controller/chat_controller.dart';
 
-class Message {
-  final String text;
-  final bool isMe;
+class ChatScreen extends GetView<ChatController> {
+  const ChatScreen({super.key});
 
-  Message({required this.text, required this.isMe});
-}
-
-class ChatController extends GetxController {
-  var messages = <Message>[].obs;
-  final textController = TextEditingController();
-  final scrollController = ScrollController();
-
-  void sendMessage() {
-    final text = textController.text.trim();
-    if (text.isEmpty) return;
-
-    messages.add(Message(text: text, isMe: true));
-    textController.clear();
-
-    Future.delayed(const Duration(milliseconds: 100), () {
-      scrollToBottom();
-    });
-
-    // fake reply (remove in real API)
-    Future.delayed(const Duration(seconds: 1), () {
-      messages.add(Message(text: "Got it 👍", isMe: false));
-      scrollToBottom();
-    });
+  bool isBuyer(int buyerId) {
+    return controller.userId == buyerId;
   }
-
-  void scrollToBottom() {
-    if (scrollController.hasClients) {
-      scrollController.animateTo(
-        scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-    }
-  }
-}
-
-class ChatScreen extends StatelessWidget {
-  ChatScreen({super.key});
-
-  final ChatController controller = Get.put(ChatController());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColor.surface,
+
+      /// 🔥 AppBar
       appBar: AppBar(
         backgroundColor: AppColor.primary,
+        elevation: 1,
         leading: IconButton(onPressed: () {
-          
+          Get.back();
         }, icon: Icon(Icons.arrow_back_ios,color: Colors.white,)),
-        title:  Row(
+        title: Row(
           children: [
-            CircleAvatar(radius: 20),
-            SizedBox(width: 10),
-            Text("Chat with Seller",style: TextStyle(fontSize: 16,fontWeight: FontWeight.w500,color: Colors.white),),
+             CircleAvatar(
+             child: FaIcon(FontAwesomeIcons.circleUser,color: AppColor.primary,),
+            ),
+            const SizedBox(width: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Text(
+                  "Service Chat",
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+                Text(
+                  "Buyer / Seller",
+                  style: TextStyle(fontSize: 12, color: Colors.white70),
+                ),
+              ],
+            )
           ],
         ),
       ),
 
       body: Column(
         children: [
-          /// CHAT LIST
+
+          /// 🔥 Chat List
           Expanded(
             child: Obx(() {
-              return ListView.builder(
-                controller: controller.scrollController,
-                padding: const EdgeInsets.all(12),
-                itemCount: controller.messages.length,
-                itemBuilder: (context, index) {
-                  final msg = controller.messages[index];
+              if (controller.isLoading.value) {
+                return ChatShimmer();
+              }
 
-                  return Align(
-                    alignment: msg.isMe
-                        ? Alignment.centerRight
-                        : Alignment.centerLeft,
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 4),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 10),
-                      constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width * 0.75,
-                      ),
-                      decoration: BoxDecoration(
-                        color: msg.isMe
-                            ? AppColor.primary
-                            : AppColor.primary.withOpacity(.2),
-                        borderRadius: BorderRadius.only(
-                          topLeft: const Radius.circular(14),
-                          topRight: const Radius.circular(14),
-                          bottomLeft: Radius.circular(msg.isMe ? 14 : 0),
-                          bottomRight: Radius.circular(msg.isMe ? 0 : 14),
+              if (controller.chatList.isEmpty) {
+                return const Center(child: Text("No messages yet"));
+              }
+
+              return ListView.builder(
+                padding: const EdgeInsets.all(10),
+                itemCount: controller.chatList.length,
+                itemBuilder: (context, index) {
+                  final chat = controller.chatList[index];
+                  final isMe = isBuyer(chat.buyer);
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+
+                      /// Role Label
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Text(
+                          isMe ? "You (Buyer)" : "Seller",
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: AppColor.subtitle,
+                          ),
                         ),
                       ),
-                      child: Text(
-                        msg.text,
-                        style: TextStyle(
-                          color: msg.isMe ? Colors.white : Colors.black87,
-                          fontSize: 14,
+
+                      Align(
+                        alignment: isMe
+                            ? Alignment.centerRight
+                            : Alignment.centerLeft,
+
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 4, horizontal: 6),
+                          padding: const EdgeInsets.all(10),
+                          constraints: BoxConstraints(
+                            maxWidth:
+                            MediaQuery.of(context).size.width * 0.7,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isMe
+                                ? AppColor.primary.withOpacity(0.15)
+                                : AppColor.white,
+                            borderRadius: BorderRadius.only(
+                              topLeft: const Radius.circular(12),
+                              topRight: const Radius.circular(12),
+                              bottomLeft: Radius.circular(isMe ? 12 : 0),
+                              bottomRight: Radius.circular(isMe ? 0 : 12),
+                            ),
+                          ),
+
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+
+                              /// Message
+                              Text(
+                                chat.message,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: AppColor.title,
+                                ),
+                              ),
+
+                              const SizedBox(height: 5),
+
+                              /// Time + Status
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    chat.createdAt.substring(11, 16),
+                                    style: const TextStyle(
+                                      fontSize: 10,
+                                      color: AppColor.subtitle,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Icon(
+                                    Icons.done_all,
+                                    size: 16,
+                                    color: chat.status == "accepted"
+                                        ? AppColor.primary
+                                        : Colors.grey,
+                                  )
+                                ],
+                              )
+                            ],
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   );
                 },
               );
             }),
           ),
 
-          /// INPUT BOX
-          _buildInput(),
+          /// 🔥 MESSAGE INPUT BOX
+          SafeArea(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              decoration: const BoxDecoration(
+                color: AppColor.white,
+                boxShadow: [
+                  BoxShadow(color: Colors.black12, blurRadius: 4)
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+            
+                  /// Emoji
+                  IconButton(
+                    icon: const Icon(Icons.emoji_emotions_outlined,
+                        color: AppColor.subtitle),
+                    onPressed: () {},
+                  ),
+            
+                  /// TextField
+                  Expanded(
+                    child: TextField(
+                      minLines: 1,
+                      maxLines: 3, // 🔥 max 3 lines
+                      keyboardType: TextInputType.multiline,
+                      textInputAction: TextInputAction.newline,
+                      decoration: InputDecoration(
+                        hintText: "Type your message...",
+                        hintStyle: const TextStyle(color: AppColor.subtitle),
+                        filled: true,
+                        fillColor: AppColor.surface,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 15,
+                          vertical: 10,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                  ),
+            
+                  /// Attachment
+                  IconButton(
+                    icon: const Icon(Icons.attach_file,
+                        color: AppColor.subtitle),
+                    onPressed: () {},
+                  ),
+            
+                  /// Send Button
+                  CircleAvatar(
+                    backgroundColor: AppColor.primary,
+                    child: IconButton(
+                      icon:
+                      const Icon(Icons.send, color: AppColor.white),
+                      onPressed: () {
+                        Get.snackbar(
+                          "Coming Soon",
+                          "Send message API next 🔥",
+                          backgroundColor: AppColor.primary,
+                          colorText: AppColor.white,
+                        );
+                      },
+                    ),
+                  )
+                ],
+              ),
+            ),
+          )
         ],
       ),
     );
   }
+}
 
-  Widget _buildInput() {
-    return SafeArea(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-        color: AppColor.white,
-        child: Row(
-          children: [
 
-            /// INPUT BOX
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                decoration: BoxDecoration(
-                  color: AppColor.surface,
-                  borderRadius: BorderRadius.circular(25),
-                  border: Border.all(color: AppColor.primary.withOpacity(0.2)),
+class ChatShimmer extends StatelessWidget {
+  const ChatShimmer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(10),
+      itemCount: 6,
+      itemBuilder: (context, index) {
+        final isMe = index % 2 == 0;
+
+        return Shimmer.fromColors(
+          baseColor: Colors.grey.shade300,
+          highlightColor: Colors.grey.shade100,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+
+              /// Role label shimmer
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Container(
+                  height: 10,
+                  width: 80,
+                  color: Colors.white,
                 ),
-                child: TextField(
-                  controller: controller.textController,
-                  keyboardType: TextInputType.multiline,
-                  textInputAction: TextInputAction.newline,
-                  minLines: 1,
-                  maxLines: 5,
-                  style: const TextStyle(color: AppColor.title),
-                  decoration: const InputDecoration(
-                    hintText: "Type a message...",
-                    hintStyle: TextStyle(color: AppColor.subtitle),
-                    border: InputBorder.none,
+              ),
+
+              const SizedBox(height: 4),
+
+              Align(
+                alignment:
+                isMe ? Alignment.centerRight : Alignment.centerLeft,
+
+                child: Container(
+                  margin:
+                  const EdgeInsets.symmetric(vertical: 4, horizontal: 6),
+                  padding: const EdgeInsets.all(10),
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * 0.7,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: const Radius.circular(12),
+                      topRight: const Radius.circular(12),
+                      bottomLeft: Radius.circular(isMe ? 12 : 0),
+                      bottomRight: Radius.circular(isMe ? 0 : 12),
+                    ),
+                  ),
+
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+
+                      /// message lines
+                      Container(
+                        height: 12,
+                        width: double.infinity,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(height: 6),
+                      Container(
+                        height: 12,
+                        width: MediaQuery.of(context).size.width * 0.4,
+                        color: Colors.white,
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      /// time + status
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            height: 10,
+                            width: 40,
+                            color: Colors.white,
+                          ),
+                          const SizedBox(width: 5),
+                          Container(
+                            height: 10,
+                            width: 15,
+                            color: Colors.white,
+                          ),
+                        ],
+                      )
+                    ],
                   ),
                 ),
               ),
-            ),
-
-            const SizedBox(width: 8),
-
-            /// SEND BUTTON
-            GestureDetector(
-              onTap: () {
-                controller.sendMessage();
-                Future.delayed(const Duration(milliseconds: 100), () {
-                  controller.scrollToBottom();
-                });
-              },
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColor.primary,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.send,
-                  color: AppColor.white,
-                  size: 18,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+            ],
+          ),
+        );
+      },
     );
-  }}
+  }
+}

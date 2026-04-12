@@ -10,16 +10,15 @@ import '../../home/widget/category_card.dart';
 import '../../home/widget/service_card.dart';
 import '../../location/controller/location_controller.dart';
 import '../../service/controller/service_list_controller.dart';
-import '../../service/repository/service_list_repository.dart';
 import '../../service/screen/service_details_screen.dart';
 
 class SearchScreen extends StatelessWidget {
   SearchScreen({super.key});
 
-  final LocationController _locationController = Get.put(LocationController());
-  final CategoryController _categoryController = Get.put(CategoryController());
-  final ServiceListController _serviceListController =
-  Get.put(ServiceListController(ServiceListRepository()));
+  final _locationController = Get.find<LocationController>();
+  final _categoryController = Get.find<CategoryController>();
+  final _serviceListController = Get.find<ServiceListController>();
+
 
   final RxList<String> recentSearches = [
     'Python Developer',

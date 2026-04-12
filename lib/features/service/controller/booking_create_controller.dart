@@ -7,9 +7,8 @@ import '../model/booking_create_model.dart';
 import '../repository/booking_create_repository.dart';
 
 class BookingCreateController extends GetxController {
-  final BookingCreateRepository repository;
+  final BookingCreateRepository repository = BookingCreateRepository();
 
-  BookingCreateController(this.repository);
 
   var isLoading = false.obs;
   var bookingResponse = Rxn<BookingCreateModel>();

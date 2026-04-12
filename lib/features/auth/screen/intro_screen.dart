@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:lottie/lottie.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import '../../../core/constant/app_size.dart';
 import '../../../core/widget/app_button.dart';
-import 'auth_screen.dart';
+import '../helper/intro_preferences.dart';
 
 class IntroScreen extends StatefulWidget {
   const IntroScreen({super.key});
@@ -39,10 +38,10 @@ class _IntroScreenState extends State<IntroScreen> {
       "icon": 'assets/intro/Growth.json',
     },
   ];
-  void _goToDashboard() async {
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('intro_seen', true);
+  void _goToDashboard() async {
+    await IntroPreferences.setIntroSeen();
+    if (!mounted) return;
     Get.offAllNamed('/auth');
   }
 
@@ -65,7 +64,11 @@ class _IntroScreenState extends State<IntroScreen> {
               child: PageView.builder(
                 controller: _controller,
                 itemCount: pages.length,
-                onPageChanged: (index) => setState(() => currentIndex = index),
+                onPageChanged: (index) {
+                  if (currentIndex != index) {
+                    setState(() => currentIndex = index);
+                  }
+                },
                 itemBuilder: (context, index) {
                   return Column(
                     children: [
@@ -143,6 +146,7 @@ class _IntroScreenState extends State<IntroScreen> {
                             ? "Get Started"
                             : "Next",
                         isLoading: false,
+
                         onPressed: () {
                           if (currentIndex == pages.length - 1) {
                             _goToDashboard();

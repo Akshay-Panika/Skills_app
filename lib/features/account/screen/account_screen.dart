@@ -6,10 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/constant/app_size.dart';
 import 'package:skills_app/core/widget/flutter_toast.dart';
-import 'package:skills_app/core/widget/my_appbar.dart';
-import 'package:skills_app/features/auth/screen/auth_screen.dart';
 import 'package:skills_app/features/wishlist/screen/wishlist_screen.dart';
-import 'package:transparent_image/transparent_image.dart';
 import '../../../core/widget/app_card.dart';
 import '../../../core/widget/app_dilog.dart';
 import '../../auth/helper/auth_preferences.dart';
@@ -30,12 +27,14 @@ class AccountScreen extends StatefulWidget {
 }
 
 class _AccountScreenState extends State<AccountScreen> {
-  final UserProfileController controller = Get.put(UserProfileController());
+
+  final userProfileController = Get.find<UserProfileController>();
+
 
   @override
   void initState() {
     super.initState();
-    if (controller.userProfile.value == null) {
+    if (userProfileController.userProfile.value == null) {
       _loadUserProfile();
     }
   }
@@ -43,7 +42,7 @@ class _AccountScreenState extends State<AccountScreen> {
   Future<void> _loadUserProfile() async {
     final userId = await AuthPreferences.getUserId();
     if (userId != null) {
-      controller.fetchUserProfile(userId);
+      userProfileController.fetchUserProfile(userId);
     } else {
       FlutterToast.error("User not logged in");
     }
@@ -109,7 +108,7 @@ class _AccountScreenState extends State<AccountScreen> {
                   icon: Icons.favorite_border_rounded,
                   title: "Wishlist",
                   subtitle: "Saved services",
-                  onTap: () => Get.to(() => WishlistScreen()),
+                  onTap: () => Get.toNamed('/wishlist'),
                 ),
                 _MenuTile(
                   icon: Icons.headset_mic_outlined,
@@ -149,8 +148,8 @@ class _AccountScreenState extends State<AccountScreen> {
        color: AppColor.primary,
       padding: EdgeInsets.all(16),
       child: Obx(() {
-        final bool loading = controller.isLoading.value;
-        final UserProfileModel? profile = controller.userProfile.value;
+        final bool loading = userProfileController.isLoading.value;
+        final UserProfileModel? profile = userProfileController.userProfile.value;
 
         // 👉 Null / loading handle
         if (loading || profile == null) {
@@ -293,7 +292,8 @@ class _AccountScreenState extends State<AccountScreen> {
     if (confirmed) {
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
-      Get.off(() => AuthScreen());
+      Get.deleteAll();
+      Get.offAllNamed('/auth');
       FlutterToast.success("Signed out successfully");
     }
   }

@@ -1,28 +1,26 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthPreferences {
+  static SharedPreferences? _prefs;
+
+  static Future init() async {
+    _prefs = await SharedPreferences.getInstance();
+  }
 
   static Future<void> setLogin(int userId) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt("user_id", userId);
-    await prefs.setBool("is_logged_in", true);
+    await _prefs?.setInt("user_id", userId);
+    await _prefs?.setBool("is_logged_in", true);
   }
 
-  static Future<bool> isLoggedIn() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool("is_logged_in") ?? false;
+  static bool isLoggedIn() {
+    return _prefs?.getBool("is_logged_in") ?? false;
   }
 
-  static Future<int?> getUserId() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getInt("user_id");
+  static int? getUserId() {
+    return _prefs?.getInt("user_id");
   }
 
-  /// logout / remove session
   static Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove("user_id");
-    await prefs.remove("is_logged_in");
+    await _prefs?.clear();
   }
-
 }

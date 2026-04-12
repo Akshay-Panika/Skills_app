@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:skills_app/core/widget/app_card.dart';
 
 import '../../../core/constant/app_color.dart';
@@ -43,7 +45,15 @@ class CategoryCard extends StatelessWidget {
               child: const Icon(Icons.broken_image_outlined, color: Colors.grey, size: 25),
             ),
           ),
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => CategoryScreen(categoryId: category.id.toString(),category: category.categoryName.toString()),)),
+          onTap: () {
+            Get.toNamed('/category', parameters: {
+              'id': category.id.toString(),
+              'name': category.categoryName.toString(),
+            });
+          },
+          // onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => CategoryScreen(
+          //     categoryId: category.id.toString(),
+          //     category: category.categoryName.toString()),)),
         ),
         Text(
           category.categoryName ?? "",

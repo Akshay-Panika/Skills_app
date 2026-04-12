@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/features/service/controller/service_list_controller.dart';
 import 'package:skills_app/features/service/screen/service_details_screen.dart';
@@ -9,8 +8,7 @@ import '../../../core/widget/my_appbar.dart';
 import '../../home/screen/home_screen.dart';
 import '../../home/widget/service_card.dart';
 import '../../location/controller/location_controller.dart';
-import '../model/service_list_model.dart';
-import '../repository/service_list_repository.dart';
+
 
 class ServiceScreen extends StatefulWidget {
   final String subcategoryId;
@@ -21,8 +19,8 @@ class ServiceScreen extends StatefulWidget {
 }
 
 class _ServiceScreenState extends State<ServiceScreen> {
-  final LocationController _getLocationController = Get.find<LocationController>();
-  final ServiceListController _serviceListController = Get.put(ServiceListController(ServiceListRepository()));
+  final  _getLocationController = Get.find<LocationController>();
+  final  _serviceListController = Get.find<ServiceListController>();
   bool _isFree = false;
 
   @override

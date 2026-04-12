@@ -9,9 +9,8 @@ import '../repository/add_service_by_user_repository.dart';
 
 class AddServiceByUserController extends GetxController {
 
-  final AddServiceByUserRepository repository;
+  final AddServiceByUserRepository repository = AddServiceByUserRepository();
 
-  AddServiceByUserController({required this.repository});
 
   var isLoading = false.obs;
 

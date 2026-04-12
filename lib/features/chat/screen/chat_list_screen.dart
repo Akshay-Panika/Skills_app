@@ -4,21 +4,18 @@ import 'package:get/get.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/constant/app_size.dart';
 import 'package:skills_app/core/widget/app_card.dart';
-
 import '../../../core/widget/app_dilog.dart';
 import '../controller/booking_controller.dart';
 import '../../notification/screen/notification_screen.dart';
 import '../controller/booking_delete_controller.dart';
-import '../repository/booking_delete_repository.dart';
 import 'chat_screen.dart';
 
 class ChatListScreen extends StatelessWidget {
   ChatListScreen({super.key});
 
-  final controller = Get.put(BookingController());
-  final deleteController = Get.put(
-    BookingDeleteController(BookingDeleteRepository()),
-  );
+  final bookingController = Get.find<BookingController>();
+  final deleteController = Get.find<BookingDeleteController>();
+
 
   @override
   Widget build(BuildContext context) {
@@ -64,15 +61,15 @@ class ChatListScreen extends StatelessWidget {
 
             Expanded(
               child: Obx(() {
-                if (controller.isLoading.value) {
+                if (bookingController.isLoading.value) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
                 return TabBarView(
                   children: [
-                    _ChatTabContent(list: controller.allChats),
-                    _ChatTabContent(list: controller.buyerBookings),
-                    _ChatTabContent(list: controller.sellerBookings),
+                    _ChatTabContent(list: bookingController.allChats),
+                    _ChatTabContent(list: bookingController.buyerBookings),
+                    _ChatTabContent(list: bookingController.sellerBookings),
                   ],
                 );
               }),
@@ -141,7 +138,12 @@ class ChatSkillCard extends StatelessWidget {
       children: [
         AppCard(
           onTap: () {
-            Get.to(() => ChatScreen(), arguments: item);
+            Get.toNamed(
+              '/chat',
+              arguments: {
+                "serviceId": service.id,
+              },
+            );
           },
           margin: const EdgeInsets.only(bottom: 10, left: 10, right: 10),
           padding: const EdgeInsets.all(12),

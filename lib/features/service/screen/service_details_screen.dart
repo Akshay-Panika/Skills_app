@@ -30,13 +30,11 @@ class ServiceDetailsScreen extends StatefulWidget {
 }
 
 class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
-  final ServiceDetailsController serviceController = Get.find();
-  final UserProfileController userProfileController = Get.find();
+  final serviceController = Get.find<ServiceDetailsController>();
+  final userProfileController = Get.find<UserProfileController>();
   final locationController = Get.find<LocationController>();
-  final checkBookingController = Get.put(BookingCheckController());
-  final bookingCreateController = Get.put(
-    BookingCreateController(BookingCreateRepository()),
-  );
+  final checkBookingController = Get.find<BookingCheckController>();
+  final bookingCreateController = Get.find<BookingCreateController>();
 
   bool _bookmark = false;
   bool _isMSG = false;
@@ -438,7 +436,15 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                   return _actionButton(
                     context,
                     text: "Skill Booked",
-                    onChatTap: () => Get.to(() => ChatScreen()),
+                    onChatTap: () {
+                      Get.toNamed(
+                        '/chat',
+                        arguments: {
+                          "serviceId": service.id,
+                        },
+                      );
+                    },
+                    // onChatTap: () => Get.to(() => ChatScreen()),
                     bookmark: _bookmark,
                     onBookmarkTap: () {
                       setState(() {

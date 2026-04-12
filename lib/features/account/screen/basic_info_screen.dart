@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -22,7 +21,8 @@ class BasicInfoScreen extends StatefulWidget {
 }
 
 class _BasicInfoScreenState extends State<BasicInfoScreen> {
-  final UserProfileController controller = Get.put(UserProfileController());
+
+  final userProfileController = Get.find<UserProfileController>();
 
   final nameController = TextEditingController();
   final emailController = TextEditingController();
@@ -45,8 +45,8 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
     userId = await AuthPreferences.getUserId();
     if (userId == null) return;
 
-    await controller.fetchUserProfile(userId!);
-    final profile = controller.userProfile.value;
+    await userProfileController.fetchUserProfile(userId!);
+    final profile = userProfileController.userProfile.value;
 
     if (profile != null) {
       nameController.text = profile.userName ?? "";
@@ -100,10 +100,10 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
       userEmail: email,
       userGender: selectedGender!,
       userBio: bioController.text.trim(),
-      userPhone: controller.userProfile.value?.userPhone ?? "",
+      userPhone: userProfileController.userProfile.value?.userPhone ?? "",
     );
 
-    await controller.updateProfile(
+    await userProfileController.updateProfile(
       userId!,
       updatedProfile,
       imageFile: selectedImage,
@@ -138,7 +138,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
         buttonColor: Colors.white,
       ),
       body: Obx(() {
-        if (controller.isLoading.value) {
+        if (userProfileController.isLoading.value) {
           return BasicInfoShimmer();
         }
         // return BasicInfoShimmer();
@@ -171,7 +171,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                     _fieldLabel(context, "Phone Number"),
                     _inputField(
                       context,
-                      initialValue: controller.userProfile.value?.userPhone ?? "",
+                      initialValue: userProfileController.userProfile.value?.userPhone ?? "",
                       hint: "Phone number",
                       icon: Icons.phone_outlined,
                       readOnly: true,
@@ -208,7 +208,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
               ),
               child: AppButton(
                 text: "Save & Continue",
-                isLoading: controller.isLoading.value,
+                isLoading: userProfileController.isLoading.value,
                 onPressed: _saveProfile,
               ),
             ),

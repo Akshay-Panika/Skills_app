@@ -5,9 +5,8 @@ import '../repository/booking_delete_repository.dart';
 
 class BookingDeleteController extends GetxController {
 
-  final BookingDeleteRepository repository;
+  final BookingDeleteRepository repository = BookingDeleteRepository();
 
-  BookingDeleteController(this.repository);
 
   final isLoading = false.obs;
 
