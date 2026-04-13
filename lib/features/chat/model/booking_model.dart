@@ -107,7 +107,7 @@ class ServiceModel {
   final String createdAt;
   final String updatedAt;
 
-  final int user;
+  final UserProfileModel? userProfile;
   final int category;
   final int subcategory;
 
@@ -125,7 +125,7 @@ class ServiceModel {
     required this.longitude,
     required this.createdAt,
     required this.updatedAt,
-    required this.user,
+    this.userProfile,
     required this.category,
     required this.subcategory,
     required this.serviceAmount,
@@ -147,7 +147,9 @@ class ServiceModel {
       createdAt: json["created_at"] ?? "",
       updatedAt: json["updated_at"] ?? "",
 
-      user: json["user"] ?? 0,
+      userProfile: json['user_profile'] != null
+          ? UserProfileModel.fromJson(json['user_profile'])
+          : null,
       category: json["category"] ?? 0,
       subcategory: json["subcategory"] ?? 0,
 
@@ -156,5 +158,57 @@ class ServiceModel {
       isFavorite: json["is_favorite"] ?? false,
       serviceStatus: json["service_status"] ?? false,
     );
+  }
+}
+
+class UserProfileModel {
+  final int id;
+  final String userPhone;
+  final String userName;
+  final String userEmail;
+  final String userGender;
+  final String userBio;
+  final String? userImage;
+  final String createdAt;
+  final int user;
+
+  UserProfileModel({
+    required this.id,
+    required this.userPhone,
+    required this.userName,
+    required this.userEmail,
+    required this.userGender,
+    required this.userBio,
+    this.userImage,
+    required this.createdAt,
+    required this.user,
+  });
+
+  factory UserProfileModel.fromJson(Map<String, dynamic> json) {
+    return UserProfileModel(
+      id: json['id'] ?? 0,
+      userPhone: json['user_phone'] ?? "",
+      userName: json['user_name'] ?? "",
+      userEmail: json['user_email'] ?? "",
+      userGender: json['user_gender'] ?? "",
+      userBio: json['user_bio'] ?? "",
+      userImage: json['user_image'],
+      createdAt: json['created_at'] ?? "",
+      user: json['user'] ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "user_phone": userPhone,
+      "user_name": userName,
+      "user_email": userEmail,
+      "user_gender": userGender,
+      "user_bio": userBio,
+      "user_image": userImage,
+      "created_at": createdAt,
+      "user": user,
+    };
   }
 }

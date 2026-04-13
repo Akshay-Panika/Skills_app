@@ -31,7 +31,6 @@ class ServiceDetailsScreen extends StatefulWidget {
 
 class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
   final serviceController = Get.find<ServiceDetailsController>();
-  final userProfileController = Get.find<UserProfileController>();
   final locationController = Get.find<LocationController>();
   final checkBookingController = Get.find<BookingCheckController>();
   final bookingCreateController = Get.find<BookingCreateController>();
@@ -59,10 +58,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
       final service = serviceController.serviceDetails.value;
 
       if (service != null) {
-        await userProfileController.fetchUserProfile(service.user);
-
         if (!mounted) return;
-
         descController.text =
         "Hi, I came across your \"${service.serviceName}\" skill and would like to connect.";
       }
@@ -308,142 +304,131 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child:Obx(() {
-                      if (userProfileController.isLoading.value) {
-                        return _sellerShimmer();
-                      }
-
-                      final UserProfileModel? profile =
-                          userProfileController.userProfile.value;
-
-                      if (profile == null) return _sellerShimmer();
-
-                      return AppCard(
-                        padding: const EdgeInsets.all(14),
-                        margin: EdgeInsets.zero,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            /// TOP ROW
-                            Row(
-                              children: [
-                                /// Profile Image
-                                CircleAvatar(
-                                  radius: context.sHeight*0.036,
-                                  backgroundColor: AppColor.white,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(context.sHeight*0.036,),
-                                    child: CachedNetworkImage(
-                                      imageUrl: profile!.userImage!,
-                                      fit: BoxFit.cover,
-                                      width: context.sHeight*0.068,
-                                      height: context.sHeight*0.068,
-                                      placeholder: (context, url) => Container(
-                                        color: Colors.grey[100],
-                                        alignment: Alignment.center,
-                                        child: FaIcon(
-                                          FontAwesomeIcons.image,
-                                          color: Colors.grey[400],
-                                          size: 25,
-                                        ),
+                    child:AppCard(
+                      padding: const EdgeInsets.all(14),
+                      margin: EdgeInsets.zero,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          /// TOP ROW
+                          Row(
+                            children: [
+                              /// Profile Image
+                              CircleAvatar(
+                                radius: context.sHeight*0.036,
+                                backgroundColor: AppColor.white,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(context.sHeight*0.036,),
+                                  child: CachedNetworkImage(
+                                    imageUrl: service.userProfile!.userImage.toString(),
+                                    fit: BoxFit.cover,
+                                    width: context.sHeight*0.068,
+                                    height: context.sHeight*0.068,
+                                    placeholder: (context, url) => Container(
+                                      color: Colors.grey[100],
+                                      alignment: Alignment.center,
+                                      child: FaIcon(
+                                        FontAwesomeIcons.image,
+                                        color: Colors.grey[400],
+                                        size: 25,
                                       ),
-                                      errorWidget: (context, url, error) => Container(
-                                        color: Colors.grey[200],
-                                        child: const Icon(Icons.broken_image_outlined, color: Colors.grey, size: 25),
-                                      ),
+                                    ),
+                                    errorWidget: (context, url, error) => Container(
+                                      color: Colors.grey[200],
+                                      child: const Icon(Icons.broken_image_outlined, color: Colors.grey, size: 25),
                                     ),
                                   ),
                                 ),
+                              ),
 
-                                const SizedBox(width: 10),
+                              const SizedBox(width: 10),
 
-                                /// Info
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      /// Name
-                                      Text(
-                                        profile.userName ?? '',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: context.text14,
-                                        ),
-                                      ),
-
-                                      SizedBox(height: 2),
-
-                                      /// Bio
-                                      Text(
-                                        profile.userBio ?? '',
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          color: AppColor.subtitle,
-                                          fontSize: context.text12,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-
-
-                                Column(
-                                  spacing: 5,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
+                              /// Info
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    AppCard(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                      color: AppColor.primary.withOpacity(0.15),
-                                      margin: EdgeInsets.zero,
-                                      child: Row(
-                                        children: [
-                                          Icon(Icons.star, size: 14, color: Colors.amber),
-                                          const SizedBox(width: 2),
-                                          Text(
-                                            "4.8",
-                                            style: TextStyle(
-                                              fontSize: context.text12,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                        ],
+                                    /// Name
+                                    Text(
+                                      service.userProfile!.userName.toString(),
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: context.text14,
                                       ),
                                     ),
+
+                                    SizedBox(height: 2),
+
+                                    /// Bio
                                     Text(
-                                      "120 reviews",
+                                      service.userProfile!.userBio.toString(),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
-                                        color: Colors.grey,
+                                        color: AppColor.subtitle,
                                         fontSize: context.text12,
                                       ),
                                     ),
                                   ],
                                 ),
-                              ],
-                            ),
+                              ),
 
 
-                            SizedBox(height: context.sHeight * 0.012),
+                              Column(
+                                spacing: 5,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  AppCard(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                    color: AppColor.primary.withOpacity(0.15),
+                                    margin: EdgeInsets.zero,
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.star, size: 14, color: Colors.amber),
+                                        const SizedBox(width: 2),
+                                        Text(
+                                          "4.8",
+                                          style: TextStyle(
+                                            fontSize: context.text12,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Text(
+                                    "120 reviews",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: context.text12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
 
-                            /// Divider
-                            Divider(height: 1, color: Colors.grey.withOpacity(0.2)),
 
-                            SizedBox(height: context.sHeight * 0.03),
+                          SizedBox(height: context.sHeight * 0.012),
 
-                            Center(
-                              child: Text(
-                                "Report this skill",
-                                style: TextStyle(
-                                  color: Colors.red.withOpacity(0.7),
-                                  fontSize: context.text12,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                          /// Divider
+                          Divider(height: 1, color: Colors.grey.withOpacity(0.2)),
+
+                          SizedBox(height: context.sHeight * 0.03),
+
+                          Center(
+                            child: Text(
+                              "Report this skill",
+                              style: TextStyle(
+                                color: Colors.red.withOpacity(0.7),
+                                fontSize: context.text12,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
-                          ],
-                        ),
-                      );
-                    }),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
                 SliverToBoxAdapter(child: SizedBox(height: context.sWidth*0.3,),),

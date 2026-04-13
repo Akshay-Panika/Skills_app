@@ -7,8 +7,8 @@ class UserProfileModel {
   final String userBio;
   final int user;
 
-  // ✅ NEW FIELD
   final String? userImage;
+  final String? createdAt;
 
   UserProfileModel({
     this.id,
@@ -18,7 +18,8 @@ class UserProfileModel {
     required this.userGender,
     required this.userBio,
     required this.user,
-    this.userImage, // optional
+    this.userImage,
+    this.createdAt,
   });
 
   // JSON → Model
@@ -31,7 +32,8 @@ class UserProfileModel {
       userGender: json['user_gender'] ?? '',
       userBio: json['user_bio'] ?? '',
       user: json['user'],
-      userImage: json['user_image'], // ✅ added
+      userImage: json['user_image'],
+      createdAt: json['created_at'],
     );
   }
 
@@ -45,7 +47,8 @@ class UserProfileModel {
       'user_gender': userGender,
       'user_bio': userBio,
       'user': user,
-      'user_image': userImage, // ✅ added
+      'user_image': userImage,
+      'created_at': createdAt,
     };
   }
 }

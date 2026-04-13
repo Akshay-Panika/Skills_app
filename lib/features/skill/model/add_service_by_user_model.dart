@@ -18,7 +18,7 @@ class AddServiceByUserModel {
     required this.id,
     required this.serviceName,
     required this.serviceImage,
-    required this.serviceAmount,
+    this.serviceAmount,
     required this.serviceStatus,
     required this.swipeStatus,
     required this.serviceDescription,
@@ -33,24 +33,24 @@ class AddServiceByUserModel {
 
   factory AddServiceByUserModel.fromJson(Map<String, dynamic> json) {
     return AddServiceByUserModel(
-      id: json['id'],
+      id: json['id'] ?? 0, // ✅ FIX
       serviceName: json['service_name'] ?? "",
       serviceImage: json['service_image'] ?? "",
       serviceAmount: json['service_amount']?.toString(),
       serviceStatus: json['service_status'] ?? false,
       swipeStatus: json['swipe_status'] ?? false,
       serviceDescription: json['service_description'] ?? "",
-      user: json['user'],
-      category: json['category'],
-      subcategory: json['subcategory'],
-      latitude: (json['latitude'] != null)
-          ? double.tryParse(json['latitude'].toString())
+      user: json['user'] ?? 0, // ✅ FIX
+      category: json['category'] ?? 0, // ✅ FIX
+      subcategory: json['subcategory'] ?? 0, // ✅ FIX
+      latitude: json['latitude'] != null
+          ? (json['latitude'] as num).toDouble()
           : null,
-      longitude: (json['longitude'] != null)
-          ? double.tryParse(json['longitude'].toString())
+      longitude: json['longitude'] != null
+          ? (json['longitude'] as num).toDouble()
           : null,
-      createdAt: json['created_at'],
-      updatedAt: json['updated_at'],
+      createdAt: json['created_at']?.toString(),
+      updatedAt: json['updated_at']?.toString(),
     );
   }
 }

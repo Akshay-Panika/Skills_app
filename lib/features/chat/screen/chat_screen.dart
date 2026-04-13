@@ -1,8 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../core/constant/app_color.dart';
+import '../../../core/constant/app_size.dart';
 import '../controller/chat_controller.dart';
 
 class ChatScreen extends GetView<ChatController> {
@@ -24,27 +26,145 @@ class ChatScreen extends GetView<ChatController> {
         leading: IconButton(onPressed: () {
           Get.back();
         }, icon: Icon(Icons.arrow_back_ios,color: Colors.white,)),
-        title: Row(
-          children: [
-             CircleAvatar(
-             child: FaIcon(FontAwesomeIcons.circleUser,color: AppColor.primary,),
-            ),
-            const SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
-                  "Service Chat",
-                  style: TextStyle(fontSize: 16, color: Colors.white),
+        title: Obx(() {
+          if (controller.isLoading.value) {
+            return Shimmer.fromColors(
+              baseColor: Colors.white.withOpacity(0.3),
+              highlightColor: Colors.white.withOpacity(0.6),
+              child: Row(
+                children: [
+                  /// Avatar shimmer
+                  CircleAvatar(
+                    radius: context.sHeight * 0.024,
+                    backgroundColor: Colors.white,
+                  ),
+
+                  const SizedBox(width: 10),
+
+                  /// Text shimmer
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        height: 12,
+                        width: 100,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(height: 6),
+                      Container(
+                        height: 10,
+                        width: 70,
+                        color: Colors.white,
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            );
+          }
+
+          if (controller.chatList.isEmpty) {
+            return Row(
+              children: [
+                CircleAvatar(
+                  child: FaIcon(FontAwesomeIcons.circleUser,color: AppColor.primary,),
                 ),
-                Text(
-                  "Buyer / Seller",
-                  style: TextStyle(fontSize: 12, color: Colors.white70),
-                ),
+                const SizedBox(width: 10),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text(
+                      "Service Chat",
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                    Text(
+                      "Buyer / Seller",
+                      style: TextStyle(fontSize: 12, color: Colors.white70),
+                    ),
+                  ],
+                )
               ],
-            )
-          ],
-        ),
+            );
+          }
+          final firstChat = controller.chatList.first;
+
+          return Obx(() {
+            if (controller.isLoading.value || controller.chatList.isEmpty) {
+              return Row(
+                children: [
+                  CircleAvatar(
+                    child: FaIcon(FontAwesomeIcons.circleUser, color: AppColor.primary),
+                  ),
+                  const SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text("Service Chat",
+                          style: TextStyle(fontSize: 16, color: Colors.white)),
+                      Text("Buyer / Seller",
+                          style: TextStyle(fontSize: 12, color: Colors.white70)),
+                    ],
+                  )
+                ],
+              );
+            }
+
+            final firstChat = controller.chatList.first;
+            final profileImage =
+                firstChat.service?.userProfile?.userImage ?? "";
+
+            return Row(
+              children: [
+                CircleAvatar(
+                  radius: context.sHeight * 0.024,
+                  backgroundColor: AppColor.white,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(context.sHeight * 0.036),
+                    child: CachedNetworkImage(
+                      imageUrl: profileImage,
+                      fit: BoxFit.cover,
+                      width: context.sHeight * 0.046,
+                      height: context.sHeight * 0.046,
+
+                      placeholder: (context, url) => Container(
+                        color: Colors.grey[100],
+                        alignment: Alignment.center,
+                        child: FaIcon(
+                          FontAwesomeIcons.image,
+                          color: Colors.grey[400],
+                          size: 25,
+                        ),
+                      ),
+
+                      errorWidget: (context, url, error) => Container(
+                        color: Colors.grey[200],
+                        child: const Icon(Icons.broken_image_outlined,
+                            color: Colors.grey, size: 25),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      firstChat.service?.userProfile?.userName ?? "User",
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+
+                    /// 🔥 Dynamic Name
+                    Text(
+                      firstChat.service?.userProfile?.userBio ?? "User",
+                      style: const TextStyle(fontSize: 12, color: Colors.white70),
+                    ),
+                  ],
+                )
+              ],
+            );
+          });
+        }),
       ),
 
       body: Column(

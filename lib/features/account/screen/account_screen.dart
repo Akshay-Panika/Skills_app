@@ -8,6 +8,7 @@ import 'package:skills_app/core/constant/app_size.dart';
 import 'package:skills_app/core/widget/flutter_toast.dart';
 import 'package:skills_app/core/widget/my_appbar.dart';
 import '../../../core/widget/app_card.dart';
+import '../../../core/widget/app_date_format.dart';
 import '../../../core/widget/app_dilog.dart';
 import '../../auth/helper/auth_preferences.dart';
 import '../../help_support/screen/help_support_screen.dart';
@@ -240,7 +241,7 @@ class _AccountScreenState extends State<AccountScreen> {
             isLoading
                 ? AppCard(height: 10, width: 80, color: Colors.grey.shade300, margin: EdgeInsets.zero,padding: EdgeInsets.zero,)
                 : Text(
-              "00-00-2026",
+              AppDateFormat.format(profile?.createdAt),
               style: TextStyle(fontSize: context.text12),
             ),
 

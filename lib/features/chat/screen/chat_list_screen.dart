@@ -1,4 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/constant/app_size.dart';
@@ -7,7 +9,6 @@ import '../../../core/widget/app_dilog.dart';
 import '../controller/booking_controller.dart';
 import '../../notification/screen/notification_screen.dart';
 import '../controller/booking_delete_controller.dart';
-import 'chat_screen.dart';
 
 class ChatListScreen extends StatelessWidget {
   ChatListScreen({super.key});
@@ -61,7 +62,7 @@ class ChatListScreen extends StatelessWidget {
             Expanded(
               child: Obx(() {
                 if (bookingController.isLoading.value) {
-                  return const Center(child: CircularProgressIndicator());
+                  return  Center(child: CircularProgressIndicator(color: AppColor.primary,));
                 }
 
                 return TabBarView(
@@ -129,11 +130,6 @@ class ChatSkillCard extends StatelessWidget {
   ChatSkillCard({super.key, required this.item});
   final deleteController = Get.find<BookingDeleteController>();
 
-  Color get _accentColor {
-    // Role ke hisaab se color change karo
-    return AppColor.primary; // ya Buyer/Seller logic se
-  }
-
   @override
   Widget build(BuildContext context) {
     final service = item.service;
@@ -142,164 +138,183 @@ class ChatSkillCard extends StatelessWidget {
       onTap: () => Get.toNamed('/chat', arguments: {"serviceId": service.id}),
       child: AppCard(
         margin: const EdgeInsets.only(bottom: 10, left: 12, right: 12),
+        padding: EdgeInsets.all(12),
         color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 12, 14, 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Avatar with initials
-                  Stack(
-                    children: [
-                      CircleAvatar(
-                        radius: 24,
-                        backgroundColor:
-                        AppColor.primary.withOpacity(0.1),
-                        child: Text(
-                          "SD", // initials
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                            color: AppColor.primary,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Avatar with initials
+                Stack(
+                  children: [
+                    CircleAvatar(
+                      radius: context.sHeight*0.034,
+                      backgroundColor: AppColor.white,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(context.sHeight*0.036,),
+                        child: CachedNetworkImage(
+                          imageUrl: service.userProfile!.userImage.toString(),
+                          fit: BoxFit.cover,
+                          width: context.sHeight*0.068,
+                          height: context.sHeight*0.068,
+                          placeholder: (context, url) => Container(
+                            color: Colors.grey[100],
+                            alignment: Alignment.center,
+                            child: FaIcon(
+                              FontAwesomeIcons.image,
+                              color: Colors.grey[400],
+                              size: 25,
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Container(
+                            color: Colors.grey[200],
+                            child: const Icon(Icons.broken_image_outlined, color: Colors.grey, size: 25),
                           ),
                         ),
                       ),
-                      // Online indicator
-                      Positioned(
-                        bottom: 1,
-                        right: 1,
-                        child: Icon(Icons.circle,size: 12,color: AppColor.primary,),
+                    ),
+                    // Online indicator
+                    Positioned(
+                      bottom: 1,
+                      right: 1,
+                      child: Icon(Icons.circle,size: 12,color: AppColor.primary,),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 11),
+
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Name + Date
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(service.userProfile!.userName.toString(),
+                              style: TextStyle(
+                                fontSize: context.text14,
+                                fontWeight: FontWeight.w700,
+                                color: AppColor.title,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          Text(
+                            item.createdAt.toString().substring(0,10),
+                            style: const TextStyle(
+                                fontSize: 11,
+                                color: AppColor.subtitle),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Icon(Icons.work,
+                              size: 13, color: AppColor.subtitle),
+                          const SizedBox(width: 3),
+                          Expanded(
+                            child: Text(
+                              "${service.userProfile!.userBio.toString()}",
+                              style: TextStyle(
+                                  fontSize: context.text12,
+                                  color: AppColor.subtitle),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 6),
+                      Row(
+                        spacing: 10,
+                        children: [
+                          Icon(
+                            Icons.done_all,
+                            size: 16,
+                            color: item.status == "seen"
+                                ? Colors.blue
+                                : Colors.grey,
+                          ),
+                          Expanded(
+                            child: Text(
+                              "${item.message}",
+                              style: TextStyle(
+                                fontSize: context.text12,
+                                color: AppColor.subtitle,
+                                height: 1.45,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+
+            Row(
+              children: [
+                // Service tag
+                AppCard(
+                  color: AppColor.primary.withOpacity(0.08),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  margin: EdgeInsets.zero,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.computer_rounded,
+                          size: 11, color: AppColor.primary),
+                      const SizedBox(width: 5),
+                      Text("${service.serviceName}",
+                        style: TextStyle(
+                          fontSize: context.text10,
+                          fontWeight: FontWeight.w600,
+                          color: AppColor.primary,
+                        ),
                       ),
                     ],
                   ),
-                  const SizedBox(width: 11),
+                ),
 
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Name + Date
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text("SD User",
-                                style: TextStyle(
-                                  fontSize: context.text14,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColor.title,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            Text(
-                              item.createdAt.toString().substring(0,10),
-                              style: const TextStyle(
-                                  fontSize: 11,
-                                  color: AppColor.subtitle),
-                            ),
-                          ],
-                        ),
+                const Spacer(),
 
-                        // Location
-                        const SizedBox(height: 3),
-                        Row(
-                          children: [
-                            Icon(Icons.location_on_outlined,
-                                size: 13, color: AppColor.subtitle),
-                            const SizedBox(width: 3),
-                            Expanded(
-                              child: Text(
-                                "Flutter · Waidhan, Singrauli",
-                                style: TextStyle(
-                                    fontSize: context.text12,
-                                    color: AppColor.subtitle),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        // Last message
-                        const SizedBox(height: 6),
-                        Text("${item.message}",
-                          style: TextStyle(
-                              fontSize: context.text12,
-                              color: AppColor.subtitle,
-                              height: 1.45),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-
-              Row(
-                children: [
-                  // Service tag
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: AppColor.primary.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.computer_rounded,
-                            size: 11, color: AppColor.primary),
-                        const SizedBox(width: 5),
-                        Text("${service.serviceName}",
-                          style: TextStyle(
-                            fontSize: context.text10,
-                            fontWeight: FontWeight.w600,
-                            color: AppColor.primary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const Spacer(),
-
-                  // Delete button
-                  InkWell(
-                    borderRadius: BorderRadius.circular(9),
-                    onTap: () async {
-                      final confirm = await AppDialog.show(context,
-                        title: "Delete Chat",
-                        message: "Are you sure you want to delete?",
-                        cancelText: "Cancel",
-                        confirmText: "Delete",
-                      );
-                      if (confirm) {
-                        await deleteController.deleteBooking(item.id);
-                        Get.find<BookingController>().fetchBookings();
-                      }
-                    },
-                    child: Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        color: Colors.red.withOpacity(0.08),
-                        borderRadius: BorderRadius.circular(9),
-                      ),
+                // Delete button
+                InkWell(
+                  borderRadius: BorderRadius.circular(9),
+                  onTap: () async {
+                    final confirm = await AppDialog.show(context,
+                      title: "Delete Chat",
+                      message: "Are you sure you want to delete?",
+                      cancelText: "Cancel",
+                      confirmText: "Delete",
+                    );
+                    if (confirm) {
+                      await deleteController.deleteBooking(item.id);
+                      Get.find<BookingController>().fetchBookings();
+                    }
+                  },
+                  child: AppCard(
+                    color: Colors.red.withOpacity(0.08),
+                    margin: EdgeInsets.zero,
+                    child: Center(
                       child: const Icon(Icons.delete_outline_rounded,
-                          color: Colors.red, size: 16),
+                          color: Colors.red, size: 22),
                     ),
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

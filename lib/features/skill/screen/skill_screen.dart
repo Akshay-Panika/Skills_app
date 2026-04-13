@@ -12,7 +12,6 @@ import '../controller/service_delete_controller.dart';
 import '../../service/controller/service_list_controller.dart';
 import '../controller/service_list_by_user_controller.dart';
 import '../widget/skill_empty_card.dart';
-import 'add_skill_screen.dart';
 
 class AdsScreen extends StatefulWidget {
   const AdsScreen({super.key});
@@ -274,7 +273,7 @@ class _AdsScreenState extends State<AdsScreen> {
                 image: s.serviceImage,
                 status: s.serviceStatus ? "Active" : "Inactive",
                 serviceId: s.id,
-                userId: s.user,
+                userId: s.userProfile!.user.toInt(),
               );
             },
           );
@@ -381,50 +380,52 @@ class SkillCard extends StatelessWidget {
                       spacing: 10,
                       children: [
                         AppCard(
-                          color: AppColor.primary,
+                          color: AppColor.primary.withOpacity(0.1),
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 3),
                           margin: EdgeInsets.zero,
                           child: Text(
                             price,
                             style: TextStyle(
-                              color: Colors.white,
-                              fontSize: context.text12,
+                              color: AppColor.primary,
+                              fontSize: context.text10,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
                         AppCard(
-                          color: _isActive
-                              ? const Color(0xFFEAF3DE)
-                              : AppColor.surface,
+                          color: AppColor.surface,
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           margin: EdgeInsets.zero,
                           child: Text(
                             status,
                             style: TextStyle(
-                              color: _isActive
-                                  ? const Color(0xFF3B6D11)
-                                  : AppColor.subtitle,
-                              fontSize: context.text12,
-                              fontWeight: FontWeight.w500,
+                              color: AppColor.title,
+                              fontSize: context.text10,
+                              fontWeight: FontWeight.w400,
                             ),
                           ),
                         ),
                         Spacer(),
-                        Text(
-                          views,
-                          style: TextStyle(
-                            fontSize: context.text12,
-                            color: AppColor.subtitle,
-                          ),
+                        Row(
+                          children: [
+                            Icon(Icons.visibility_outlined, size: 14, color: AppColor.subtitle),
+                            const SizedBox(width: 4),
+                            Text(
+                              views,
+                              style: TextStyle(
+                                fontSize: context.text12,
+                                color: AppColor.subtitle,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ],
                 ),
               ),
-              SizedBox(width: 10,),
+
             ],
           ),
           onTap: () {
