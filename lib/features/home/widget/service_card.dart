@@ -111,7 +111,7 @@ class ServiceCard extends StatelessWidget {
                         ? Icons.bookmark
                         : Icons.bookmark_border,
                     color: service.isFavorite
-                        ? Colors.red
+                        ? AppColor.primary
                         : Colors.grey,
                     size: 25,
                   ),

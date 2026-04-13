@@ -549,7 +549,7 @@ class _AddSkillScreenState extends State<AddSkillScreen>
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('Service Type',style: TextStyle(
+        Text('Skill Type',style: TextStyle(
           fontWeight: FontWeight.w500,
           fontSize: context.text12,
           color: AppColor.title,
@@ -567,7 +567,7 @@ class _AddSkillScreenState extends State<AddSkillScreen>
               child: Row(
                 children: [
                   Icon(
-                    label == "Paid" ? Icons.currency_rupee : Icons.currency_rupee,
+                    label == "Paid" ? Icons.currency_rupee : Icons.money_off,
                     size: context.text18,
                     color: selected ? AppColor.white : AppColor.title,
                   ),

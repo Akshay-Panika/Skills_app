@@ -2,21 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/constant/app_size.dart';
-import 'package:skills_app/features/skill/repository/service_list_byuser_repository.dart';
 import '../../../core/widget/app_dilog.dart';
 import '../../account/screen/account_screen.dart';
-import '../../category/controller/category_controller.dart';
 import '../../chat/screen/chat_list_screen.dart';
 import '../../home/controller/home_screen_controller.dart';
 import '../../home/screen/home_screen.dart';
 import '../../location/controller/location_controller.dart';
-import '../../service/controller/service_list_controller.dart';
-import '../../service/repository/service_list_repository.dart';
 import 'package:get/get.dart';
-import '../../skill/controller/service_delete_controller.dart';
-import '../../skill/controller/service_list_by_user_controller.dart';
 import '../../skill/screen/skill_screen.dart';
-import '../../skill/screen/add_skill_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -120,8 +113,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           right: context.sWidth * 0.03,
                           top: context.sWidth * 0.01,
                           bottom: context.sWidth * 0.01),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF0D6E6E),
+                      decoration:  BoxDecoration(
+                        color: AppColor.primary,
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(10),
                           bottomLeft: Radius.circular(10),
@@ -149,7 +142,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       icon: FaIcon(
         icon,
         color: _currentIndex == index
-            ? const Color(0xFF0D6E6E)
+            ? AppColor.primary
             : Colors.grey,
       ),
     );

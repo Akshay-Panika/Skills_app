@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/constant/app_size.dart';
@@ -127,96 +126,174 @@ class _ChatTabContent extends StatelessWidget {
 
 class ChatSkillCard extends StatelessWidget {
   final dynamic item;
-
-   ChatSkillCard({super.key, required this.item});
+  ChatSkillCard({super.key, required this.item});
   final deleteController = Get.find<BookingDeleteController>();
+
+  Color get _accentColor {
+    // Role ke hisaab se color change karo
+    return AppColor.primary; // ya Buyer/Seller logic se
+  }
+
   @override
   Widget build(BuildContext context) {
     final service = item.service;
 
-    return Stack(
-      children: [
-        AppCard(
-          onTap: () {
-            Get.toNamed(
-              '/chat',
-              arguments: {
-                "serviceId": service.id,
-              },
-            );
-          },
-          margin: const EdgeInsets.only(bottom: 10, left: 10, right: 10),
-          padding: const EdgeInsets.all(12),
+    return GestureDetector(
+      onTap: () => Get.toNamed('/chat', arguments: {"serviceId": service.id}),
+      child: AppCard(
+        margin: const EdgeInsets.only(bottom: 10, left: 12, right: 12),
+        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 12, 14, 12),
           child: Column(
-            spacing: 10,
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                 AppCard(
-                   margin: EdgeInsets.zero,
-                   color: AppColor.primary.withOpacity(0.1),
-                   padding: EdgeInsets.all(context.sWidth*0.05),
-                   child:FaIcon(FontAwesomeIcons.circleUser,color: AppColor.primary,),
-                 ),
-
-                  const SizedBox(width: 12),
+                  // Avatar with initials
+                  Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 24,
+                        backgroundColor:
+                        AppColor.primary.withOpacity(0.1),
+                        child: Text(
+                          "SD", // initials
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: AppColor.primary,
+                          ),
+                        ),
+                      ),
+                      // Online indicator
+                      Positioned(
+                        bottom: 1,
+                        right: 1,
+                        child: Icon(Icons.circle,size: 12,color: AppColor.primary,),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 11),
 
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Text("SD User",
-                          style: TextStyle(
-                            fontSize: context.text14,
-                            fontWeight: FontWeight.w700,
-                            color: AppColor.title,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        // Name + Date
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text("SD User",
+                                style: TextStyle(
+                                  fontSize: context.text14,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColor.title,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            Text(
+                              item.createdAt.toString().substring(0,10),
+                              style: const TextStyle(
+                                  fontSize: 11,
+                                  color: AppColor.subtitle),
+                            ),
+                          ],
                         ),
-                        Text("Flutter- Waidhan, Singrauli",
-                          style: TextStyle(
-                            fontSize: context.text12,
-                            color: AppColor.subtitle,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+
+                        // Location
+                        const SizedBox(height: 3),
+                        Row(
+                          children: [
+                            Icon(Icons.location_on_outlined,
+                                size: 13, color: AppColor.subtitle),
+                            const SizedBox(width: 3),
+                            Expanded(
+                              child: Text(
+                                "Flutter · Waidhan, Singrauli",
+                                style: TextStyle(
+                                    fontSize: context.text12,
+                                    color: AppColor.subtitle),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(height: 10,),
+
+                        // Last message
+                        const SizedBox(height: 6),
                         Text("${item.message}",
                           style: TextStyle(
-                            fontSize: context.text12,
-                            color: AppColor.title,
-                          ),
+                              fontSize: context.text12,
+                              color: AppColor.subtitle,
+                              height: 1.45),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
-
                       ],
                     ),
                   ),
                 ],
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
+              const SizedBox(height: 10),
+
+              Row(
                 children: [
-                  AppCard(
-                    color: AppColor.surface,
-                    margin: EdgeInsets.zero,
-                    child: Text("${service.serviceName}",
-                      style: TextStyle(
-                        fontSize: context.text10,
-                        fontWeight: FontWeight.w500,
-                        color: AppColor.primary,
+                  // Service tag
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColor.primary.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.computer_rounded,
+                            size: 11, color: AppColor.primary),
+                        const SizedBox(width: 5),
+                        Text("${service.serviceName}",
+                          style: TextStyle(
+                            fontSize: context.text10,
+                            fontWeight: FontWeight.w600,
+                            color: AppColor.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const Spacer(),
+
+                  // Delete button
+                  InkWell(
+                    borderRadius: BorderRadius.circular(9),
+                    onTap: () async {
+                      final confirm = await AppDialog.show(context,
+                        title: "Delete Chat",
+                        message: "Are you sure you want to delete?",
+                        cancelText: "Cancel",
+                        confirmText: "Delete",
+                      );
+                      if (confirm) {
+                        await deleteController.deleteBooking(item.id);
+                        Get.find<BookingController>().fetchBookings();
+                      }
+                    },
+                    child: Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.08),
+                        borderRadius: BorderRadius.circular(9),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      child: const Icon(Icons.delete_outline_rounded,
+                          color: Colors.red, size: 16),
                     ),
                   ),
                 ],
@@ -224,43 +301,11 @@ class ChatSkillCard extends StatelessWidget {
             ],
           ),
         ),
-
-        Positioned(
-          top: 10,
-          right: 20,
-          bottom: 20,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              InkWell(
-                onTap: () async {
-                  final confirm = await AppDialog.show(
-                    context,
-                    title: "Delete Chat",
-                    message: "Are you sure you want to delete this booking?",
-                    cancelText: "Cancel",
-                    confirmText: "Delete",
-                  );
-
-                  if (confirm) {
-                    await deleteController.deleteBooking(item.id);
-                    Get.find<BookingController>().fetchBookings();
-                  }
-                },
-                child: const Icon(Icons.delete, color: Colors.grey),
-              ),
-              Text(
-                item.createdAt.toString().substring(0, 10),
-                style: const TextStyle(fontSize: 11, color: AppColor.subtitle),
-              ),
-            ],
-          ),
-        )
-      ],
+      ),
     );
   }
 }
+
 class _EmptyState extends StatelessWidget {
   const _EmptyState();
 

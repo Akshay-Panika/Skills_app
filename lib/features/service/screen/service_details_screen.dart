@@ -142,12 +142,58 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                     child: InkWell(
                       onTap: () => Get.back(),
                       child: const CircleAvatar(
-                        backgroundColor: Colors.white,
+                        backgroundColor: Colors.black38,
                         child: Padding(
                           padding: EdgeInsets.only(left: 8.0),
-                          child: Icon(Icons.arrow_back_ios, color: Colors.black),
+                          child: Icon(Icons.arrow_back_ios, color: Colors.white),
                         ),
                       ),
+                    ),
+                  ),
+                  actions: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: InkWell(
+                        // onTap: () => Get.back(),
+                        child: const CircleAvatar(
+                          backgroundColor: Colors.black38,
+                          child: Padding(
+                              padding: EdgeInsets.only(left: 8.0),
+                              child: FaIcon(FontAwesomeIcons.shareFromSquare,color: Colors.white,)
+                          ),
+                        ),
+                      ),
+                    ),
+
+                  ],
+                  bottom: PreferredSize(
+                    preferredSize: Size.fromHeight(50),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.only(
+                            left: context.sWidth*0.1,
+                            right: context.sWidth*0.1,top: context.sWidth*0.01
+                          ),
+                          decoration: BoxDecoration(
+                              color: AppColor.primary,
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(20),
+                              )
+                          ),
+                          child:  Text(
+                            service.serviceAmount != null
+                                ? "₹${double.tryParse(service.serviceAmount.toString())?.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '') ?? service.serviceAmount!}"
+                                : "Free",
+                            style: TextStyle(
+                                color: service.serviceAmount != null ?AppColor.white: AppColor.white,
+                                fontWeight: FontWeight.w500,
+                                fontSize: context.text16),
+                          ),
+                        )
+                      ],
                     ),
                   ),
                   flexibleSpace: FlexibleSpaceBar(
@@ -169,10 +215,10 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                         color: Colors.grey[200],
                         child: const Icon(Icons.broken_image_outlined, color: Colors.grey, size: 40),
                       ),
-                    ),
+                    )
                   ),
                 ),
-                SliverToBoxAdapter(child: SizedBox(height: context.sWidth*0.06,),),
+                SliverToBoxAdapter(child: SizedBox(height: context.sWidth*0.03,),),
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -181,11 +227,21 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(flex: 2,
-                          child: Text(
-                            service.serviceName,
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: context.text16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                service.serviceName,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: context.text16),
+                              ),
+                              Text(
+                                service.serviceDescription,
+                                style:
+                                TextStyle(color: AppColor.subtitle, fontSize: context.text16),
+                              ),
+                            ],
                           ),
                         ),
                         Expanded(
@@ -193,15 +249,6 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                             spacing: 10,
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              Text(
-                                service.serviceAmount != null
-                                    ? "₹${double.tryParse(service.serviceAmount.toString())?.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '') ?? service.serviceAmount!}"
-                                    : "Free",
-                                style: TextStyle(
-                                    color: service.serviceAmount != null ? Colors.green: AppColor.primary,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: context.text16),
-                              ),
                               Row(
                                 spacing: 2,
                                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -241,31 +288,10 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                                     );
                                   }),
                                 ],
-                              ),
+                              )
+
                             ],
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Description",
-                          style: TextStyle(
-                              color: Colors.grey,
-                              fontWeight: FontWeight.w500, fontSize: context.text16),
-                        ),
-                        SizedBox(height: context.sHeight * 0.002),
-                        Text(
-                          service.serviceDescription,
-                          style:
-                          TextStyle(color: AppColor.subtitle, fontSize: context.text16),
                         ),
                       ],
                     ),

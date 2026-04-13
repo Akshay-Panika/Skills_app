@@ -201,12 +201,12 @@ class _ServiceCard extends StatelessWidget {
               right: -2,
               child: InkWell(
                 onTap: onRemove,
-                child: const CircleAvatar(
+                child:  CircleAvatar(
                   radius: 18,
                   backgroundColor: Colors.white,
                   child: Icon(
                     Icons.bookmark,
-                    color: Colors.red,
+                    color: AppColor.primary,
                     size: 25,
                   ),
                 ),

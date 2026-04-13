@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 class AppColor {
   AppColor._();
 
+  // 0xFFF97316 // 0xFF2563EB // 0xFF14B8A6
+  // static const primary = Colors.deepPurpleAccent;
   static const primary = Color(0xFF0D6E6E);
   static const secondary = Color(0xFFFFB347);
   static const surface = Color(0xFFF4F7F7);

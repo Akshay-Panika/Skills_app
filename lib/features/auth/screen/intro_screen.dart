@@ -76,7 +76,7 @@ class _IntroScreenState extends State<IntroScreen> {
                         width: double.infinity,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
-                          color: Colors.white
+                          // color: Colors.white
                         ),
                         child: Lottie.asset(pages[index]["icon"]),
                       ),

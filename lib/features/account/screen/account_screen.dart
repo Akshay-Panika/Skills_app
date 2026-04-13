@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/constant/app_size.dart';
 import 'package:skills_app/core/widget/flutter_toast.dart';
-import 'package:skills_app/features/wishlist/screen/wishlist_screen.dart';
+import 'package:skills_app/core/widget/my_appbar.dart';
 import '../../../core/widget/app_card.dart';
 import '../../../core/widget/app_dilog.dart';
 import '../../auth/helper/auth_preferences.dart';
@@ -52,16 +52,11 @@ class _AccountScreenState extends State<AccountScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColor.surface,
-      appBar : AppBar(
+      appBar : myAppBar(
         backgroundColor: AppColor.primary,
-        title:  Text(
-          'Skills Dashboard',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: context.text16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        title: 'Account',
+        centerTitle: false,
+        titleColor: AppColor.white,
         actions: [
         InkWell(
               onTap: () => Get.to(() => NotificationScreen()),
@@ -134,6 +129,7 @@ class _AccountScreenState extends State<AccountScreen> {
                   isDestructive: true,
                   onTap: () => _showSignOutDialog(context),
                 ),
+                SizedBox(height: context.sWidth*0.2),
               ]),
             ),
           ),
@@ -144,115 +140,135 @@ class _AccountScreenState extends State<AccountScreen> {
 
 
   Widget _buildHeader(BuildContext context) {
-    return Container(
-       color: AppColor.primary,
-      padding: EdgeInsets.all(16),
-      child: Obx(() {
-        final bool loading = userProfileController.isLoading.value;
-        final UserProfileModel? profile = userProfileController.userProfile.value;
-
-        // 👉 Null / loading handle
-        if (loading || profile == null) {
-          return Row(
-            spacing: 10,
-            children: [
-              CircleAvatar(
-                radius: context.sHeight * 0.036,
-                backgroundColor: Colors.grey[300],
-                child:  FaIcon(
-                  FontAwesomeIcons.image,
-                  color: Colors.grey[400],
-                  size: 25,
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Guest User",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                        fontSize: context.text14,
-                        color: AppColor.white,
-                      ),
-                    ),
-
-                    Text("Bio",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: context.text12,
-                        color: AppColor.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          );
-        }
-
-        return Row(
-          spacing: 10,
+    return Stack(
+      alignment: Alignment.bottomCenter,
+      children: [
+        Positioned.fill(child: Column(
           children: [
-            CircleAvatar(
-              radius: context.sHeight * 0.036,
-              backgroundColor: AppColor.white,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(context.sHeight * 0.036),
-                child: CachedNetworkImage(
-                  imageUrl: profile.userImage ?? "",
-                  fit: BoxFit.cover,
-                  width: context.sHeight * 0.068,
-                  height: context.sHeight * 0.068,
-
-                  placeholder: (context, url) => Container(
-                    color: Colors.grey[100],
-                    alignment: Alignment.center,
-                    child: FaIcon(
-                      FontAwesomeIcons.image,
-                      color: Colors.grey[400],
-                      size: 25,
-                    ),
-                  ),
-
-                  errorWidget: (context, url, error) => Container(
-                    color: Colors.grey[200],
-                    alignment: Alignment.center,
-                    child: const Icon(Icons.person, color: Colors.grey, size: 25),
-                  ),
-                ),
+            Expanded(
+              child: Container(
+                color: AppColor.primary,
               ),
             ),
+            Expanded(child: SizedBox())
+          ],
+        )),
+        AppCard(
+          color: AppColor.white,
+          padding: EdgeInsets.all(16),
+          margin: EdgeInsets.only(
+            left: 16,right: 16,top: 16
+          ),
+          child: Obx(() {
+            final loading = userProfileController.isLoading.value;
+            final profile = userProfileController.userProfile.value;
 
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            if (loading) {
+              return profileCard(null, isLoading: true);
+            }
+
+            return profileCard(profile);
+          }),
+        )
+      ],
+    );
+  }
+
+  Widget profileCard(UserProfileModel? profile, {bool isLoading = false}) {
+    return Column(
+      children: [
+        CircleAvatar(
+          radius: context.sHeight * 0.04,
+          backgroundColor: AppColor.primary,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(100),
+            child: CachedNetworkImage(
+              imageUrl: (profile?.userImage != null &&
+                  profile!.userImage!.trim().isNotEmpty)
+                  ? profile.userImage!
+                  : "",
+
+              fit: BoxFit.cover,
+              width: context.sHeight * 0.077,
+              height: context.sHeight * 0.077,
+
+              placeholder: (context, url) => CircleAvatar(
+                backgroundColor: Colors.grey.shade300,
+                child: FaIcon(FontAwesomeIcons.circleUser, color: AppColor.primary),
+              ),
+
+              errorWidget: (context, url, error) => CircleAvatar(
+                backgroundColor: Colors.grey.shade300,
+                child: FaIcon(FontAwesomeIcons.circleUser, color: AppColor.primary),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        isLoading
+            ? AppCard(height: 12, width: 100, color: Colors.grey.shade300, margin: EdgeInsets.zero,padding: EdgeInsets.zero,)
+            : Text(
+          (profile?.userName?.isNotEmpty ?? false)
+              ? profile!.userName!
+              : "Guest User",
+          style: TextStyle(
+            fontWeight: FontWeight.w800,
+            fontSize: context.text14,
+            color: AppColor.title,
+          ),
+        ),
+        const SizedBox(height: 6),
+
+        isLoading
+            ? AppCard(height: 10, width: 150, color: Colors.grey.shade300, margin: EdgeInsets.zero,padding: EdgeInsets.zero,)
+            : Text(
+          (profile?.userBio?.isNotEmpty ?? false)
+              ? profile!.userBio!
+              : "No Profile Found",
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: context.text12,
+            color: AppColor.subtitle,
+          ),
+        ),
+
+        const SizedBox(height: 16),
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            isLoading
+                ? AppCard(height: 10, width: 80, color: Colors.grey.shade300, margin: EdgeInsets.zero,padding: EdgeInsets.zero,)
+                : Text(
+              "00-00-2026",
+              style: TextStyle(fontSize: context.text12),
+            ),
+
+            isLoading
+                ? AppCard(height: 30, width: 80, color: Colors.grey.shade300,  margin: EdgeInsets.zero,padding: EdgeInsets.zero,)
+                : AppCard(
+              color: AppColor.primary,
+              margin: EdgeInsets.zero,
+              borderRadius: 10,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+              child: Row(
                 children: [
+                  const Icon(Icons.edit, size: 18, color: Colors.white),
+                  const SizedBox(width: 6),
                   Text(
-                    (profile.userName?.isNotEmpty ?? false)
-                        ? profile.userName!
-                        : "Guest User",
+                    "Edit",
                     style: TextStyle(
-                      fontWeight: FontWeight.w800,
-                      fontSize: context.text14,
-                      color: AppColor.white,
-                    ),
-                  ),
-
-                  Text(
-                    profile.userBio ?? "",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
                       fontSize: context.text12,
                       color: AppColor.white,
                     ),
                   ),
                 ],
               ),
+              onTap: () => Get.to(() => BasicInfoScreen()),
             ),
           ],
-        );
-      }),
+        ),
+      ],
     );
   }
 

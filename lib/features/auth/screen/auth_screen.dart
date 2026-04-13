@@ -142,29 +142,39 @@ class _AuthScreenState extends State<AuthScreen> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColor.primary,
 
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: context.sWidth * 0.04),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
 
-            /// ICON
-            Expanded(
+          /// ICON
+          Expanded(
+            child: Container(
+              color: AppColor.primary,
               child: Center(
                 child: FaIcon(
                   FontAwesomeIcons.chalkboardTeacher,
                   size: context.sWidth * 0.4,
-                  color: AppColor.primary,
+                  color: AppColor.white,
                 ),
               ),
             ),
+          ),
 
-            /// CONTENT
-            Expanded(
+          /// CONTENT
+          Expanded(
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: context.sWidth * 0.06),
+              decoration: BoxDecoration(
+                color: AppColor.white,
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(20),
+                  topLeft: Radius.circular(20),
+                )
+              ),
               child: Column(
-
+                crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
 
@@ -172,6 +182,8 @@ class _AuthScreenState extends State<AuthScreen> {
                   Obx(() {
                     return Column(
                       spacing: 5,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
 
                         Text(
@@ -189,7 +201,7 @@ class _AuthScreenState extends State<AuthScreen> {
                           controller.isOtpSent.value
                               ? 'We have send a 5 digit OTP to +91 ${phoneController.text}'
                               : 'We’ll send you a verification code',
-                          textAlign: TextAlign.center,
+                          // textAlign: TextAlign.center,
                           style: TextStyle(
                             color: AppColor.subtitle,
                             fontSize: context.text16,
@@ -297,8 +309,8 @@ class _AuthScreenState extends State<AuthScreen> {
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
