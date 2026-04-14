@@ -64,14 +64,16 @@ class _ServiceDetailsShimmerState extends State<ServiceDetailsShimmer>
 
   @override
   Widget build(BuildContext context) {
+    final double imageHeight = context.sWidth * 0.75;
+
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       body: CustomScrollView(
         physics: const NeverScrollableScrollPhysics(),
         slivers: [
-          // IMAGE SHIMMER
+          // ── HERO IMAGE with price badge overlay ──────────────────────────
           SliverAppBar(
-            expandedHeight: context.sWidth * 0.7,
+            expandedHeight: imageHeight,
             pinned: true,
             backgroundColor: Colors.transparent,
             automaticallyImplyLeading: false,
@@ -79,114 +81,176 @@ class _ServiceDetailsShimmerState extends State<ServiceDetailsShimmer>
               padding: const EdgeInsets.all(8.0),
               child: AnimatedBuilder(
                 animation: _animation,
-                builder: (context, _) => CircleAvatar(
-                  backgroundColor: const Color(0xFFE0E0E0),
+                builder: (context, _) => const CircleAvatar(
+                  backgroundColor: Color(0xFFE0E0E0),
                 ),
               ),
             ),
-            flexibleSpace: FlexibleSpaceBar(
-              background: AnimatedBuilder(
-                animation: _animation,
-                builder: (context, _) => Container(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: [
-                        Color(0xFFE0E0E0),
-                        Color(0xFFF5F5F5),
-                        Color(0xFFE0E0E0),
-                      ],
-                    ),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: AnimatedBuilder(
+                  animation: _animation,
+                  builder: (context, _) => const CircleAvatar(
+                    backgroundColor: Color(0xFFE0E0E0),
                   ),
                 ),
+              ),
+            ],
+            flexibleSpace: FlexibleSpaceBar(
+              background: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // Full image shimmer
+                  AnimatedBuilder(
+                    animation: _animation,
+                    builder: (context, _) => Container(
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Color(0xFFE0E0E0),
+                            Color(0xFFF5F5F5),
+                            Color(0xFFE0E0E0),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Price badge — bottom-right (like the ₹9999 teal badge)
+                  Positioned(
+                    bottom: 16,
+                    right: 0,
+                    child: _shimmerBox(
+                      width: context.sWidth * 0.28,
+                      height: context.sWidth * 0.1,
+                      radius: 8,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
 
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // TITLE & PRICE + LOCATION
+                  // ── TITLE (left) + LOCATION (right) ──────────────────────
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Title
-                      Expanded(child: _shimmerBox(height: context.text16, width: 200)),
-
-                      // Price & Location
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                      // Title block — two lines like "Ethical Hacking / Learn with Chandu"
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _shimmerBox(
+                              width: context.sWidth * 0.55,
+                              height: context.text16 + 2,
+                            ),
+                            SizedBox(height: context.sHeight * 0.006),
+                            _shimmerBox(
+                              width: context.sWidth * 0.42,
+                              height: context.text14,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      // Location pin + distance
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          _shimmerBox(width: 60, height: context.text16),
-                          SizedBox(height: context.sHeight * 0.005),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              _shimmerBox(
-                                  width: context.sWidth * 0.04,
-                                  height: context.sWidth * 0.04,
-                                  radius: 50),
-                              SizedBox(width: context.sWidth * 0.01),
-                              _shimmerBox(width: context.sWidth * 0.2, height: context.text14),
-                            ],
+                          _shimmerBox(
+                            width: context.sWidth * 0.04,
+                            height: context.sWidth * 0.04,
+                            radius: 50,
+                          ),
+                          SizedBox(width: context.sWidth * 0.01),
+                          _shimmerBox(
+                            width: context.sWidth * 0.1,
+                            height: context.text14,
                           ),
                         ],
                       ),
                     ],
                   ),
-                  SizedBox(height: context.sHeight * 0.02),
+                  SizedBox(height: context.sHeight * 0.022),
 
-                  // DESCRIPTION
-                  _shimmerBox(width: context.sWidth * 0.4, height: context.text16),
-                  SizedBox(height: context.sHeight * 0.01),
-                  _shimmerBox(height: context.text14),
-                  SizedBox(height: context.sHeight * 0.005),
-                  _shimmerBox(height: context.text14),
-                  SizedBox(height: context.sHeight * 0.005),
-                  _shimmerBox(width: context.sWidth * 0.5, height: context.text14),
-                  SizedBox(height: context.sHeight * 0.02),
-
-                  // AD BANNER
-                  Container(
-                    height: context.sWidth * 0.6,
-                    margin: EdgeInsets.zero,
-                    child: _shimmerBox(height: context.sWidth * 0.6, radius: 14),
+                  // ── AD BANNER ─────────────────────────────────────────────
+                  _shimmerBox(
+                    height: context.sWidth * 0.58,
+                    radius: 14,
                   ),
-                  SizedBox(height: context.sHeight * 0.02),
+                  SizedBox(height: context.sHeight * 0.022),
 
-                  // SELLER CARD
+                  // ── SELLER CARD ───────────────────────────────────────────
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 14),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        _shimmerBox(width: 64, height: 64, radius: 50),
-                        SizedBox(width: context.sWidth * 0.03),
+                        // Avatar
+                        _shimmerBox(
+                            width: 56, height: 56, radius: 50),
+                        SizedBox(width: context.sWidth * 0.035),
+                        // Name + Role
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _shimmerBox(width: context.sWidth * 0.4, height: context.text16),
-                              SizedBox(height: context.sHeight * 0.005),
-                              _shimmerBox(height: context.text14),
-                              SizedBox(height: context.sHeight * 0.002),
-                              // _shimmerBox(width: context.sWidth * 0.5, height: context.text14),
+                              _shimmerBox(
+                                width: context.sWidth * 0.38,
+                                height: context.text16,
+                              ),
+                              SizedBox(height: context.sHeight * 0.006),
+                              _shimmerBox(
+                                width: context.sWidth * 0.5,
+                                height: context.text14,
+                              ),
                             ],
                           ),
+                        ),
+                        SizedBox(width: context.sWidth * 0.03),
+                        // Rating badge — right side (star + 4.8 / 120 reviews)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            _shimmerBox(
+                              width: context.sWidth * 0.18,
+                              height: context.sWidth * 0.07,
+                              radius: 20,
+                            ),
+                            SizedBox(height: context.sHeight * 0.005),
+                            _shimmerBox(
+                              width: context.sWidth * 0.18,
+                              height: context.text12,
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(height: context.sHeight * 0.03),
+                  SizedBox(height: context.sHeight * 0.022),
+
+                  // ── "Report this skill" link ──────────────────────────────
+                  Center(
+                    child: _shimmerBox(
+                      width: context.sWidth * 0.35,
+                      height: context.text14,
+                      radius: 6,
+                    ),
+                  ),
+                  SizedBox(height: context.sHeight * 0.02),
                 ],
               ),
             ),
@@ -194,28 +258,38 @@ class _ServiceDetailsShimmerState extends State<ServiceDetailsShimmer>
         ],
       ),
 
-      // BOTTOM BUTTON SHIMMER
+      // ── BOTTOM BAR: "Chat With Mentor" + bookmark icon ─────────────────
       bottomNavigationBar: Padding(
         padding: EdgeInsets.only(
-            left: context.sWidth * 0.04,
-            right: context.sWidth * 0.04,
-            bottom: context.sHeight * 0.03),
-        child: SizedBox(
-          height: context.sWidth * 0.12,
-          child: Row(
-            children: [
-              Expanded(child: _shimmerBox(height: context.sWidth * 0.12, radius: 10)),
-              SizedBox(width: context.sWidth * 0.02),
-              _shimmerBox(width: context.sWidth * 0.12, height: context.sWidth * 0.12, radius: 10),
-            ],
-          ),
+          left: context.sWidth * 0.04,
+          right: context.sWidth * 0.04,
+          bottom: context.sHeight * 0.03,
+          top: context.sHeight * 0.01,
+        ),
+        child: Row(
+          children: [
+            // Wide CTA button
+            Expanded(
+              child: _shimmerBox(
+                height: context.sWidth * 0.13,
+                radius: 12,
+              ),
+            ),
+            SizedBox(width: context.sWidth * 0.025),
+            // Square bookmark button
+            _shimmerBox(
+              width: context.sWidth * 0.13,
+              height: context.sWidth * 0.13,
+              radius: 12,
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-// GRADIENT TRANSFORM
+// ── GRADIENT SLIDING TRANSFORM ─────────────────────────────────────────────
 class _SlidingGradientTransform extends GradientTransform {
   final double slidePercent;
   const _SlidingGradientTransform(this.slidePercent);

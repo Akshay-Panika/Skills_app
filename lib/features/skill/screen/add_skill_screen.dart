@@ -249,7 +249,8 @@ class _AddSkillScreenState extends State<AddSkillScreen>
                     isLoading: loading,
                     onPressed: postService,
                   );
-                })
+                }),
+                const SizedBox(height: 40),
               ],
             ),
           ),
