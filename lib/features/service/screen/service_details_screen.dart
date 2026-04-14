@@ -5,10 +5,12 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:skills_app/core/widget/app_card.dart';
 import 'package:skills_app/core/widget/app_contact.dart';
+import 'package:skills_app/core/widget/my_appbar.dart';
 import 'package:skills_app/features/chat/screen/chat_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constant/app_color.dart';
 import '../../../core/constant/app_size.dart';
+import '../../../core/widget/app_error_card.dart';
 import '../../account/controller/user_profile_controller.dart';
 import '../../account/model/user_profile_model.dart';
 import '../../location/controller/location_controller.dart';
@@ -74,7 +76,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      if (serviceController.isLoading.value || checkBookingController.isLoading.value) {
+      if (serviceController.isLoading.value) {
         return const Scaffold(
           body: ServiceDetailsShimmer(),
         );
@@ -82,30 +84,20 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
 
       if (serviceController.errorMessage.isNotEmpty) {
         debugPrint("Error ${serviceController.errorMessage.value}");
+
         return Scaffold(
+          appBar: myAppBar(title: 'Skill Details',
+              backgroundColor: AppColor.primary,
+              titleColor: Colors.white,
+              showBackButton: true,
+              buttonColor: AppColor.white
+          ),
           body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.error_outline, size: context.sHeight*0.06, color: Colors.red),
-                const SizedBox(height: 12),
-                Padding(
-                  padding: EdgeInsets.symmetric( horizontal:context.sHeight*0.06),
-                  child: Text(
-                    serviceController.errorMessage.value,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: Colors.red, fontSize: context.text16),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton.icon(
-                  onPressed: () => serviceController
-                      .fetchServiceDetails(int.parse(widget.serviceId)),
-                  icon: const Icon(Icons.refresh),
-                  label: Text("Retry", style: TextStyle(fontSize: context.text16)),
-                ),
-              ],
+            child: AppErrorCard(
+              message: serviceController.errorMessage.value,
+              title: "Connection Problem",
+              onRetry: () => serviceController
+                  .fetchServiceDetails(int.parse(widget.serviceId)),
             ),
           ),
         );
@@ -446,6 +438,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                 if (alreadyBooked) {
                   return _actionButton(
                     context,
+                    loading: checkBookingController.isLoading.value,
                     text: "Skill Booked",
                     onChatTap: () {
                       Get.toNamed(
@@ -501,6 +494,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
 
                     _actionButton(
                       context,
+                      loading: checkBookingController.isLoading.value,
                       text: _isMSG ? "Send Message" : "Chat With Mentor",
                       onChatTap: () {
                         if (!_isMSG) {
@@ -530,6 +524,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
           ],
         ),
       );
+
     });
   }
   Widget _fieldLabel(BuildContext context, String text) {
@@ -573,69 +568,48 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
     );
   }
 
-  Widget _sellerShimmer() =>  Container(
-    padding: const EdgeInsets.all(16),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(14),
-    ),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _shimmerBox(width: 64, height: 64, radius: 50),
-        SizedBox(width: context.sWidth * 0.03),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _shimmerBox(width: context.sWidth * 0.4, height: context.text16),
-              SizedBox(height: context.sHeight * 0.005),
-              _shimmerBox(height: context.text14),
-              SizedBox(height: context.sHeight * 0.002),
-              // _shimmerBox(width: context.sWidth * 0.5, height: context.text14),
-            ],
-          ),
-        ),
-      ],
-    ),
-  );
-  Widget _shimmerBox({double? width, double? height, double radius = 8}) {
-    return Container(
-      width: width ?? double.infinity,
-      height: height ?? 16,
-      decoration: BoxDecoration(
-        color: Colors.grey.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(radius),
-      ),
-    );
-  }
 }
 
 Widget _actionButton(
     BuildContext context, {
+      required bool loading,
       required String text,
       required bool bookmark,
       required VoidCallback onBookmarkTap,
       VoidCallback? onChatTap,
+
     }) {
   return Row(
     children: [
+
       Expanded(
         child: AppCard(
           height: context.sWidth * 0.12,
           color: AppColor.primary,
-          onTap: onChatTap,
-          child: Row(
+          onTap:onChatTap,
+          child:
+          loading ?
+          Center(
+            child: SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+            ),
+          )
+          :
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const Icon(Icons.chat, color: Colors.white),
-              SizedBox(width: 10),
+              const SizedBox(width: 8),
               Text(
                 text,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: context.text14,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],
@@ -643,12 +617,13 @@ Widget _actionButton(
         ),
       ),
 
-      SizedBox(width: 10),
+      const SizedBox(width: 10),
 
+      /// 🔖 Bookmark Button
       AppCard(
-        color: AppColor.primary,
         height: context.sWidth * 0.12,
         width: context.sWidth * 0.12,
+        color: AppColor.primary,
         onTap: onBookmarkTap,
         child: Icon(
           bookmark ? Icons.bookmark : Icons.bookmark_border,

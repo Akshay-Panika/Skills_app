@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/constant/app_size.dart';
 import 'package:skills_app/core/widget/app_card.dart';
+import 'package:skills_app/core/widget/app_error_card.dart';
 import '../../../core/widget/app_dilog.dart';
 import '../controller/booking_controller.dart';
 import '../../notification/screen/notification_screen.dart';
@@ -65,6 +66,14 @@ class ChatListScreen extends StatelessWidget {
                   return  Center(child: CircularProgressIndicator(color: AppColor.primary,));
                 }
 
+                if (bookingController.errorMessage.isNotEmpty) {
+                  return AppErrorCard(
+                    message: bookingController.errorMessage.value,
+                    title: "Connection Problem",
+                    onRetry: () => bookingController.fetchBookings(),
+                  );
+                }
+
                 return TabBarView(
                   children: [
                     _ChatTabContent(list: bookingController.allChats),
@@ -72,6 +81,7 @@ class ChatListScreen extends StatelessWidget {
                     _ChatTabContent(list: bookingController.sellerBookings),
                   ],
                 );
+
               }),
             ),
           ],
@@ -329,9 +339,9 @@ class _EmptyState extends StatelessWidget {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
+        children:  [
           Icon(Icons.chat_bubble_outline,
-              size: 60, color: AppColor.primary),
+              size: context.sWidth*0.14, color: AppColor.primary),
           SizedBox(height: 10),
           Text("No chats found",
               style: TextStyle(fontWeight: FontWeight.bold)),

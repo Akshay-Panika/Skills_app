@@ -11,6 +11,7 @@ class ServiceListByUserController extends GetxController {
   var isLoading = false.obs;
   var serviceList = <Service>[].obs;
   var count = 0.obs;
+  var errorMessage = "".obs;
 
   @override
   void onInit() {
@@ -22,11 +23,12 @@ class ServiceListByUserController extends GetxController {
   Future<void> fetchMyServices() async {
     try {
       isLoading.value = true;
+      errorMessage.value = "";
 
       final userId = await AuthPreferences.getUserId();
 
       if (userId == null) {
-        log("User not logged in");
+        errorMessage.value = "User not logged in";
         return;
       }
 
@@ -36,7 +38,7 @@ class ServiceListByUserController extends GetxController {
       count.value = data.count;
 
     } catch (e) {
-      log("Error: $e");
+      errorMessage.value = "Failed to load services";
     } finally {
       isLoading.value = false;
     }

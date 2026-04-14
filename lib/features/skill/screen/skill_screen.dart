@@ -6,6 +6,7 @@ import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/widget/app_card.dart';
 import '../../../core/constant/app_size.dart';
 import '../../../core/widget/app_dilog.dart';
+import '../../../core/widget/app_error_card.dart';
 import '../../../core/widget/flutter_toast.dart';
 import '../../notification/screen/notification_screen.dart';
 import '../controller/service_delete_controller.dart';
@@ -230,6 +231,15 @@ class _AdsScreenState extends State<AdsScreen> {
           ],
         );
       }
+
+      if (serviceListController.errorMessage.isNotEmpty) {
+        return AppErrorCard(
+          message: serviceListController.errorMessage.value,
+          title: "Connection Problem",
+          onRetry: () => serviceListController.fetchMyServices(),
+        );
+      }
+
 
       return PageView.builder(
         controller: _pageController,

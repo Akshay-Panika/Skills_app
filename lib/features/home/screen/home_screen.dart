@@ -427,7 +427,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     );
                   }),
                 ),
-                SliverToBoxAdapter(child: SizedBox(height: context.sHeight*0.06,),),
+                SliverToBoxAdapter(child: SizedBox(height: context.sHeight*0.1,),),
               ],
             ),
           );

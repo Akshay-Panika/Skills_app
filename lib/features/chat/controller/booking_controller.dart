@@ -7,6 +7,7 @@ class BookingController extends GetxController {
   final BookingRepository repository = BookingRepository();
 
   var isLoading = false.obs;
+  var errorMessage = "".obs; // ✅ ADD THIS
 
   var allChats = <BookingItem>[].obs;
   var buyerBookings = <BookingItem>[].obs;
@@ -27,17 +28,19 @@ class BookingController extends GetxController {
   Future<void> fetchBookings() async {
     try {
       isLoading(true);
+      errorMessage(""); // ✅ reset
 
       final userId = await AuthPreferences.getUserId();
-      if (userId == null) return;
+      if (userId == null) {
+        errorMessage("User not found");
+        return;
+      }
 
       final result = await repository.getUserBookings(userId);
 
-      // ✅ Assign buyer & seller
       buyerBookings.value = result.data.buyerBookings;
       sellerBookings.value = result.data.sellerBookings;
 
-      // ✅ FIX: merge both into allChats
       allChats.value = [
         ...result.data.buyerBookings,
         ...result.data.sellerBookings,
@@ -46,13 +49,13 @@ class BookingController extends GetxController {
       counts.value = result.counts;
 
     } catch (e) {
+      errorMessage("Something went wrong"); // ✅ set error
       print("Booking Error: $e");
     } finally {
       isLoading(false);
     }
   }
 
-  // 🔥 Optional: Pull to refresh support
   Future<void> refreshBookings() async {
     await fetchBookings();
   }

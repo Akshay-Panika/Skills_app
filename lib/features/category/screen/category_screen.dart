@@ -238,7 +238,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                     children: [
 
                      AppCard(
-                       height: context.sHeight*0.1,
+                       // height: context.sHeight*0.1,
                        hasBorder: true,
                        width: double.infinity,
                        margin: EdgeInsets.zero,
