@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/features/service/controller/service_list_controller.dart';
-import 'package:skills_app/features/service/screen/service_details_screen.dart';
 import '../../../core/widget/my_appbar.dart';
 import '../../home/screen/home_screen.dart';
 import '../../home/widget/service_card.dart';
-import '../../location/controller/location_controller.dart';
 
 
 class ServiceScreen extends StatefulWidget {
@@ -27,7 +24,7 @@ class _ServiceScreenState extends State<ServiceScreen> {
     return Scaffold(
       backgroundColor: AppColor.white,
       appBar: myAppBar(
-        title: "Service",
+        title: "Near by Skill",
         showBackButton: true,
         backgroundColor: AppColor.primary,
         titleColor: AppColor.white,

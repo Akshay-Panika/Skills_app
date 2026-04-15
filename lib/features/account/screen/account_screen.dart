@@ -96,7 +96,7 @@ class _AccountScreenState extends State<AccountScreen> {
                 ),
                 _MenuTile(
                   icon: Icons.campaign_outlined,
-                  title: "My Ads",
+                  title: "Skill Dashboard",
                   subtitle: "Manage your listings",
                   onTap: () => Get.to(() => AdsScreen()),
                 ),
