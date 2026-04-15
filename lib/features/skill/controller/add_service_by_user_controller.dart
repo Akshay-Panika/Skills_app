@@ -51,7 +51,7 @@ class AddServiceByUserController extends GetxController {
         longitude: longitude,
       );
 
-      FlutterToast.success("Service Created Successfully");
+      FlutterToast.success("Your skill has been created Successfully");
       Get.find<ServiceListController>().fetchServiceList();
       Get.find<ServiceListByUserController>().fetchMyServices();
       Get.find<BookingController>().fetchBookings();
@@ -104,8 +104,7 @@ class AddServiceByUserController extends GetxController {
         longitude: longitude,
       );
 
-      FlutterToast.success("Service Updated Successfully");
-
+      FlutterToast.success("Your skill has been updated successfully");
       Get.find<ServiceListController>().fetchServiceList();
       Get.find<ServiceListByUserController>().fetchMyServices();
       Get.find<BookingController>().fetchBookings();

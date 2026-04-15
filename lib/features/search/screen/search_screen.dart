@@ -10,7 +10,6 @@ import '../../home/widget/category_card.dart';
 import '../../home/widget/service_card.dart';
 import '../../location/controller/location_controller.dart';
 import '../../service/controller/service_list_controller.dart';
-import '../../service/screen/service_details_screen.dart';
 
 class SearchScreen extends StatelessWidget {
   SearchScreen({super.key});
@@ -28,7 +27,6 @@ class SearchScreen extends StatelessWidget {
     'Web Developer',
     'React Developer',
   ].obs;
-  bool _isClear = false;
 
   final TextEditingController _searchController = TextEditingController();
   final RxString _searchQuery = ''.obs;
@@ -243,7 +241,6 @@ class SearchScreen extends StatelessWidget {
             final service = nearby[index];
             return ServiceCard(
               service: service,
-              serviceDistance: getDistanceText(lat, lon, service.latitude!, service.longitude!),
             );
           },
         ),
@@ -312,7 +309,7 @@ class SearchScreen extends StatelessWidget {
             itemCount: filtered.length,
             itemBuilder: (context, index) {
               final s = filtered[index];
-              return ServiceCard(service: s, serviceDistance: getDistanceText(lat, lon, s.latitude!, s.longitude!));
+              return ServiceCard(service: s);
             },
           ),
         ],

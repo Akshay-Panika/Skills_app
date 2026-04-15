@@ -1,26 +1,35 @@
 import 'package:dio/dio.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
 import '../../../core/network/api_client.dart';
+import '../../auth/helper/auth_preferences.dart';
+import '../../location/controller/location_controller.dart';
 import '../model/service_details_model.dart';
 
 class ServiceDetailsRepository {
+
   Future<ServiceDetailsModel> getServiceDetails(int id) async {
     try {
-      final response = await ApiClient.dio.get('service/$id/');
 
-      if (response.statusCode == 200 && response.data != null) {
-        return ServiceDetailsModel.fromJson(
-          response.data as Map<String, dynamic>,
-        );
-      } else {
-        throw Exception('Failed: ${response.statusCode}');
-      }
-    } on DioException catch (e) {
-      // 🔥 safe error handling
-      return Future.error(
-        e.response?.data?['message'] ?? 'Server error',
+      final userId = AuthPreferences.getUserId();
+      final locationController = Get.find<LocationController>();
+
+      final lat = locationController.latitude.value;
+      final lng = locationController.longitude.value;
+
+      final response = await ApiClient.dio.get(
+        'service/$id/',
+        queryParameters: {
+          "user": userId,
+          "lat": lat,
+          "lon": lng,
+        },
       );
-    } catch (_) {
-      return Future.error('Something went wrong');
+
+      return ServiceDetailsModel.fromJson(response.data);
+
+    } catch (e) {
+      throw Exception("Failed to load service details: $e");
     }
   }
 }

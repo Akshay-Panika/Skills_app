@@ -19,7 +19,6 @@ class ServiceScreen extends StatefulWidget {
 }
 
 class _ServiceScreenState extends State<ServiceScreen> {
-  final  _getLocationController = Get.find<LocationController>();
   final  _serviceListController = Get.find<ServiceListController>();
   bool _isFree = false;
 
@@ -61,32 +60,20 @@ class _ServiceScreenState extends State<ServiceScreen> {
         ],
       ),
       body: Obx(() {
-        final lat = _getLocationController.latitude.value;
-        final lon = _getLocationController.longitude.value;
 
-        // Step 1: Filter by subcategory
+
         final filteredServices = _serviceListController.services.where((service) {
-          return service.subcategory?.toString() == widget.subcategoryId;
+          final matchesSubcategory =
+              service.subcategory?.toString() == widget.subcategoryId;
+
+          final matchesFree =
+          _isFree ? service.serviceStatus == false : true;
+
+          return matchesSubcategory && matchesFree;
         }).toList();
 
-        // Step 2: Filter by distance & free/paid
-        final nearby = filteredServices.where((service) {
-          if (service.latitude == null || service.longitude == null) return false;
 
-          final distanceKm = Geolocator.distanceBetween(
-            lat,
-            lon,
-            service.latitude!,
-            service.longitude!,
-          ) / 1000;
-
-          // ✅ Corrected _isFree logic
-          final matchesFree = _isFree ? service.serviceStatus == false : true;
-
-          return distanceKm <= 20 && matchesFree;
-        }).toList();
-
-        if (nearby.isEmpty) {
+        if (filteredServices.isEmpty) {
           return const Padding(
             padding: EdgeInsets.only(top: 200),
             child: Center(child: EmptyServiceWidget()),
@@ -102,19 +89,12 @@ class _ServiceScreenState extends State<ServiceScreen> {
             mainAxisSpacing: 10,
             childAspectRatio: 0.8,
           ),
-          itemCount: nearby.length,
+          itemCount: filteredServices.length,
           itemBuilder: (context, index) {
-            final service = nearby[index];
-            final distanceText = getDistanceText(
-              lat,
-              lon,
-              service.latitude!,
-              service.longitude!,
-            );
+            final service = filteredServices[index];
 
             return ServiceCard(
               service: service,
-              serviceDistance: distanceText,
             );
           },
         );

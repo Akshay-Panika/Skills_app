@@ -5,7 +5,7 @@ class ServiceListModel {
   final String serviceName;
   final bool serviceStatus;
   final bool swipeStatus;
-  bool isFavorite;
+  final bool isFavorite;
   final String serviceDescription;
   final double? latitude;
   final double? longitude;
@@ -14,6 +14,7 @@ class ServiceListModel {
   final int category;
   final int subcategory;
   final UserProfileModel? userProfile;
+  final String? distance;
 
   ServiceListModel({
     required this.id,
@@ -31,36 +32,44 @@ class ServiceListModel {
     required this.category,
     required this.subcategory,
     this.userProfile,
-
+    this.distance,
   });
 
   factory ServiceListModel.fromJson(Map<String, dynamic> json) {
     return ServiceListModel(
-      id: json['id'],
+      id: json['id'] ?? 0,
       serviceImage: json['service_image'] ?? "",
-      serviceAmount: json['service_amount']?.toString(), // ✅ safe convert
+      serviceAmount: json['service_amount']?.toString(),
       serviceName: json['service_name'] ?? "",
       serviceStatus: json['service_status'] ?? false,
       swipeStatus: json['swipe_status'] ?? false,
       isFavorite: json['is_favorite'] ?? false,
       serviceDescription: json['service_description'] ?? "",
-      latitude: json['latitude'] != null
+
+      latitude: (json['latitude'] != null)
           ? (json['latitude'] as num).toDouble()
           : null,
-      longitude: json['longitude'] != null
+
+      longitude: (json['longitude'] != null)
           ? (json['longitude'] as num).toDouble()
           : null,
+
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'])
           : null,
+
       updatedAt: json['updated_at'] != null
           ? DateTime.tryParse(json['updated_at'])
           : null,
+
       category: json['category'] ?? 0,
       subcategory: json['subcategory'] ?? 0,
+
       userProfile: json['user_profile'] != null
           ? UserProfileModel.fromJson(json['user_profile'])
           : null,
+
+      distance: json['distance']?.toString(),
     );
   }
 
@@ -81,9 +90,33 @@ class ServiceListModel {
       "category": category,
       "subcategory": subcategory,
       "user_profile": userProfile?.toJson(),
+      "distance": distance,
     };
   }
+  ServiceListModel copyWith({
+    bool? isFavorite,
+  }) {
+    return ServiceListModel(
+      id: id,
+      serviceImage: serviceImage,
+      serviceAmount: serviceAmount,
+      serviceName: serviceName,
+      serviceStatus: serviceStatus,
+      swipeStatus: swipeStatus,
+      isFavorite: isFavorite ?? this.isFavorite,
+      serviceDescription: serviceDescription,
+      latitude: latitude,
+      longitude: longitude,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      category: category,
+      subcategory: subcategory,
+      userProfile: userProfile,
+      distance: distance,
+    );
+  }
 }
+
 class ServiceListResponse {
   final int count;
   final List<ServiceListModel> services;
@@ -103,7 +136,6 @@ class ServiceListResponse {
   }
 }
 
-
 class UserProfileModel {
   final int id;
   final String userPhone;
@@ -112,7 +144,7 @@ class UserProfileModel {
   final String userGender;
   final String userBio;
   final String? userImage;
-  final String createdAt;
+  final DateTime? createdAt;
   final int user;
 
   UserProfileModel({
@@ -123,7 +155,7 @@ class UserProfileModel {
     required this.userGender,
     required this.userBio,
     this.userImage,
-    required this.createdAt,
+    this.createdAt,
     required this.user,
   });
 
@@ -136,7 +168,11 @@ class UserProfileModel {
       userGender: json['user_gender'] ?? "",
       userBio: json['user_bio'] ?? "",
       userImage: json['user_image'],
-      createdAt: json['created_at'] ?? "",
+
+      createdAt: json['created_at'] != null
+          ? DateTime.tryParse(json['created_at'])
+          : null,
+
       user: json['user'] ?? 0,
     );
   }
@@ -150,7 +186,7 @@ class UserProfileModel {
       "user_gender": userGender,
       "user_bio": userBio,
       "user_image": userImage,
-      "created_at": createdAt,
+      "created_at": createdAt?.toIso8601String(),
       "user": user,
     };
   }

@@ -33,7 +33,6 @@ class ServiceDetailsScreen extends StatefulWidget {
 
 class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
   final serviceController = Get.find<ServiceDetailsController>();
-  final locationController = Get.find<LocationController>();
   final checkBookingController = Get.find<BookingCheckController>();
   final bookingCreateController = Get.find<BookingCreateController>();
 
@@ -244,37 +243,14 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                                 children: [
                                   Icon(Icons.location_on, size: context.sHeight*0.02, color: Colors.green),
 
-                                  Obx(() {
-                                    final lat = locationController.latitude.value;
-                                    final lon = locationController.longitude.value;
-
-                                    if (service.latitude == null || service.longitude == null) {
-                                      return Text(
-                                        "N/A",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColor.subtitle,
-                                          fontSize: context.text14,
-                                        ),
-                                      );
-                                    }
-
-                                    final distanceText = getDistanceText(
-                                      lat,
-                                      lon,
-                                      service.latitude!,
-                                      service.longitude!,
-                                    );
-
-                                    return Text(
-                                      distanceText,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        color: AppColor.subtitle,
-                                        fontSize: context.text14,
-                                      ),
-                                    );
-                                  }),
+                                  Text(
+                                    service.distance.toString(),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      color: AppColor.subtitle,
+                                      fontSize: context.text14,
+                                    ),
+                                  )
                                 ],
                               )
 

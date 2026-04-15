@@ -404,15 +404,15 @@ class _AddSkillScreenState extends State<AddSkillScreen>
               margin: EdgeInsets.only(top: 10),
               child: subcategoryItems.isEmpty
                   ? Center(
-                    child: Text(
-                      "No subcategories available",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: AppColor.subtitle,
-                      ),
-                    ),
-                  )
+                child: Text(
+                  "No subcategories available",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: AppColor.subtitle,
+                  ),
+                ),
+              )
                   : Column(
                 children: subcategoryItems.map((sub) {
                   return ListTile(
@@ -442,11 +442,11 @@ class _AddSkillScreenState extends State<AddSkillScreen>
                     title: Text(
                       sub.subcategoryName ?? '',
                       style: TextStyle(
-                        fontSize: context.text12,
-                        color: selectedSubcategoryId == sub.id.toString()
-                            ? AppColor.title
-                            : AppColor.subtitle,
-                        fontWeight: selectedSubcategoryId == sub.id.toString()?FontWeight.w600:FontWeight.w500
+                          fontSize: context.text12,
+                          color: selectedSubcategoryId == sub.id.toString()
+                              ? AppColor.title
+                              : AppColor.subtitle,
+                          fontWeight: selectedSubcategoryId == sub.id.toString()?FontWeight.w600:FontWeight.w500
                       ),
                     ),
                     trailing: Radio<String>(

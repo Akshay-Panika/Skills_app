@@ -32,8 +32,8 @@ class AppErrorCard extends StatelessWidget {
             SizedBox(height: 10),
             Text(title ?? "Network error",
                 style: TextStyle(fontWeight: FontWeight.bold)),
-            Text(message ?? "Start booking services to chat"),
-
+            // Text(message ?? "Start booking services to chat"),
+            SizedBox(height: 10),
             InkWell(
               borderRadius: BorderRadius.circular(30),
               onTap: onRetry,

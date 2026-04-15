@@ -3,10 +3,14 @@ import 'package:get/get.dart';
 import 'package:skills_app/routes/app_pages.dart';
 import 'features/auth/helper/auth_preferences.dart';
 import 'features/auth/helper/intro_preferences.dart';
+import 'features/location/controller/location_controller.dart';
 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  Get.put(LocationController(),permanent: true);
+  await Get.find<LocationController>().fetchLocation();
 
   await IntroPreferences.init();
   await AuthPreferences.init();

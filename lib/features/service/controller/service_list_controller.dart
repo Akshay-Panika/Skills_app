@@ -22,11 +22,13 @@ class ServiceListController extends GetxController {
   Future<void> fetchServiceList() async {
     try {
       isLoading.value = true;
+
       final response = await repository.getServiceList();
+
       services.assignAll(response.services);
 
-      services.value = response.services;
       count.value = response.count;
+
     } catch (e) {
       debugPrint('Service Error ${e.toString()}');
     } finally {
@@ -38,10 +40,12 @@ class ServiceListController extends GetxController {
     final index = services.indexWhere((e) => e.id == id);
 
     if (index != -1) {
-      services[index].isFavorite = !services[index].isFavorite;
+      final item = services[index];
 
-      /// 🔥 THIS is required for UI update
+      services[index] = item.copyWith(
+        isFavorite: !item.isFavorite,
+      );
+
       services.refresh();
     }
-  }
-}
+  }}

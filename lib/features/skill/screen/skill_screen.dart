@@ -493,16 +493,7 @@ class SkillCard extends StatelessWidget {
             confirmText: "Delete",
           );
           if (confirm == true) {
-            await deleteController.deleteService(
-                userId: userId, serviceId: serviceId);
-            if (deleteController.message.value.contains("success")) {
-              listController.removeService(serviceId);
-              FlutterToast.success(deleteController.message.value);
-              Get.find<ServiceListController>().fetchServiceList();
-              Get.find<ServiceListByUserController>().fetchMyServices();
-            } else {
-              FlutterToast.error("Service not found");
-            }
+            await deleteController.deleteService(serviceId: serviceId);
           }
         }
       },

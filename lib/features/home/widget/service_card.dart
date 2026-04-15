@@ -5,7 +5,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:skills_app/core/constant/app_size.dart';
 import 'package:skills_app/features/wishlist/controller/wishlist_toggle_controller.dart';
 import '../../../core/constant/app_color.dart';
@@ -15,8 +14,7 @@ import '../../service/model/service_list_model.dart';
 
 class ServiceCard extends StatelessWidget {
   final ServiceListModel service;
-  final String serviceDistance;
-  const ServiceCard({super.key, required this.service,required this.serviceDistance, });
+  const ServiceCard({super.key, required this.service, });
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +82,7 @@ class ServiceCard extends StatelessWidget {
                           Row(
                             children:  [
                               Icon(Icons.location_on, size: 12, color: Colors.green),
-                              Text("$serviceDistance", style: TextStyle(fontSize: context.text12, color: Colors.black87),),
+                              Text(service.distance ?? "0 m", style: TextStyle(fontSize: context.text12, color: Colors.black87),),
                             ],
                           ),
                         ],

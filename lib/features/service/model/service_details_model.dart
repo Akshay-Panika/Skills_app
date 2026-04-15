@@ -13,7 +13,7 @@ class ServiceDetailsModel {
   final int category;
   final int subcategory;
   final UserProfileModel? userProfile;
-
+  final String? distance; // ✅ ADDED
 
   ServiceDetailsModel({
     required this.id,
@@ -30,7 +30,7 @@ class ServiceDetailsModel {
     required this.category,
     required this.subcategory,
     this.userProfile,
-
+    this.distance, // ✅ ADDED
   });
 
   factory ServiceDetailsModel.fromJson(Map<String, dynamic> json) {
@@ -48,9 +48,12 @@ class ServiceDetailsModel {
       updatedAt: json['updated_at'] as String,
       category: json['category'] as int,
       subcategory: json['subcategory'] as int,
+
       userProfile: json['user_profile'] != null
           ? UserProfileModel.fromJson(json['user_profile'])
           : null,
+
+      distance: json['distance']?.toString(), // ✅ ADDED
     );
   }
 
@@ -70,10 +73,10 @@ class ServiceDetailsModel {
       'category': category,
       'subcategory': subcategory,
       "user_profile": userProfile?.toJson(),
+      "distance": distance, // ✅ ADDED
     };
   }
 }
-
 class UserProfileModel {
   final int id;
   final String userPhone;
