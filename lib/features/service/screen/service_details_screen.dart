@@ -13,6 +13,7 @@ import '../../../core/constant/app_size.dart';
 import '../../../core/widget/app_error_card.dart';
 import '../../account/controller/user_profile_controller.dart';
 import '../../account/model/user_profile_model.dart';
+import '../../auth/helper/auth_preferences.dart';
 import '../../location/controller/location_controller.dart';
 import '../controller/booking_check_controller.dart';
 import '../controller/booking_create_controller.dart';
@@ -32,6 +33,8 @@ class ServiceDetailsScreen extends StatefulWidget {
 }
 
 class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
+  final userId = AuthPreferences.getUserId();
+
   final serviceController = Get.find<ServiceDetailsController>();
   final checkBookingController = Get.find<BookingCheckController>();
   final bookingCreateController = Get.find<BookingCreateController>();
@@ -269,6 +272,8 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                         color: Colors.grey, size: 30),
                   ),
                 ),),
+
+                if(userId != service.userProfile!.id)
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -403,6 +408,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
 
               ],
             ),
+            if(userId != service.userProfile!.id)
             Positioned(
               bottom: context.sWidth * 0.06,
               left: 0,
@@ -497,6 +503,67 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                 );
               }),
             ),
+
+            if(userId == service.userProfile!.id)
+              Positioned(
+                bottom: context.sWidth * 0.06,
+                left: 0,
+                right: 0,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 6, left: 16),
+                      child: Text(
+                        "Self Mentor",
+                        style: TextStyle(
+                          fontSize: context.text16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+
+                    Padding(
+                      padding:  EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                          "You are your own mentor—guide your journey, track your growth, and become your best version."
+                          , style: TextStyle(
+                          fontSize: context.text14,
+                          color: AppColor.subtitle ,
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(height: 12),
+
+                    AppCard(
+                      margin: EdgeInsets.symmetric(horizontal: 16),
+                      height: context.sWidth * 0.12,
+                      color: AppColor.primary,
+                      onTap: () => Get.back(),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.settings_backup_restore_rounded,
+                            color: Colors.white,
+                          ),
+                          SizedBox(width: 5),
+                          Text(
+                            'Back',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: context.text14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
           ],
         ),
       );

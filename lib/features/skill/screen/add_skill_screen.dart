@@ -557,8 +557,8 @@ class _AddSkillScreenState extends State<AddSkillScreen>
         )),
         Row(
           spacing: 0,
-          children: ["Unpaid", "Paid"].map((label) {
-            final bool selected = (label == "Paid" && isPaid) || (label == "Unpaid" && !isPaid);
+          children: ["Free", "Paid"].map((label) {
+            final bool selected = (label == "Paid" && isPaid) || (label == "Free" && !isPaid);
             return AppCard(
               color: selected ? AppColor.primary : AppColor.surface,
               onTap: () => setState(() => isPaid = label == "Paid"),

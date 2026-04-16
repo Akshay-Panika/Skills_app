@@ -4,13 +4,12 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/widget/app_card.dart';
+import 'package:skills_app/features/skill/model/service_list_by_user_model.dart';
 import '../../../core/constant/app_size.dart';
 import '../../../core/widget/app_dilog.dart';
 import '../../../core/widget/app_error_card.dart';
-import '../../../core/widget/flutter_toast.dart';
 import '../../notification/screen/notification_screen.dart';
 import '../controller/service_delete_controller.dart';
-import '../../service/controller/service_list_controller.dart';
 import '../controller/service_list_by_user_controller.dart';
 import '../widget/skill_empty_card.dart';
 
@@ -22,13 +21,40 @@ class AdsScreen extends StatefulWidget {
 }
 
 class _AdsScreenState extends State<AdsScreen> {
+  late PageController _pageController;
+  final _serviceListController = Get.find<ServiceListByUserController>();
+  final _deleteController = Get.find<ServiceDeleteController>();
 
-  final serviceListController = Get.find<ServiceListByUserController>();
-
-  final PageController _pageController = PageController();
+  final List<ScrollController> _scrollControllers = [
+    ScrollController(),
+    ScrollController(),
+    ScrollController(),
+  ];
 
   int _currentIndex = 0;
-  final List<String> _filters = ['All', 'Active', 'Inactive'];
+  final List<String> _filters = ['All', 'Free', 'Paid'];
+
+  List<int> selectedIds = [];
+  bool showActionBar = false;
+
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _currentIndex);
+  }
+  void toggleSelection(int id) {
+    setState(() {
+      if (selectedIds.contains(id)) {
+        selectedIds.remove(id);
+      } else {
+        selectedIds.add(id);
+      }
+
+      showActionBar = selectedIds.isNotEmpty;
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +65,7 @@ class _AdsScreenState extends State<AdsScreen> {
         toolbarHeight: 10,
       ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           _buildDarkHeader(context),
           _buildFilterRow(context),
@@ -110,21 +137,17 @@ class _AdsScreenState extends State<AdsScreen> {
 
           /// Stats
           Obx(() {
-            final list = serviceListController.serviceList;
+            final list = _serviceListController.serviceList;
             final total = list.length;
-            final active = list
-                .where((s) => s.serviceStatus)
-                .length;
-            final inactive = list
-                .where((s) => !s.serviceStatus)
-                .length;
+            final free = list.where((s) => !s.serviceStatus).length;
+            final paid = list.where((s) => s.serviceStatus).length;
 
             return Row(
               spacing: 12,
               children: [
                 _statBox(context, label: 'All', value: '$total'),
-                _statBox(context, label: 'Active', value: '${total}'),
-                _statBox(context, label: 'Inactive', value: '${0}'),
+                _statBox(context, label: 'Free', value: '$free'),
+                _statBox(context, label: 'Paid', value: '$paid'),
               ],
             );
           }),
@@ -145,7 +168,7 @@ class _AdsScreenState extends State<AdsScreen> {
           children: [
             Text(label,
                 style:
-                TextStyle(color: Colors.white, fontSize: context.text12)),
+                TextStyle(color: Colors.white, fontSize: context.text14)),
             const SizedBox(height: 4),
             Text(value,
                 style: TextStyle(
@@ -160,20 +183,23 @@ class _AdsScreenState extends State<AdsScreen> {
 
   Widget _buildFilterRow(BuildContext context) {
     return Container(
+      height: context.sWidth*0.14,
       color: AppColor.white,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16,),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             'My listings',
             style: TextStyle(
-              fontSize: context.text12,
+              fontSize: context.text16,
               fontWeight: FontWeight.w500,
               color: AppColor.title,
             ),
           ),
 
+          showActionBar?
+          _futcherAction():
           Row(
             children: List.generate(_filters.length, (index) {
               final filter = _filters[index];
@@ -206,9 +232,7 @@ class _AdsScreenState extends State<AdsScreen> {
                       style: TextStyle(
                         fontSize: context.text12,
                         fontWeight: FontWeight.w500,
-                        color: selected
-                            ? Colors.white
-                            : AppColor.subtitle,
+                        color: selected ? Colors.white : AppColor.subtitle,
                       ),
                     ),
                   ),
@@ -223,7 +247,18 @@ class _AdsScreenState extends State<AdsScreen> {
 
   Widget _buildList() {
     return Obx(() {
-      if (serviceListController.isLoading.value) {
+
+      if (!_serviceListController.isLoading.value) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (_pageController.hasClients) {
+            if (_pageController.page?.round() != _currentIndex) {
+              _pageController.jumpToPage(_currentIndex);
+            }
+          }
+        });
+      }
+
+      if (_serviceListController.isLoading.value) {
         return Column(
           children: [
             LinearProgressIndicator(color: AppColor.primary, minHeight: 2),
@@ -232,28 +267,23 @@ class _AdsScreenState extends State<AdsScreen> {
         );
       }
 
-      if (serviceListController.errorMessage.isNotEmpty) {
+      if (_serviceListController.errorMessage.isNotEmpty) {
         return AppErrorCard(
-          message: serviceListController.errorMessage.value,
+          message: _serviceListController.errorMessage.value,
           title: "Connection Problem",
-          onRetry: () => serviceListController.fetchMyServices(),
+          onRetry: () => _serviceListController.fetchMyServices(),
         );
       }
 
-
       return PageView.builder(
+        key: const PageStorageKey('pageView'),
         controller: _pageController,
-
-        onPageChanged: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
+        onPageChanged: (index) {setState(() {_currentIndex = index;});},
 
         itemCount: _filters.length,
 
         itemBuilder: (context, pageIndex) {
-          final allList = serviceListController.serviceList;
+          final allList = _serviceListController.serviceList;
 
           final filteredList = pageIndex == 0
               ? allList
@@ -266,24 +296,35 @@ class _AdsScreenState extends State<AdsScreen> {
           }
 
           return ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            key: PageStorageKey(pageIndex),
+            controller: _scrollControllers[pageIndex],
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
             itemCount: filteredList.length,
             itemBuilder: (context, index) {
-              final s = filteredList[index];
+              final list = filteredList[index];
 
-              return SkillCard(
-                title: s.serviceName,
-                price: s.serviceAmount != null
-                    ? "₹${double.tryParse(s.serviceAmount!)
-                    ?.toStringAsFixed(2)
-                    .replaceAll(RegExp(r'\.00$'), '') ?? s.serviceAmount!}"
-                    : "Free",
-                serviceDescription: s.serviceDescription,
-                views: "0 views",
-                image: s.serviceImage,
-                status: s.serviceStatus ? "Active" : "Inactive",
-                serviceId: s.id,
-                userId: s.userProfile!.user.toInt(),
+              return Padding(
+                padding:  EdgeInsets.only(
+                  bottom: index == filteredList.length - 1 ? context.sWidth*0.2 : 0,
+                ),
+                child: SkillCard(
+                  key: ValueKey(list.id),
+                  list: list,
+                  isSelected: selectedIds.contains(list.id),
+                  onLongPress: () {
+                    toggleSelection(list.id);
+                  },
+                  onTap: () {
+                    if (showActionBar) {
+                      toggleSelection(list.id);
+                    } else {
+                      Get.toNamed('/service-details', parameters: {
+                        'id': list.id.toString(),
+                      });
+                    }
+                  },
+                  showActionBar: showActionBar,
+                ),
               );
             },
           );
@@ -291,246 +332,235 @@ class _AdsScreenState extends State<AdsScreen> {
       );
     });
   }
+
+  Widget _futcherAction(){
+    return  Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        if(selectedIds.length == 1)
+          IconButton(
+            onPressed: () async {
+              if (selectedIds.length != 1) return;
+              final selectedId = selectedIds.first;
+              final confirm = await AppDialog.show(
+                context,
+                title: "Edit Skill?",
+                message: "Do you want to update this skill?",
+                confirmText: "Edit",
+                cancelText: "Cancel",
+              );
+              if (confirm == true) {
+                final serviceData = _serviceListController.serviceList
+                    .firstWhere((s) => s.id == selectedId);
+
+                print('--------------- Selected Service Name: ${serviceData.serviceName}');
+
+                Get.toNamed('/add-skill', arguments: {
+                  "isEdit": true, "serviceData": serviceData,
+                });
+                setState(() {
+                  selectedIds.clear();
+                  showActionBar = false;
+                });
+              }
+            },
+            icon: Icon(Icons.edit, color: Colors.grey.shade500),
+          ),
+
+        IconButton(
+            onPressed: () async {
+              if (selectedIds.isEmpty) return;
+
+              final confirm = await AppDialog.show(
+                context,
+                title: "Delete Skill?",
+                message: "Do you want to delete selected skills?",
+                confirmText: "Delete",
+                cancelText: "Cancel",
+              );
+
+              if (confirm == true) {
+                await _deleteController.deleteService(
+                  serviceIds: List<int>.from(selectedIds),
+                );
+
+                setState(() {
+                  selectedIds.clear();
+                  showActionBar = false;
+                });
+              }
+            },
+            icon: Icon(Icons.delete,color: Colors.grey.shade500,)),
+        IconButton(
+          onPressed: () {
+            setState(() {
+              selectedIds.clear();
+              showActionBar = false;
+            });
+          },
+          icon: Icon(Icons.close,color: AppColor.primary,),
+        ),
+      ],
+    );
+  }
 }
 class SkillCard extends StatelessWidget {
-  final int serviceId;
-  final int userId;
-  final String title;
-  final String serviceDescription;
-  final String price;
-  final String views;
-  final String status;
-  final String image;
+  final Service list;
+  final bool isSelected;
+  final VoidCallback onLongPress;
+  final VoidCallback onTap;
+  final bool showActionBar;
+  const SkillCard({super.key, required this.list, required this.isSelected, required this.onLongPress, required this.onTap, required this.showActionBar,});
 
-  const SkillCard({
-    super.key,
-    required this.serviceId,
-    required this.userId,
-    required this.title,
-    required this.serviceDescription,
-    required this.price,
-    required this.views,
-    required this.status,
-    required this.image,
-  });
-
-  bool get _isActive => status == "Active";
 
   @override
   Widget build(BuildContext context) {
-    final deleteController = Get.find<ServiceDeleteController>();
-    final listController = Get.find<ServiceListByUserController>();
-
-    return Stack(
-      children: [
-        AppCard(
-          margin: const EdgeInsets.only(bottom: 10),
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            spacing: 10,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: CachedNetworkImage(
-                  imageUrl: image,
-                  fit: BoxFit.cover,
-                  width: context.sHeight*0.1,
-                  height: context.sHeight*0.1,
-                  placeholder: (context, url) => Container(
-                    color: Colors.grey[100],
-                    alignment: Alignment.center,
-                    child: FaIcon(
-                      FontAwesomeIcons.chalkboardTeacher,
-                      color: Colors.grey[400],
-                      size: 25,
+    return GestureDetector(
+      onLongPress: onLongPress,
+      onTap: onTap,
+      child: Stack(
+        children: [
+          AppCard(
+            margin:  EdgeInsets.only(bottom: 10),
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              spacing: 10,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: CachedNetworkImage(
+                    imageUrl: list.serviceImage,
+                    fit: BoxFit.cover,
+                    width: context.sHeight*0.1,
+                    height: context.sHeight*0.1,
+                    placeholder: (context, url) => Container(
+                      color: Colors.grey[100],
+                      alignment: Alignment.center,
+                      child: FaIcon(
+                        FontAwesomeIcons.chalkboardTeacher,
+                        color: Colors.grey[400],
+                        size: 25,
+                      ),
                     ),
-                  ),
-                  errorWidget: (context, url, error) => Container(
-                    color: Colors.grey[200],
-                    child: const Icon(Icons.broken_image_outlined, color: Colors.grey, size: 25),
+                    errorWidget: (context, url, error) => Container(
+                      color: Colors.grey[200],
+                      child: const Icon(Icons.broken_image_outlined, color: Colors.grey, size: 25),
+                    ),
                   ),
                 ),
-              ),
-
-              Expanded(
-                child: Column(
-                  spacing: 20,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      spacing: 5,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: context.text14,
-                            fontWeight: FontWeight.w500,
-                            color: AppColor.title,
+          
+                Expanded(
+                  child: Column(
+                    spacing: 20,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+          
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                list.serviceName,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: context.text14,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColor.title,
+                                ),
+                              ),
+                              Container(width: context.sWidth*0.12,height: context.sWidth*0.05,color: Colors.transparent,)
+                            ],
                           ),
-                        ),
-                        Text(
-                          serviceDescription,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: context.text12,
-                            color: AppColor.subtitle,
-                            height: 1.4,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    Row(
-                      spacing: 10,
-                      children: [
-                        AppCard(
-                          color: AppColor.primary.withOpacity(0.1),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 3),
-                          margin: EdgeInsets.zero,
-                          child: Text(
-                            price,
+                          Text(
+                            list.serviceDescription,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              color: AppColor.primary,
-                              fontSize: context.text10,
-                              fontWeight: FontWeight.w500,
+                              fontSize: context.text14,
+                              color: AppColor.subtitle,
+                              height: 1.4,
                             ),
                           ),
-                        ),
-                        AppCard(
-                          color: AppColor.surface,
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                          margin: EdgeInsets.zero,
-                          child: Text(
-                            status,
-                            style: TextStyle(
-                              color: AppColor.title,
-                              fontSize: context.text10,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ),
-                        Spacer(),
-                        Row(
-                          children: [
-                            Icon(Icons.visibility_outlined, size: 14, color: AppColor.subtitle),
-                            const SizedBox(width: 4),
-                            Text(
-                              views,
-                              style: TextStyle(
-                                fontSize: context.text12,
-                                color: AppColor.subtitle,
+                        ],
+                      ),
+          
+                      Row(
+          
+                        children: [
+                          AppCard(
+                            color: AppColor.primary.withOpacity(0.1),
+                            padding:  EdgeInsets.symmetric(vertical: 3,horizontal: 12),
+                            margin: EdgeInsets.zero,
+                            child: Center(
+                              child: Text(
+                                list.serviceAmount != null
+                                    ? "₹${double.tryParse(list.serviceAmount!)?.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '') ?? list.serviceAmount!}"
+                                    : "Free",
+                                style: TextStyle(
+                                  color: AppColor.primary,
+                                  fontSize: context.text14,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
+                          ),
+          
+          
+                          Expanded(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Icon(Icons.visibility_outlined, size: 14, color: AppColor.subtitle),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'views',
+                                  style: TextStyle(
+                                    fontSize: context.text14,
+                                    color: AppColor.subtitle,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-
-            ],
+          
+              ],
+            ),
           ),
-          onTap: () {
-            Get.toNamed('/service-details', parameters: {
-              'id': serviceId.toString(),
-            });
-          },
-        ),
-
-        Positioned(
-          right: -5, top: -5,
-          child:  _popupMenu(context, deleteController, listController),)
-      ],
+          
+          Positioned(
+              top: 5,right: 5,
+              child: showActionBar
+              ? _checkBox(context, isSelected, onLongPress)
+              : SizedBox())
+        ],
+      ),
     );
   }
 
-  Widget _popupMenu(
+  Widget _checkBox(
       BuildContext context,
-      ServiceDeleteController deleteController,
-      ServiceListByUserController listController,
+      bool isSelected,
+      VoidCallback onChanged,
       ) {
-    return PopupMenuButton<String>(
-      icon: Icon(Icons.more_vert_rounded,
-          color: AppColor.subtitle, size: context.sHeight*0.025),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      color: Colors.white,
-      elevation: 6,
-      padding: EdgeInsets.zero,
-      onSelected: (value) async {
-        if (value == "edit") {
-          final confirm = await AppDialog.show(
-            context,
-            title: "Edit Service?",
-            message: "Do you want to update this service?",
-            confirmText: "Edit",
-          );
-          if (confirm == true) {
-            final service = listController.serviceList
-                .firstWhere((e) => e.id == serviceId);
-
-            Get.toNamed('/add-skill',
-              arguments: {"isEdit": true,
-                "serviceData": service,
-              },
-            );
-            // Get.to(() => AddSkillScreen(isEdit: true, serviceData: service));
-          }
-        }
-
-        if (value == "delete") {
-          final confirm = await AppDialog.show(
-            context,
-            title: "Delete Service?",
-            message: "This action cannot be undone. Are you sure?",
-            confirmText: "Delete",
-          );
-          if (confirm == true) {
-            await deleteController.deleteService(serviceId: serviceId);
-          }
-        }
-      },
-      itemBuilder: (_) => [
-        PopupMenuItem(
-          value: "edit",
-          child: _menuItem(
-              context, Icons.edit_outlined, "Edit", AppColor.primary,
-              AppColor.primary.withOpacity(0.08)),
-        ),
-        PopupMenuItem(
-          value: "delete",
-          child: _menuItem(
-              context, Icons.delete_outline_rounded, "Delete",
-              AppColor.error, AppColor.error.withOpacity(0.08)),
-        ),
-      ],
+    return Checkbox(
+      value: isSelected,
+      activeColor: AppColor.primary,
+      side: const BorderSide(color: Colors.grey, width: 2),
+      visualDensity: VisualDensity.compact,
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      onChanged: (_) => onChanged(),
     );
   }
-
-  Widget _menuItem(BuildContext context, IconData icon, String label,
-      Color color, Color bgColor) {
-    return Row(
-      children: [
-        Container(
-          width: 30,
-          height: 30,
-          decoration: BoxDecoration(
-              color: bgColor, borderRadius: BorderRadius.circular(8)),
-          child: Icon(icon, size: 16, color: color),
-        ),
-        const SizedBox(width: 10),
-        Text(label,
-            style: TextStyle(
-                fontWeight: FontWeight.w600, fontSize: 13, color: color)),
-      ],
-    );
-  }
-
 }

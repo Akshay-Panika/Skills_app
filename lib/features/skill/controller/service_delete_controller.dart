@@ -11,31 +11,32 @@ class ServiceDeleteController extends GetxController {
   var isLoading = false.obs;
   var message = "".obs;
 
-  Future<void> deleteService({required int serviceId}) async {
+  Future<void> deleteService({
+    required List<int> serviceIds,
+  }) async {
     final userId = AuthPreferences.getUserId();
 
     if (userId == null) {
-      message.value = "User not logged in";
       FlutterToast.error("User not logged in");
       return;
     }
+
+    if (serviceIds.isEmpty) return;
 
     try {
       isLoading.value = true;
 
       final responseMessage = await repository.deleteService(
         userId: userId,
-        serviceId: serviceId,
+        serviceIds: serviceIds,
       );
 
       message.value = responseMessage;
 
-      FlutterToast.success("Your skill has been deleted");
-      Get.find<ServiceListController>().fetchServiceList();
-      Get.find<ServiceListByUserController>().fetchMyServices();
-    } catch (e) {
-      message.value = "Delete failed";
-      FlutterToast.error("Error ${message.value}");
+      FlutterToast.success(responseMessage);
+
+      await Get.find<ServiceListController>().fetchServiceList();
+      await Get.find<ServiceListByUserController>().fetchMyServices();
 
     } finally {
       isLoading.value = false;

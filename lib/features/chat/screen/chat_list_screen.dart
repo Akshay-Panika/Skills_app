@@ -11,12 +11,32 @@ import '../controller/booking_controller.dart';
 import '../../notification/screen/notification_screen.dart';
 import '../controller/booking_delete_controller.dart';
 
-class ChatListScreen extends StatelessWidget {
-  ChatListScreen({super.key});
+class ChatListScreen extends StatefulWidget {
+  const ChatListScreen({super.key});
 
+  @override
+  State<ChatListScreen> createState() => _ChatListScreenState();
+}
+
+class _ChatListScreenState extends State<ChatListScreen> {
   final bookingController = Get.find<BookingController>();
   final deleteController = Get.find<BookingDeleteController>();
 
+  List<int> selectedIds = [];
+
+  bool showActionBar = false;
+
+  void toggleSelection(int id) {
+    setState(() {
+      if (selectedIds.contains(id)) {
+        selectedIds.remove(id);
+      } else {
+        selectedIds.add(id);
+      }
+
+      showActionBar = selectedIds.isNotEmpty;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,18 +44,64 @@ class ChatListScreen extends StatelessWidget {
       length: 3,
       child: Scaffold(
         backgroundColor: AppColor.surface,
-
         appBar: AppBar(
           backgroundColor: AppColor.primary,
-          title: Text(
-            'Chats',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: context.text16,
-              fontWeight: FontWeight.w600,
-            ),
+          title: showActionBar
+              ? Text("(${selectedIds.length}) Selected")
+              : Text("Chats"),
+          titleTextStyle: TextStyle(
+            color: Colors.white,
+            fontSize: context.text16,
+            fontWeight: FontWeight.w600,
           ),
           actions: [
+            if (showActionBar)
+            InkWell(
+              // onTap: () {
+              //   // delete logic
+              //   print("Delete: $selectedIds");
+              //
+              //   setState(() {
+              //     selectedIds.clear();
+              //     showActionBar = false;
+              //   });
+              // },
+              onTap: () async {
+                final confirm = await AppDialog.show(context,
+                  title: "Delete Chat",
+                  message: "Are you sure you want to delete?",
+                  cancelText: "Cancel",
+                  confirmText: "Delete",
+                );
+                if (confirm) {
+                  for (var id in selectedIds) {
+                    await deleteController.deleteBooking(id);
+                  }
+
+                  Get.find<BookingController>().fetchBookings();
+
+                  setState(() {
+                    selectedIds.clear();
+                    showActionBar = false;
+                  });
+                }
+              },
+              child: Container(
+                width: 36,
+                height: 36,
+                margin: const EdgeInsets.only(right: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.delete,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+            ),
+
             InkWell(
               onTap: () => Get.to(() => NotificationScreen()),
               child: Container(
@@ -75,10 +141,27 @@ class ChatListScreen extends StatelessWidget {
                 }
 
                 return TabBarView(
-                  children: [
-                    _ChatTabContent(list: bookingController.allChats),
-                    _ChatTabContent(list: bookingController.buyerBookings),
-                    _ChatTabContent(list: bookingController.sellerBookings),
+                  children: [_ChatTabContent(
+                    list: bookingController.allChats,
+                    selectedIds: selectedIds,
+                    toggleSelection: toggleSelection,
+                    showActionBar: showActionBar,
+                  ),
+                    _ChatTabContent(
+                      list: bookingController.allChats,
+                      selectedIds: selectedIds,
+                      toggleSelection: toggleSelection,
+                      showActionBar: showActionBar,
+                    ),
+                    _ChatTabContent(
+                      list: bookingController.allChats,
+                      selectedIds: selectedIds,
+                      toggleSelection: toggleSelection,
+                      showActionBar: showActionBar,
+                    ),
+                    // _ChatTabContent(list: bookingController.allChats),
+                    // _ChatTabContent(list: bookingController.buyerBookings),
+                    // _ChatTabContent(list: bookingController.sellerBookings),
                   ],
                 );
 
@@ -114,8 +197,16 @@ class ChatListScreen extends StatelessWidget {
 
 class _ChatTabContent extends StatelessWidget {
   final List list;
+  final List<int> selectedIds;
+  final Function(int) toggleSelection;
+  final bool showActionBar;
 
-  const _ChatTabContent({required this.list});
+  const _ChatTabContent({
+    required this.list,
+    required this.selectedIds,
+    required this.toggleSelection,
+    required this.showActionBar,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +220,19 @@ class _ChatTabContent extends StatelessWidget {
       itemBuilder: (context, index) {
         final item = list[index];
 
-        return ChatSkillCard(item: item);
+        return ChatSkillCard(
+          item: item,
+          isSelected: selectedIds.contains(item.id),
+          onLongPress: () => toggleSelection(item.id),
+          onTap: () {
+            if (showActionBar) {
+              toggleSelection(item.id);
+            } else {
+              Get.toNamed('/chat', arguments: {"serviceId": item.service.id});
+            }
+          },
+          showActionBar: showActionBar,
+        );
       },
     );
   }
@@ -137,27 +240,38 @@ class _ChatTabContent extends StatelessWidget {
 
 class ChatSkillCard extends StatelessWidget {
   final dynamic item;
-  ChatSkillCard({super.key, required this.item});
-  final deleteController = Get.find<BookingDeleteController>();
+  final bool isSelected;
+  final VoidCallback onLongPress;
+  final VoidCallback onTap;
+  final bool showActionBar;
+
+  const ChatSkillCard({
+    super.key,
+    required this.item,
+    required this.isSelected,
+    required this.onLongPress,
+    required this.onTap,
+    required this.showActionBar,
+  });
 
   @override
   Widget build(BuildContext context) {
     final service = item.service;
 
     return GestureDetector(
-      onTap: () => Get.toNamed('/chat', arguments: {"serviceId": service.id}),
-      child: AppCard(
-        margin: const EdgeInsets.only(bottom: 10, left: 12, right: 12),
-        padding: EdgeInsets.all(12),
-        color: Colors.white,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+      onLongPress: onLongPress,
+      onTap: onTap,
+      child: Stack(
+        children: [
+          AppCard(
+            margin: const EdgeInsets.only(bottom: 10, left: 12, right: 12),
+            padding: EdgeInsets.all(12),
+            color: Colors.white,
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Avatar with initials
-                Stack(
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CircleAvatar(
                       radius: context.sHeight*0.034,
@@ -185,147 +299,126 @@ class ChatSkillCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    // Online indicator
-                    Positioned(
-                      bottom: 1,
-                      right: 1,
-                      child: Icon(Icons.circle,size: 12,color: AppColor.primary,),
+                    const SizedBox(width: 11),
+
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(service.userProfile!.userName.toString(),
+                                  style: TextStyle(
+                                    fontSize: context.text14,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColor.title,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              Container(width: context.sWidth*0.12,height: context.sWidth*0.05,color: Colors.transparent,)
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Icon(Icons.work_outline,
+                                  size: 13, color: AppColor.subtitle),
+                              const SizedBox(width: 3),
+                              Expanded(
+                                child: Text(
+                                  "${service.userProfile!.userBio.toString()}",
+                                  style: TextStyle(
+                                      fontSize: context.text12,
+                                      color: AppColor.subtitle),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 6),
+                          Row(
+                            spacing: 10,
+                            children: [
+                              Icon(
+                                Icons.done_all,
+                                size: 16,
+                                color: item.status == "seen"
+                                    ? Colors.blue
+                                    : Colors.grey,
+                              ),
+                              Expanded(
+                                child: Text(
+                                  "${item.message}",
+                                  style: TextStyle(
+                                    fontSize: context.text12,
+                                    color: AppColor.subtitle,
+                                    height: 1.45,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+
+                            ],
+                          )
+                        ],
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(width: 11),
+                const SizedBox(height: 10),
 
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Name + Date
-                      Row(
+                Row(
+                  children: [
+
+                    AppCard(
+                      color: AppColor.primary.withOpacity(0.08),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      margin: EdgeInsets.zero,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Expanded(
-                            child: Text(service.userProfile!.userName.toString(),
-                              style: TextStyle(
-                                fontSize: context.text14,
-                                fontWeight: FontWeight.w700,
-                                color: AppColor.title,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          Text(
-                            item.createdAt.toString().substring(0,10),
-                            style: const TextStyle(
-                                fontSize: 11,
-                                color: AppColor.subtitle),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Icon(Icons.work,
-                              size: 13, color: AppColor.subtitle),
-                          const SizedBox(width: 3),
-                          Expanded(
-                            child: Text(
-                              "${service.userProfile!.userBio.toString()}",
-                              style: TextStyle(
-                                  fontSize: context.text12,
-                                  color: AppColor.subtitle),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                          Icon(Icons.computer_rounded,
+                              size: 11, color: AppColor.primary),
+                          const SizedBox(width: 5),
+                          Text("${service.serviceName}",
+                            style: TextStyle(
+                              fontSize: context.text10,
+                              fontWeight: FontWeight.w600,
+                              color: AppColor.primary,
                             ),
                           ),
                         ],
                       ),
-
-                      const SizedBox(height: 6),
-                      Row(
-                        spacing: 10,
-                        children: [
-                          Icon(
-                            Icons.done_all,
-                            size: 16,
-                            color: item.status == "seen"
-                                ? Colors.blue
-                                : Colors.grey,
-                          ),
-                          Expanded(
-                            child: Text(
-                              "${item.message}",
-                              style: TextStyle(
-                                fontSize: context.text12,
-                                color: AppColor.subtitle,
-                                height: 1.45,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-
-            Row(
-              children: [
-                // Service tag
-                AppCard(
-                  color: AppColor.primary.withOpacity(0.08),
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  margin: EdgeInsets.zero,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.computer_rounded,
-                          size: 11, color: AppColor.primary),
-                      const SizedBox(width: 5),
-                      Text("${service.serviceName}",
-                        style: TextStyle(
-                          fontSize: context.text10,
-                          fontWeight: FontWeight.w600,
-                          color: AppColor.primary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const Spacer(),
-
-                // Delete button
-                InkWell(
-                  borderRadius: BorderRadius.circular(9),
-                  onTap: () async {
-                    final confirm = await AppDialog.show(context,
-                      title: "Delete Chat",
-                      message: "Are you sure you want to delete?",
-                      cancelText: "Cancel",
-                      confirmText: "Delete",
-                    );
-                    if (confirm) {
-                      await deleteController.deleteBooking(item.id);
-                      Get.find<BookingController>().fetchBookings();
-                    }
-                  },
-                  child: AppCard(
-                    color: Colors.red.withOpacity(0.08),
-                    margin: EdgeInsets.zero,
-                    child: Center(
-                      child: const Icon(Icons.delete_outline_rounded,
-                          color: Colors.red, size: 22),
                     ),
-                  ),
+
+                    const Spacer(),
+                    Text(
+                      item.createdAt.toString().substring(0,10),
+                      style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColor.subtitle),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+          Positioned(
+              top: 5,right: 20,
+              child: showActionBar
+                  ?Checkbox(
+                activeColor: AppColor.primary,
+                side: const BorderSide(color: Colors.grey, width: 2),
+                visualDensity: VisualDensity.compact,
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                value: isSelected, onChanged: (_) => onLongPress(),)
+                  : SizedBox())
+        ],
       ),
     );
   }
