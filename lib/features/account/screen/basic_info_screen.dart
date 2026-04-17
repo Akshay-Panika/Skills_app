@@ -3,6 +3,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/constant/app_size.dart';
 import 'package:skills_app/core/widget/app_button.dart';
@@ -325,7 +326,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
           SizedBox(height: context.sHeight * 0.02),
           Text(
             "Tap to change photo",
-            style: TextStyle(color: Colors.white60, fontSize: context.text14),
+            style: GoogleFonts.poppins(color: Colors.white60, fontSize: context.text14),
           ),
           SizedBox(height: context.sHeight * 0.02),
         ],
@@ -338,7 +339,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(
         text,
-        style: TextStyle(
+        style: GoogleFonts.poppins(
           fontWeight: FontWeight.w500,
           fontSize: context.text12,
           color: AppColor.title,
@@ -365,7 +366,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
 
     final decoration = InputDecoration(
       hintText: hint,
-      hintStyle: TextStyle(color: AppColor.subtitle, fontSize: context.text14),
+      hintStyle: GoogleFonts.poppins(color: AppColor.subtitle, fontSize: context.text14),
       filled: true,
       fillColor: AppColor.surface,
       prefixIcon: Icon(icon, color: AppColor.title, size: context.sHeight * 0.02),
@@ -388,7 +389,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
       keyboardType: keyboardType,
       readOnly: readOnly,
       maxLines: maxLines,
-      style: TextStyle(color: AppColor.title, fontSize: context.text14),
+      style: GoogleFonts.poppins(color: AppColor.title, fontSize: context.text14),
     );
   }
 
@@ -404,7 +405,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
       minLines: 3,
       keyboardType: TextInputType.multiline,
       controller: bioController,
-      style: TextStyle(color: AppColor.title, fontSize: context.text14),
+      style: GoogleFonts.poppins(color: AppColor.title, fontSize: context.text14),
       decoration: InputDecoration(
         filled: true,
         fillColor: AppColor.surface,
@@ -414,7 +415,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
         border: border,
         enabledBorder: border,
         focusedBorder: border,
-        hintStyle: TextStyle(color: AppColor.subtitle, fontSize: context.text14),
+        hintStyle: GoogleFonts.poppins(color: AppColor.subtitle, fontSize: context.text14),
       ),
     );
   }
@@ -436,9 +437,9 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
               child: Text(
                 gender,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: GoogleFonts.poppins(
                   fontSize: context.text14,
-                  fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                  fontWeight: selected ? FontWeight.w500 : FontWeight.w400,
                   color: selected ? AppColor.white : AppColor.primary,
                 ),
               ),

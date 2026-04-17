@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:skills_app/core/constant/app_size.dart';
 import 'package:skills_app/features/wishlist/controller/wishlist_toggle_controller.dart';
 import '../../../core/constant/app_color.dart';
@@ -69,7 +70,7 @@ class ServiceCard extends StatelessWidget {
                     spacing: 6,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(service.serviceName, style:  TextStyle(fontSize: context.text12,fontWeight: FontWeight.w600, color: AppColor.title)),
+                      Text(service.serviceName, style:  GoogleFonts.poppins(fontSize: context.text12,fontWeight: FontWeight.w500, color: AppColor.title)),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -78,11 +79,11 @@ class ServiceCard extends StatelessWidget {
                               service.serviceAmount != null
                                   ? "₹${double.tryParse(service.serviceAmount!)?.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '') ?? service.serviceAmount!}"
                                   : "Free",
-                              style:  TextStyle(fontWeight: FontWeight.w600,fontSize: context.text12)),
+                              style:  GoogleFonts.poppins(fontWeight: FontWeight.w600,fontSize: context.text12)),
                           Row(
                             children:  [
                               Icon(Icons.location_on, size: 12, color: Colors.green),
-                              Text(service.distance ?? "0 m", style: TextStyle(fontSize: context.text12, color: Colors.black87),),
+                              Text(service.distance ?? "0 m", style: GoogleFonts.poppins(fontSize: context.text12, color: Colors.black87),),
                             ],
                           ),
                         ],

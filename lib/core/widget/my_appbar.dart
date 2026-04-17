@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../constant/app_color.dart';
 
@@ -25,9 +26,9 @@ PreferredSizeWidget myAppBar({
         : null,
     title: Text(
       title,
-      style: TextStyle(
-        fontSize: 16,
+      style: GoogleFonts.poppins(
         fontWeight: FontWeight.w500,
+        fontSize: 16,
         color: titleColor,
       ),
     ),

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:skills_app/core/widget/app_button.dart';
 import 'package:skills_app/core/widget/app_card.dart';
 import 'package:skills_app/core/widget/flutter_toast.dart';
@@ -200,8 +201,8 @@ class _AddSkillScreenState extends State<AddSkillScreen>
                   widget.isEdit
                       ? "Update your service details"
                       : "Share your skills and start earning",
-                  style: TextStyle(
-                    fontSize: context.text16,
+                  style: GoogleFonts.poppins(
+                    fontSize: context.text14,
                     color: AppColor.subtitle,
                   ),
                 ),
@@ -493,7 +494,7 @@ class _AddSkillScreenState extends State<AddSkillScreen>
                   children: [
                     Icon(Icons.edit, size: 18, color: AppColor.primary),
                     const SizedBox(width: 4),
-                    Text("Change", style: TextStyle(color: AppColor.primary)),
+                    Text("Change", style: GoogleFonts.poppins(color: AppColor.primary,fontSize: context.text12)),
                   ],
                 ),
               ),
@@ -515,7 +516,7 @@ class _AddSkillScreenState extends State<AddSkillScreen>
                   children: [
                     Icon(Icons.edit, size: 18, color: AppColor.primary),
                     const SizedBox(width: 4),
-                    Text("Change", style: TextStyle(color: AppColor.primary)),
+                    Text("Change", style: GoogleFonts.poppins(color: AppColor.primary, fontSize: context.text12)),
                   ],
                 ),
               ),
@@ -530,13 +531,13 @@ class _AddSkillScreenState extends State<AddSkillScreen>
                 size: context.sHeight * 0.04),
             const SizedBox(height: 20),
             Text("Upload Service Image",
-                style: TextStyle(
+                style: GoogleFonts.poppins(
                     fontWeight: FontWeight.w600,
                     color: AppColor.subtitle,
-                    fontSize: context.text14)),
+                    fontSize: context.text12)),
             const SizedBox(height: 4),
             Text("Tap to choose from gallery",
-                style: TextStyle(
+                style: GoogleFonts.poppins(
                     fontSize: context.text12,
                     color: AppColor.subtitle)),
           ],
@@ -550,7 +551,7 @@ class _AddSkillScreenState extends State<AddSkillScreen>
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('Skill Type',style: TextStyle(
+        Text('Skill Type',style: GoogleFonts.poppins(
           fontWeight: FontWeight.w500,
           fontSize: context.text12,
           color: AppColor.title,
@@ -575,7 +576,7 @@ class _AddSkillScreenState extends State<AddSkillScreen>
                   Text(
                     label,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       fontSize: context.text12,
                       fontWeight: FontWeight.w500,
                       color: selected ? AppColor.white : AppColor.title,
@@ -595,7 +596,7 @@ class _AddSkillScreenState extends State<AddSkillScreen>
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(
         text,
-        style: TextStyle(
+        style: GoogleFonts.poppins(
           fontWeight: FontWeight.w500,
           fontSize: context.text12,
           color: AppColor.title,
@@ -622,7 +623,7 @@ class _AddSkillScreenState extends State<AddSkillScreen>
 
     final decoration = InputDecoration(
       hintText: hint,
-      hintStyle: TextStyle(color: AppColor.subtitle, fontSize: context.text14),
+      hintStyle: GoogleFonts.poppins(color: AppColor.subtitle, fontSize: context.text14),
       filled: true,
       fillColor: AppColor.surface,
       prefixIcon: Icon(icon, color: AppColor.title, size: context.sHeight * 0.02),
@@ -645,7 +646,7 @@ class _AddSkillScreenState extends State<AddSkillScreen>
       keyboardType: keyboardType,
       readOnly: readOnly,
       maxLines: maxLines,
-      style: TextStyle(color: AppColor.title, fontSize: context.text14),
+      style: GoogleFonts.poppins(color: AppColor.title, fontSize: context.text14),
     );
   }
 
@@ -662,7 +663,7 @@ class _AddSkillScreenState extends State<AddSkillScreen>
       minLines: 3,
       keyboardType: TextInputType.multiline,
       controller: descController,
-      style: TextStyle(color: AppColor.title, fontSize: context.text14),
+      style: GoogleFonts.poppins(color: AppColor.title, fontSize: context.text14),
       decoration: InputDecoration(
         filled: true,
         fillColor: AppColor.surface,
@@ -672,7 +673,7 @@ class _AddSkillScreenState extends State<AddSkillScreen>
         border: border,
         enabledBorder: border,
         focusedBorder: border,
-        hintStyle: TextStyle(color: AppColor.subtitle, fontSize: context.text14),
+        hintStyle: GoogleFonts.poppins(color: AppColor.subtitle, fontSize: context.text14),
       ),
     );
   }

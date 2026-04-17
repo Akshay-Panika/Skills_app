@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/constant/app_color.dart';
 import '../../../core/constant/app_size.dart';
@@ -17,33 +19,21 @@ class SkillEmptyCard extends StatelessWidget {
           children: [
             FaIcon(
               FontAwesomeIcons.chalkboardTeacher,
-              size: context.sWidth * 0.12,
-              color: AppColor.primary.withOpacity(0.4),
-            ),
+                size: context.sWidth*0.14, color: AppColor.primary),
 
-            SizedBox(height: context.sHeight * 0.025),
+            SizedBox(height: 10,),
 
             Text(
               "Share Your Skills",
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: context.text16,
-                fontWeight: FontWeight.w700,
-                color: AppColor.title,
-              ),
-            ),
+                style: GoogleFonts.poppins(fontWeight: FontWeight.w500)),
 
             SizedBox(height: 8),
 
             Text(
               "Start posting your skills and connect with people",
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: context.text12,
-                color: AppColor.subtitle,
-                height: 1.4,
-              ),
-            ),
+                style: GoogleFonts.poppins(fontWeight: FontWeight.w500,fontSize: context.text12,color: Colors.grey)),
 
             SizedBox(height: context.sHeight * 0.03),
 

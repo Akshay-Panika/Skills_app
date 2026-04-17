@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/constant/app_size.dart';
 import 'package:skills_app/core/widget/app_card.dart';
 import '../../category/controller/category_controller.dart';
 import '../../home/widget/category_card.dart';
+import '../../home/widget/section_header.dart';
 import '../../home/widget/service_card.dart';
 import '../../location/controller/location_controller.dart';
 import '../../service/controller/service_list_controller.dart';
@@ -85,9 +87,9 @@ class SearchScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              FaIcon(FontAwesomeIcons.chalkboardTeacher, color: AppColor.white),
+              FaIcon(FontAwesomeIcons.chalkboardTeacher, color: AppColor.white, size: 18,),
               const SizedBox(width: 8),
-              Text('Skill Daan', style: TextStyle(color: AppColor.white, fontSize: context.text16, fontWeight: FontWeight.w700)),
+              Text('Skill Daan', style: GoogleFonts.poppins(color: AppColor.white, fontSize: context.text14, fontWeight: FontWeight.w600)),
             ],
           ),
           SizedBox(height: context.sHeight * 0.01),
@@ -217,19 +219,25 @@ class SearchScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _sectionTitle("Resent View", context),
-              const SizedBox(height: 4),
-              Text('Based on your learning interests',
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SectionHeader(
+              title: "Resent View",
+              onTap: () {
+
+              },
+            ),
+            const SizedBox(height: 4),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text('Based on your learning interests',
                   style: TextStyle(fontSize: context.text12, color: AppColor.title)),
-            ],
-          ),
+            ),
+          ],
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: context.sHeight * 0.014),
+
         GridView.builder(
           shrinkWrap: true,
           padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -332,9 +340,9 @@ class SearchScreen extends StatelessWidget {
         final locationText = isLoading ? 'Fetching location...' : '${_locationController.city.value}, ${_locationController.state.value}';
         return Row(
           children: [
-            const Icon(Icons.location_on, color: AppColor.white),
+            const Icon(Icons.location_on, color: AppColor.white, size: 18,),
             const SizedBox(width: 8),
-            Expanded(child: Text(locationText, style: TextStyle(fontSize: context.text12, color: AppColor.white, fontWeight: FontWeight.w500))),
+            Expanded(child: Text(locationText, style: GoogleFonts.poppins(fontSize: context.text12, color: AppColor.white, fontWeight: FontWeight.w500))),
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: InkWell(
@@ -356,7 +364,12 @@ class SearchScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(height: context.sHeight * 0.02),
-          Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: _sectionTitle("Popular Skills", context)),
+          SectionHeader(
+            title: "Popular Skills",
+            onTap: () {
+
+            },
+          ),
           SizedBox(height: context.sHeight * 0.014),
           SizedBox(
             height: context.sHeight * 0.25,
@@ -379,7 +392,7 @@ class SearchScreen extends StatelessWidget {
       children: [
         Container(width: 5, height: 16, decoration: BoxDecoration(color: AppColor.primary, borderRadius: BorderRadius.circular(5))),
         const SizedBox(width: 8),
-        Text(title, style: TextStyle(fontSize: context.text14, fontWeight: FontWeight.w600, color: AppColor.title)),
+        Text(title, style: GoogleFonts.poppins(fontSize: context.text14, fontWeight: FontWeight.w500, color: AppColor.title)),
       ],
     );
   }

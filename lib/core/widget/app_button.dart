@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../constant/app_color.dart';
 import '../constant/app_size.dart';
 
@@ -57,9 +58,9 @@ class AppButton extends StatelessWidget {
         )
             : Text(
           text,
-          style: TextStyle(
+          style: GoogleFonts.poppins(
             fontSize: context.text14,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ),

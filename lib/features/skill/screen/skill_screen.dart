@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/widget/app_card.dart';
 import 'package:skills_app/features/skill/model/service_list_by_user_model.dart';
@@ -106,10 +107,10 @@ class _AdsScreenState extends State<AdsScreen> {
                   const SizedBox(height: 2),
                   Text(
                     'Skills Dashboard',
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       color: Colors.white,
                       fontSize: context.text16,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
@@ -168,10 +169,10 @@ class _AdsScreenState extends State<AdsScreen> {
           children: [
             Text(label,
                 style:
-                TextStyle(color: Colors.white, fontSize: context.text14)),
+                GoogleFonts.poppins(color: Colors.white, fontSize: context.text14)),
             const SizedBox(height: 4),
             Text(value,
-                style: TextStyle(
+                style: GoogleFonts.poppins(
                     color: Colors.white,
                     fontSize: context.text18,
                     fontWeight: FontWeight.w500)),
@@ -191,8 +192,8 @@ class _AdsScreenState extends State<AdsScreen> {
         children: [
           Text(
             'My listings',
-            style: TextStyle(
-              fontSize: context.text16,
+            style: GoogleFonts.poppins(
+              fontSize: context.text14,
               fontWeight: FontWeight.w500,
               color: AppColor.title,
             ),
@@ -229,7 +230,7 @@ class _AdsScreenState extends State<AdsScreen> {
                     margin: EdgeInsets.zero,
                     child: Text(
                       filter,
-                      style: TextStyle(
+                      style: GoogleFonts.poppins(
                         fontSize: context.text12,
                         fontWeight: FontWeight.w500,
                         color: selected ? Colors.white : AppColor.subtitle,
@@ -468,8 +469,8 @@ class SkillCard extends StatelessWidget {
                                 list.serviceName,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: context.text14,
+                                style: GoogleFonts.poppins(
+                                  fontSize: context.text12,
                                   fontWeight: FontWeight.w500,
                                   color: AppColor.title,
                                 ),
@@ -481,8 +482,8 @@ class SkillCard extends StatelessWidget {
                             list.serviceDescription,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: context.text14,
+                            style: GoogleFonts.poppins(
+                              fontSize: context.text12,
                               color: AppColor.subtitle,
                               height: 1.4,
                             ),
@@ -502,9 +503,9 @@ class SkillCard extends StatelessWidget {
                                 list.serviceAmount != null
                                     ? "₹${double.tryParse(list.serviceAmount!)?.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '') ?? list.serviceAmount!}"
                                     : "Free",
-                                style: TextStyle(
+                                style: GoogleFonts.poppins(
                                   color: AppColor.primary,
-                                  fontSize: context.text14,
+                                  fontSize: context.text12,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -521,8 +522,8 @@ class SkillCard extends StatelessWidget {
                                 const SizedBox(width: 4),
                                 Text(
                                   'views',
-                                  style: TextStyle(
-                                    fontSize: context.text14,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: context.text12,
                                     color: AppColor.subtitle,
                                   ),
                                 ),

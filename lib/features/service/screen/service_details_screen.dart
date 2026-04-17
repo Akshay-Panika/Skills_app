@@ -3,22 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:skills_app/core/widget/app_card.dart';
-import 'package:skills_app/core/widget/app_contact.dart';
 import 'package:skills_app/core/widget/my_appbar.dart';
-import 'package:skills_app/features/chat/screen/chat_screen.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constant/app_color.dart';
 import '../../../core/constant/app_size.dart';
 import '../../../core/widget/app_error_card.dart';
-import '../../account/controller/user_profile_controller.dart';
-import '../../account/model/user_profile_model.dart';
 import '../../auth/helper/auth_preferences.dart';
-import '../../location/controller/location_controller.dart';
 import '../controller/booking_check_controller.dart';
 import '../controller/booking_create_controller.dart';
 import '../controller/service_details_controller.dart';
-import '../repository/booking_create_repository.dart';
 import '../widget/service_details_shimmer.dart';
 
 class ServiceDetailsScreen extends StatefulWidget {
@@ -177,7 +171,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                             service.serviceAmount != null
                                 ? "₹${double.tryParse(service.serviceAmount.toString())?.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '') ?? service.serviceAmount!}"
                                 : "Free",
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
                                 color: service.serviceAmount != null ?AppColor.white: AppColor.white,
                                 fontWeight: FontWeight.w500,
                                 fontSize: context.text16),
@@ -222,14 +216,14 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                             children: [
                               Text(
                                 service.serviceName,
-                                style: TextStyle(
+                                style: GoogleFonts.poppins(
                                     fontWeight: FontWeight.w500,
                                     fontSize: context.text16),
                               ),
                               Text(
                                 service.serviceDescription,
                                 style:
-                                TextStyle(color: AppColor.subtitle, fontSize: context.text16),
+                                GoogleFonts.poppins(color: AppColor.subtitle, fontSize: context.text14),
                               ),
                             ],
                           ),
@@ -248,7 +242,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
 
                                   Text(
                                     service.distance.toString(),
-                                    style: TextStyle(
+                                    style: GoogleFonts.poppins(
                                       fontWeight: FontWeight.w500,
                                       color: AppColor.subtitle,
                                       fontSize: context.text14,
@@ -324,8 +318,8 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                                     /// Name
                                     Text(
                                       service.userProfile!.userName.toString(),
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
+                                      style: GoogleFonts.poppins(
+                                        fontWeight: FontWeight.w500,
                                         fontSize: context.text14,
                                       ),
                                     ),
@@ -337,7 +331,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                                       service.userProfile!.userBio.toString(),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
+                                      style: GoogleFonts.poppins(
                                         color: AppColor.subtitle,
                                         fontSize: context.text12,
                                       ),
@@ -361,7 +355,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                                         const SizedBox(width: 2),
                                         Text(
                                           "4.8",
-                                          style: TextStyle(
+                                          style: GoogleFonts.poppins(
                                             fontSize: context.text12,
                                             fontWeight: FontWeight.w600,
                                           ),
@@ -371,9 +365,9 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                                   ),
                                   Text(
                                     "120 reviews",
-                                    style: TextStyle(
+                                    style: GoogleFonts.poppins(
                                       color: Colors.grey,
-                                      fontSize: context.text12,
+                                      fontSize: context.text10,
                                     ),
                                   ),
                                 ],
@@ -392,7 +386,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                           Center(
                             child: Text(
                               "Report this skill",
-                              style: TextStyle(
+                              style: GoogleFonts.poppins(
                                 color: Colors.red.withOpacity(0.7),
                                 fontSize: context.text12,
                                 fontWeight: FontWeight.w500,
@@ -517,8 +511,8 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                       padding: const EdgeInsets.only(bottom: 6, left: 16),
                       child: Text(
                         "Self Mentor",
-                        style: TextStyle(
-                          fontSize: context.text16,
+                        style: GoogleFonts.poppins(
+                          fontSize: context.text14,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -552,7 +546,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                           SizedBox(width: 5),
                           Text(
                             'Back',
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
                               color: Colors.white,
                               fontSize: context.text14,
                               fontWeight: FontWeight.w600,
@@ -575,7 +569,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(
         text,
-        style: TextStyle(
+        style: GoogleFonts.poppins(
           fontWeight: FontWeight.w500,
           fontSize: context.text14,
           color: AppColor.subtitle,
@@ -649,7 +643,7 @@ Widget _actionButton(
               const SizedBox(width: 8),
               Text(
                 text,
-                style: TextStyle(
+                style: GoogleFonts.poppins(
                   color: Colors.white,
                   fontSize: context.text14,
                   fontWeight: FontWeight.w600,

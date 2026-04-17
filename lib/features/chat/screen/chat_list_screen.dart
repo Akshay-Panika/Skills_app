@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/constant/app_size.dart';
 import 'package:skills_app/core/widget/app_card.dart';
@@ -49,23 +50,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
           title: showActionBar
               ? Text("(${selectedIds.length}) Selected")
               : Text("Chats"),
-          titleTextStyle: TextStyle(
+          titleTextStyle: GoogleFonts.poppins(
             color: Colors.white,
             fontSize: context.text16,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w500,
           ),
           actions: [
             if (showActionBar)
             InkWell(
-              // onTap: () {
-              //   // delete logic
-              //   print("Delete: $selectedIds");
-              //
-              //   setState(() {
-              //     selectedIds.clear();
-              //     showActionBar = false;
-              //   });
-              // },
               onTap: () async {
                 final confirm = await AppDialog.show(context,
                   title: "Delete Chat",
@@ -179,7 +171,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
       child: TabBar(
         labelColor: Colors.white,
         unselectedLabelColor: Colors.white60,
-        labelStyle: TextStyle(
+        labelStyle: GoogleFonts.poppins(
           fontWeight: FontWeight.w700,
           fontSize: context.text12,
         ),
@@ -309,9 +301,9 @@ class ChatSkillCard extends StatelessWidget {
                             children: [
                               Expanded(
                                 child: Text(service.userProfile!.userName.toString(),
-                                  style: TextStyle(
-                                    fontSize: context.text14,
-                                    fontWeight: FontWeight.w700,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: context.text12,
+                                    fontWeight: FontWeight.w500,
                                     color: AppColor.title,
                                   ),
                                   maxLines: 1,
@@ -329,7 +321,7 @@ class ChatSkillCard extends StatelessWidget {
                               Expanded(
                                 child: Text(
                                   "${service.userProfile!.userBio.toString()}",
-                                  style: TextStyle(
+                                  style: GoogleFonts.poppins(
                                       fontSize: context.text12,
                                       color: AppColor.subtitle),
                                   maxLines: 1,
@@ -386,7 +378,7 @@ class ChatSkillCard extends StatelessWidget {
                               size: 11, color: AppColor.primary),
                           const SizedBox(width: 5),
                           Text("${service.serviceName}",
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
                               fontSize: context.text10,
                               fontWeight: FontWeight.w600,
                               color: AppColor.primary,
@@ -399,7 +391,7 @@ class ChatSkillCard extends StatelessWidget {
                     const Spacer(),
                     Text(
                       item.createdAt.toString().substring(0,10),
-                      style: const TextStyle(
+                      style: GoogleFonts.poppins(
                           fontSize: 11,
                           color: AppColor.subtitle),
                     ),
@@ -437,8 +429,8 @@ class _EmptyState extends StatelessWidget {
               size: context.sWidth*0.14, color: AppColor.primary),
           SizedBox(height: 10),
           Text("No chats found",
-              style: TextStyle(fontWeight: FontWeight.bold)),
-          Text("Start booking services to chat"),
+              style: GoogleFonts.poppins(fontWeight: FontWeight.w500)),
+          Text("Start booking services to chat",style: GoogleFonts.poppins(fontWeight: FontWeight.w500,fontSize: context.text12,color: Colors.grey)),
         ],
       ),
     );

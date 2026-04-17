@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/constant/app_size.dart';
 import 'package:skills_app/features/home/widget/category_card.dart';
@@ -12,10 +13,11 @@ import '../../service/controller/service_list_controller.dart';
 import '../controller/home_screen_controller.dart';
 import '../widget/home_shimer_card.dart';
 import '../widget/invite_friend_card.dart';
+import '../widget/section_header.dart';
 import '../widget/service_card.dart';
 
 class HomeScreenController extends GetxController {
-
+  var isPinned = false.obs;
   final CategoryController categoryController = Get.find();
   final ServiceListController serviceController = Get.find();
 
@@ -42,6 +44,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final GlobalKey _trendingKey = GlobalKey();
   final _locationController = Get.find<LocationController>();
   final _homeController = Get.find<HomeScreenController>();
   final _categoryController = Get.find<CategoryController>();
@@ -55,6 +58,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _scrollController.addListener(() {
+      _homeController.isPinned.value = _scrollController.offset > (context.sWidth * 0.4);
+
       double offset = _scrollController.offset;
       if (offset > _lastOffset) {
         Get.find<ScrollStatusController>().status.value = "Scrolling Down";
@@ -71,6 +76,22 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
+  void _scrollToTrending() {
+    if (_homeController.isPinned.value) {
+      _scrollController.animateTo(0, duration: 300.milliseconds, curve: Curves.easeOut);
+    } else {
+      final rb = _trendingKey.currentContext?.findRenderObject() as RenderBox?;
+      if (rb == null) return;
+
+      final target = _scrollController.offset + rb.localToGlobal(Offset.zero).dy - (context.sWidth * 0.26);
+
+      _scrollController.animateTo(
+        target.clamp(0.0, _scrollController.position.maxScrollExtent),
+        duration: 500.milliseconds,
+        curve: Curves.easeInOut,
+      );
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -99,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
               SliverToBoxAdapter(
                 child: Container(
                   color: AppColor.primary,
-                  padding: EdgeInsets.all(context.sWidth*0.02),
+                  padding: EdgeInsets.only(left: context.sWidth*0.02,right: context.sWidth*0.02,bottom: context.sWidth*0.026,top: context.sWidth*0.02),
                   child: Obx((){
                     final _city = _locationController.city.value;
                     final _state = _locationController.state.value;
@@ -109,8 +130,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         Row(
                           children:  [
                             Padding(
-                              padding:  EdgeInsets.symmetric(horizontal: context.sWidth*0.02),
-                              child: FaIcon(FontAwesomeIcons.chalkboardTeacher, color: Colors.white, size: context.sWidth*0.08),
+                              padding:EdgeInsets.symmetric(horizontal: context.sWidth*0.02),
+                              child: FaIcon(FontAwesomeIcons.chalkboardTeacher, color: AppColor.white, size: context.sWidth*0.08),
                             ),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,22 +139,31 @@ class _HomeScreenState extends State<HomeScreen> {
                               children: [
                                 Row(
                                   children: [
-                                    // Icon(Icons.location_on,size: 10,color: Colors.green.shade700,),
-                                    Text(" Skill Daan",
-                                        style: TextStyle(fontSize: context.text12, color: Colors.white,fontWeight: FontWeight.w500)),
+                                    FaIcon(
+                                      FontAwesomeIcons.locationDot,
+                                      size: 10,
+                                      color: AppColor.white,
+                                    ),
+                                    SizedBox(width: 6),
+                                    Text(
+                                      "Location",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: context.text10,
+                                        color: AppColor.white,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
                                   ],
                                 ),
-                                SizedBox(height: 2),
                                 Row(
                                   spacing: 2,
                                   children: [
-                                    Icon(Icons.location_on,size: context.sWidth*0.03,color: Colors.white,),
                                     Text(
                                       "$_city, $_state",
-                                      style: TextStyle(
-                                        fontSize: context.text10,
+                                      style: GoogleFonts.poppins(
+                                        fontSize: context.text12,
                                         fontWeight: FontWeight.w500,
-                                        color: Colors.white,
+                                        color: AppColor.white,
                                       ),
                                     ),
                                   ],
@@ -146,15 +176,40 @@ class _HomeScreenState extends State<HomeScreen> {
 
                         Row(
                           children: [
-                            IconButton(
-                              onPressed: () => Get.toNamed('/wishlist'),
-                              icon: const Icon(Icons.bookmark, color: Colors.white,),
+
+                            InkWell(
+                              onTap: () => Get.toNamed('/wishlist'),
+                              child: Container(
+                                width: 36,
+                                height: 36,
+                                margin: const EdgeInsets.only(right: 16),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(
+                                  Icons.bookmark,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                              ),
                             ),
-
-                            IconButton(
-                              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => NotificationScreen(),)),
-
-                              icon: const Icon(Icons.notifications,color: Colors.white,),
+                            InkWell(
+                              onTap: () => Get.to(() => NotificationScreen()),
+                              child: Container(
+                                width: 36,
+                                height: 36,
+                                margin: const EdgeInsets.only(right: 16),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(
+                                  Icons.notifications_none_rounded,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                              ),
                             ),
                           ],
                         )
@@ -204,20 +259,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         scale: 0.8,
                         child: Switch(
                           value: _isFree,
-
-                          /// 👇 ₹ ICON BOTH STATES
                           thumbIcon: MaterialStateProperty.resolveWith<Icon?>(
                                 (states) {
                               if (states.contains(MaterialState.selected)) {
-                                /// ON → PAID (Bold ₹)
                                 return const Icon(
                                   Icons.currency_rupee,
                                   size: 16,
                                   color: Colors.white,
                                 );
                               }
-
-                              /// OFF → UNPAID (Outlined ₹)
                               return const Icon(
                                 Icons.currency_rupee_outlined,
                                 size: 16,
@@ -255,31 +305,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if(_categoryController.categoryList.isNotEmpty)
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                          child: Row(
-                            spacing: 10,
-                            children: [
-                              Container(
-                                width: 5,
-                                height: 16,
-                                decoration: BoxDecoration(
-                                    color: Color(0xFF0D6E6E),
-                                    borderRadius: BorderRadius.circular(5)
-                                ),
-                              ),
-                              Text(
-                                "Grow Your Skills",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.black87,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      if(_categoryController.categoryList.isNotEmpty)
+                      SectionHeader(
+                        title: "Grow Your Skills",
+                        onTap: () {
+                          Get.toNamed('/category', parameters: {
+                            'id':_categoryController.categoryList.first.id.toString(),
+                            'name': _categoryController.categoryList.first.categoryName.toString(),
+                          });
+                        },
+                      ),
+
+                       if(_categoryController.categoryList.isNotEmpty)
                         SizedBox(height: 16,),
 
                       if(_categoryController.categoryList.isNotEmpty)
@@ -310,16 +346,33 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 }),
               ),
-              SliverToBoxAdapter(child: SizedBox(height: context.sHeight*0.02,),),
+              SliverToBoxAdapter(child: SizedBox(height: context.sHeight*0.01,),),
 
-              SliverToBoxAdapter(
+              if(_serviceListController.services.isNotEmpty)
+                SliverPersistentHeader(
+                  pinned: true,
+                  delegate: _SliverSearchBarDelegate(
+                    key: _trendingKey,
+                    color:  Colors.white,
+                    height: context.sWidth * 0.12,
+                      padding: EdgeInsets.zero,
+                      child: Obx(() {
+                        return SectionHeader(
+                          title: "Trending Courses",
+                          actionText: _homeController.isPinned.value ? "Back to Top" : "See All",
+                          onTap: _scrollToTrending,
+                        );
+                      })
+                  ),
+                ),
+
+               SliverToBoxAdapter(
                 child: Obx(() {
                   if (_serviceListController.isLoading.value &&
                       _serviceListController.services.isEmpty) {
                     return Center(child: CircularProgressIndicator());
                   }
 
-                  // final nearby = _serviceListController.services;
                   final nearby = _serviceListController.services.where((s) {
                     final matchesFree = _isFree ? s.serviceStatus == false : true;
                     return matchesFree;
@@ -336,35 +389,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
-                        child: Row(
-                          spacing: 10,
-                          children: [
-                            Container(
-                              width: 5,
-                              height: 16,
-                              decoration: BoxDecoration(
-                                  color: Color(0xFF0D6E6E),
-                                  borderRadius: BorderRadius.circular(5)
-                              ),
-                            ),
-                            Text(
-                              "Trending Courses",
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.black87,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 10),
-
                       GridView.builder(
                         shrinkWrap: true,
-                        padding: const EdgeInsets.symmetric(horizontal: 10,),
+                        padding: const EdgeInsets.symmetric(horizontal: 12,),
                         physics: NeverScrollableScrollPhysics(),
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
@@ -461,16 +488,19 @@ class EmptyServiceWidget extends StatelessWidget {
 class _SliverSearchBarDelegate extends SliverPersistentHeaderDelegate {
   final Widget child;
   final double height;
-
-  _SliverSearchBarDelegate({required this.child, required this.height});
+  final Color? color;
+  final EdgeInsetsGeometry? padding;
+  final Key? key;
+  _SliverSearchBarDelegate({required this.child, required this.height,this.color, this.padding, this.key});
 
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     return SizedBox(
+      key: key,
       height: height,
       child: Container(
-        color: AppColor.primary,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
+        color: color?? AppColor.primary,
+        padding: padding ?? EdgeInsets.symmetric(horizontal: 12),
         child: child,
       ),
     );

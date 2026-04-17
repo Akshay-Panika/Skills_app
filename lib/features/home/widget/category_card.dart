@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:skills_app/core/widget/app_card.dart';
 
 import '../../../core/constant/app_color.dart';
 import '../../../core/constant/app_size.dart';
 import '../../category/model/category_model.dart';
-import '../../category/screen/category_screen.dart';
 
 class CategoryCard extends StatelessWidget {
   final CategoryModel category;
@@ -51,9 +51,6 @@ class CategoryCard extends StatelessWidget {
               'name': category.categoryName.toString(),
             });
           },
-          // onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => CategoryScreen(
-          //     categoryId: category.id.toString(),
-          //     category: category.categoryName.toString()),)),
         ),
         Text(
           category.categoryName ?? "",
@@ -61,7 +58,7 @@ class CategoryCard extends StatelessWidget {
           maxLines: 2,
           softWrap: true,
           overflow: TextOverflow.ellipsis,
-          style:  TextStyle(
+          style:  GoogleFonts.poppins(
               fontWeight: FontWeight.w600,
               fontSize: context.text10,
               height: 1.2,

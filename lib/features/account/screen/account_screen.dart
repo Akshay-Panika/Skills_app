@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/constant/app_size.dart';
@@ -212,13 +213,13 @@ class _AccountScreenState extends State<AccountScreen> {
           (profile?.userName?.isNotEmpty ?? false)
               ? profile!.userName!
               : "Guest User",
-          style: TextStyle(
-            fontWeight: FontWeight.w800,
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w500,
             fontSize: context.text14,
             color: AppColor.title,
           ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 3),
 
         isLoading
             ? AppCard(height: 10, width: 150, color: Colors.grey.shade300, margin: EdgeInsets.zero,padding: EdgeInsets.zero,)
@@ -226,7 +227,7 @@ class _AccountScreenState extends State<AccountScreen> {
           (profile?.userBio?.isNotEmpty ?? false)
               ? profile!.userBio!
               : "No Profile Found",
-          style: TextStyle(
+          style: GoogleFonts.poppins(
             fontWeight: FontWeight.w500,
             fontSize: context.text12,
             color: AppColor.subtitle,
@@ -242,7 +243,7 @@ class _AccountScreenState extends State<AccountScreen> {
                 ? AppCard(height: 10, width: 80, color: Colors.grey.shade300, margin: EdgeInsets.zero,padding: EdgeInsets.zero,)
                 : Text(
               AppDateFormat.format(profile?.createdAt),
-              style: TextStyle(fontSize: context.text12),
+              style: GoogleFonts.poppins(fontSize: context.text12,),
             ),
 
             isLoading
@@ -258,7 +259,7 @@ class _AccountScreenState extends State<AccountScreen> {
                   const SizedBox(width: 6),
                   Text(
                     "Edit",
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       fontSize: context.text12,
                       color: AppColor.white,
                     ),
@@ -288,8 +289,8 @@ class _AccountScreenState extends State<AccountScreen> {
 
         Text(
           text,
-          style:  TextStyle(
-            fontWeight: FontWeight.w600,
+          style:  GoogleFonts.poppins(
+            fontWeight: FontWeight.w500,
             fontSize: context.text14,
             color: AppColor.primary,
           ),
@@ -360,9 +361,9 @@ class _MenuTile extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: context.text14,
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w500,
+                    fontSize: context.text12,
                     color: iconColor,
                   ),
                 ),
@@ -370,7 +371,7 @@ class _MenuTile extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     subtitle!,
-                    style: TextStyle(fontSize: context.text12, color: AppColor.subtitle),
+                    style: GoogleFonts.poppins(fontSize: context.text12, color: AppColor.subtitle),
                   ),
                 ],
               ],

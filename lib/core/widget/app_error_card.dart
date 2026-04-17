@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../constant/app_color.dart';
 import '../constant/app_size.dart';
 import 'app_card.dart';
@@ -31,7 +32,7 @@ class AppErrorCard extends StatelessWidget {
                 size: context.sWidth*0.14, color: AppColor.primary),
             SizedBox(height: 10),
             Text(title ?? "Network error",
-                style: TextStyle(fontWeight: FontWeight.bold)),
+                style: GoogleFonts.poppins(fontSize: context.text14,fontWeight: FontWeight.w500)),
             // Text(message ?? "Start booking services to chat"),
             SizedBox(height: 10),
             InkWell(
@@ -49,7 +50,7 @@ class AppErrorCard extends StatelessWidget {
                 ),
                 label: Text(
                   "Refresh",
-                  style: TextStyle(
+                  style: GoogleFonts.poppins(
                     color: AppColor.primary,
                     fontWeight: FontWeight.w600,
                   ),

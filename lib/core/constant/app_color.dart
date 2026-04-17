@@ -5,13 +5,14 @@ import 'package:flutter/material.dart';
 class AppColor {
   AppColor._();
 
-  // 0xFFF97316 // 0xFF2563EB // 0xFF14B8A6
-  // static const primary = Colors.deepPurpleAccent;
   static const primary = Color(0xFF0D6E6E);
-  static const secondary = Color(0xFFFFB347);
+  // static const primary = Color(0xFFFF9933);
+  static const primaryLight = Color(0xFFFFAD66);
+  static const primarySofter = Color(0xFFFFC299);
+  static const primaryVeryLight = Color(0xFFFFE0CC);
   static const surface = Color(0xFFF4F7F7);
 
-  static const title = Color(0xFF0F172A);
+  static const title = Color(0xFF000000);
   static const subtitle = Color(0xFF475569);
 
   static const white = Color(0xFFFFFFFF);

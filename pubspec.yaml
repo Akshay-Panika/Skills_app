@@ -17,6 +17,7 @@ dependencies:
   fluttertoast: ^9.0.0
   dio: ^5.9.2
   font_awesome_flutter: ^11.0.0
+  google_fonts: ^6.3.2
   file_picker: ^10.3.10
   geolocator: ^14.0.2
   geocoding: ^2.1.0
