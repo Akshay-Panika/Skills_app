@@ -5,6 +5,7 @@ import 'package:skills_app/features/service/controller/service_list_controller.d
 import '../../../core/widget/my_appbar.dart';
 import '../../home/screen/home_screen.dart';
 import '../../home/widget/service_card.dart';
+import '../../location/widget/location_card.dart';
 
 
 class ServiceScreen extends StatefulWidget {

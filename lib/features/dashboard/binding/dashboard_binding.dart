@@ -6,13 +6,13 @@ import '../../account/controller/user_profile_controller.dart';
 import '../../category/controller/category_controller.dart';
 import '../../chat/controller/booking_controller.dart';
 import '../../chat/controller/booking_delete_controller.dart';
+import '../../home/controller/home_screen_controller.dart';
+import '../../home/screen/home_screen.dart';
 import '../../location/controller/location_controller.dart';
 import '../../service/controller/service_list_controller.dart';
 import '../../skill/controller/service_delete_controller.dart';
 import '../../skill/controller/service_list_by_user_controller.dart';
 import '../../wishlist/controller/wishlist_toggle_controller.dart';
-import '../controller/home_screen_controller.dart';
-import '../screen/home_screen.dart';
 
 class DashboardBinding extends Bindings {
   @override

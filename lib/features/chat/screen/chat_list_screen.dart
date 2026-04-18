@@ -57,7 +57,15 @@ class _ChatListScreenState extends State<ChatListScreen> {
           ),
           actions: [
             if (showActionBar)
-            InkWell(
+            AppCard(
+              color: Colors.white.withOpacity(0.15),
+              borderRadius: context.sWidth*0.02,
+              padding: EdgeInsets.all( context.sWidth*0.018,),
+              child:  Icon(
+                Icons.delete,
+                color: Colors.white,
+                size: context.sWidth*0.05,
+              ),
               onTap: () async {
                 final confirm = await AppDialog.show(context,
                   title: "Delete Chat",
@@ -78,39 +86,20 @@ class _ChatListScreenState extends State<ChatListScreen> {
                   });
                 }
               },
-              child: Container(
-                width: 36,
-                height: 36,
-                margin: const EdgeInsets.only(right: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(
-                  Icons.delete,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
             ),
 
-            InkWell(
-              onTap: () => Get.to(() => NotificationScreen()),
-              child: Container(
-                width: 36,
-                height: 36,
-                margin: const EdgeInsets.only(right: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(
-                  Icons.notifications_none_rounded,
-                  color: Colors.white,
-                  size: 20,
-                ),
+            AppCard(
+              color: Colors.white.withOpacity(0.15),
+              borderRadius: context.sWidth*0.02,
+              padding: EdgeInsets.all( context.sWidth*0.018,),
+              child:  Icon(
+                Icons.notifications_none_rounded,
+                color: Colors.white,
+                size: context.sWidth*0.05,
               ),
+              onTap: () => Get.to(() => NotificationScreen()),
             ),
+            SizedBox(width: context.sWidth*0.02,)
           ],
         ),
 
@@ -208,7 +197,9 @@ class _ChatTabContent extends StatelessWidget {
 
     return ListView.builder(
       itemCount: list.length,
-      padding: const EdgeInsets.only(top: 20,bottom: 100),
+      padding: const EdgeInsets.only(
+          top: 20,bottom: 100
+      ),
       itemBuilder: (context, index) {
         final item = list[index];
 

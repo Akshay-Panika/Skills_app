@@ -7,8 +7,8 @@ import '../../account/screen/account_screen.dart';
 import '../../chat/screen/chat_list_screen.dart';
 import '../../home/controller/home_screen_controller.dart';
 import '../../home/screen/home_screen.dart';
-import '../../location/controller/location_controller.dart';
 import 'package:get/get.dart';
+import '../../location/controller/location_controller.dart';
 import '../../skill/screen/skill_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -20,8 +20,7 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
 
-  final LocationController _locationController = Get.put(LocationController(), permanent: true);
-  final ScrollStatusController _scrollStatusController = Get.put(ScrollStatusController(), permanent: true);
+  final _scrollStatusController = Get.put(ScrollStatusController(), permanent: true);
 
   int _currentIndex = 0;
 
@@ -30,6 +29,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final locationController = Get.find<LocationController>();
+
+      await locationController.requestLocationPermission();
+
+      print("Latitude: ${locationController.latitude.value}");
+      print("Longitude: ${locationController.longitude.value}");
+      print("City: ${locationController.city.value}");
+      print("State: ${locationController.state.value}");
+    });
+
     _screens = [
       HomeScreen(),
       ChatListScreen(),
@@ -37,9 +47,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       AccountScreen(),
     ];
 
-    if (!_locationController.isLocationLoaded.value) {
-      _locationController.fetchLocation();
-    }
   }
 
   Future<bool> _onWillPop() async {
@@ -72,10 +79,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   _scrollStatusController.status.value == "Scrolling Down";
 
               return Container(
-                height: context.sHeight * 0.09,
+                height: context.sHeight * 0.086,
                 color: Colors.transparent,
                 child: Row(
-                  spacing: 10,
+                  spacing: context.sWidth*0.02,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
@@ -86,15 +93,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             : Offset.zero,
                         child: Container(
                           decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.only(
-                              topRight: Radius.circular(10),
-                              bottomRight: Radius.circular(10),
+                            borderRadius:  BorderRadius.only(
+                              topRight: Radius.circular(context.sWidth*0.03),
+                              bottomRight: Radius.circular(context.sWidth*0.03),
                             ),
                             color: Colors.white,
                             border: Border.all(color: Colors.grey, width: 0.3),
                           ),
-                          padding: EdgeInsets.symmetric(
-                              vertical: context.sWidth * 0.01),
+                          padding: EdgeInsets.symmetric(vertical: context.sWidth * 0.01),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
@@ -116,8 +122,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       decoration:  BoxDecoration(
                         color: AppColor.primary,
                         borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(10),
-                          bottomLeft: Radius.circular(10),
+                          topLeft: Radius.circular(context.sWidth*0.03),
+                          bottomLeft: Radius.circular(context.sWidth*0.03),
                         ),
                       ),
                       child: IconButton(

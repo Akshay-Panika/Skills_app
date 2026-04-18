@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:skills_app/core/widget/app_card.dart';
 
 import '../../../core/constant/app_color.dart';
 import '../../../core/constant/app_size.dart';
@@ -9,14 +11,10 @@ class InviteFriendCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 10),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColor.primary,
-        borderRadius: BorderRadius.circular(16),
-      ),
-
+    return AppCard(
+      margin:  EdgeInsets.symmetric(horizontal: context.sWidth*0.03),
+      padding:  EdgeInsets.all(context.sWidth*0.02),
+      color: AppColor.primary,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -24,19 +22,16 @@ class InviteFriendCard extends StatelessWidget {
 
           Row(
             children: [
-              Container(
+              AppCard(
+                color: Colors.blueAccent.withOpacity(.15),
                 padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.blueAccent.withOpacity(.15),
-                  borderRadius: BorderRadius.circular(12),
-                ),
                 child: const Icon(
                   Icons.card_giftcard,
                   color: Colors.white,
                 ),
               ),
 
-              const SizedBox(width: 12),
+               SizedBox(width: context.sWidth*0.02),
 
               /// text
               Column(
@@ -44,13 +39,12 @@ class InviteFriendCard extends StatelessWidget {
                 children: [
                   Text(
                     "Invite Friends",
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       fontWeight: FontWeight.bold,
                       color: AppColor.white,
                       fontSize: context.text14,
                     ),
                   ),
-                  SizedBox(height: 4),
                   Text(
                     "Earn rewards by sharing",
                     style: TextStyle(
@@ -80,7 +74,7 @@ class InviteFriendCard extends StatelessWidget {
               ),
               child:  Text(
                 "Share",
-                style: TextStyle(
+                style: GoogleFonts.poppins(
                   fontSize: context.text12,
                   color: Colors.black87,
                   fontWeight: FontWeight.w600,

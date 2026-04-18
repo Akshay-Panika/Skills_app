@@ -19,6 +19,10 @@ class ServiceListRepository {
         throw Exception("User not logged in");
       }
 
+      if (!locationController.hasLocation) {
+        await locationController.requestLocationPermission();
+      }
+
       final double lat = locationController.latitude.value;
       final double log = locationController.longitude.value;
 

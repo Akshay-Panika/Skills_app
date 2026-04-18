@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:skills_app/core/widget/flutter_toast.dart';
@@ -72,7 +73,8 @@ class AuthController extends GetxController {
       int userId = res["data"]["id"];
       await AuthPreferences.setLogin(userId);
 
-      FlutterToast.success("Login Successful");
+      debugPrint("Login Successful");
+      // FlutterToast.success("Login Successful");
 
       return true;
 

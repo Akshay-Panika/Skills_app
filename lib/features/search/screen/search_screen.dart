@@ -331,32 +331,69 @@ class SearchScreen extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 12),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
       decoration: BoxDecoration(
-        border: Border.all(color: AppColor.primary, width: 0.3),
+        border: Border.all(
+          color: AppColor.primary,
+          width: 0.3,
+        ),
         borderRadius: BorderRadius.circular(6),
         color: AppColor.primary,
       ),
       child: Obx(() {
-        final isLoading = !_locationController.isLocationLoaded.value;
-        final locationText = isLoading ? 'Fetching location...' : '${_locationController.city.value}, ${_locationController.state.value}';
+        final isLoading = _locationController.isLoading.value;
+
+        final locationText = isLoading
+            ? 'Fetching location...'
+            : '${_locationController.city.value}, ${_locationController.state.value}';
+
         return Row(
           children: [
-            const Icon(Icons.location_on, color: AppColor.white, size: 18,),
+            const Icon(
+              Icons.location_on,
+              color: AppColor.white,
+              size: 18,
+            ),
             const SizedBox(width: 8),
-            Expanded(child: Text(locationText, style: GoogleFonts.poppins(fontSize: context.text12, color: AppColor.white, fontWeight: FontWeight.w500))),
+
+            Expanded(
+              child: Text(
+                locationText,
+                style: GoogleFonts.poppins(
+                  fontSize: context.text12,
+                  color: AppColor.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: InkWell(
-                  onTap: () => _locationController.fetchLocation(),
-                  child: isLoading
-                      ? const SizedBox(height: 22, width: 22, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3))
-                      : const FaIcon(FontAwesomeIcons.refresh, color: Colors.white, size: 22)),
+                onTap: () async {
+                  if (_locationController.isLoading.value) return;
+                  await _locationController.requestLocationPermission();
+                  await _serviceListController.fetchServiceList();
+                },
+                child: isLoading
+                    ? const SizedBox(
+                  height: 22,
+                  width: 22,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 3,
+                  ),
+                )
+                    : const FaIcon(
+                  FontAwesomeIcons.refresh,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
             ),
           ],
         );
       }),
     );
   }
-
   Widget _buildCategories(BuildContext context) {
     return Obx(() {
       if (_categoryController.isLoading.value || _categoryController.categoryList.isEmpty) return const SizedBox.shrink();

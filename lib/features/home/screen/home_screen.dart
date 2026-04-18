@@ -7,6 +7,7 @@ import 'package:skills_app/core/constant/app_size.dart';
 import 'package:skills_app/features/home/widget/category_card.dart';
 import '../../category/controller/category_controller.dart';
 import '../../location/controller/location_controller.dart';
+import '../../location/widget/location_card.dart';
 import '../../notification/screen/notification_screen.dart';
 import '../../search/screen/search_screen.dart';
 import '../../service/controller/service_list_controller.dart';
@@ -57,6 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+
     _scrollController.addListener(() {
       _homeController.isPinned.value = _scrollController.offset > (context.sWidth * 0.4);
 
@@ -92,6 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -141,10 +144,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                   children: [
                                     FaIcon(
                                       FontAwesomeIcons.locationDot,
-                                      size: 10,
+                                      size: context.sWidth*0.02,
                                       color: AppColor.white,
                                     ),
-                                    SizedBox(width: 6),
+                                    SizedBox(width: context.sWidth*0.01),
                                     Text(
                                       "Location",
                                       style: GoogleFonts.poppins(
@@ -157,7 +160,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 Row(
                                   spacing: 2,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
+                                    (_city.isNotEmpty || _state.isNotEmpty)?
                                     Text(
                                       "$_city, $_state",
                                       style: GoogleFonts.poppins(
@@ -165,7 +171,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         fontWeight: FontWeight.w500,
                                         color: AppColor.white,
                                       ),
-                                    ),
+                                    ):Text('')
                                   ],
                                 )
 
@@ -233,22 +239,22 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SearchScreen(),)),
                           child: Container(
                             height:  context.sWidth*0.09,
-                            padding: const EdgeInsets.symmetric(horizontal: 14),
+                            padding:  EdgeInsets.symmetric(horizontal: context.sWidth*0.02),
                             decoration: BoxDecoration(
                               color: AppColor.white,
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(context.sWidth*0.02),
                               border: Border.all(
                                 color: Colors.grey.withOpacity(.3),
                                 width: .5,
                               ),
                             ),
-                            child: const Row(
+                            child:  Row(
                               children: [
                                 Icon(Icons.search, color: Colors.grey),
-                                SizedBox(width: 10),
+                                SizedBox(width: context.sWidth*0.02),
                                 Text(
                                   "Search skills…",
-                                  style: TextStyle(color: Colors.grey),
+                                  style: GoogleFonts.poppins(color: Colors.grey,fontSize: context.text12),
                                 ),
                               ],
                             ),
@@ -262,15 +268,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           thumbIcon: MaterialStateProperty.resolveWith<Icon?>(
                                 (states) {
                               if (states.contains(MaterialState.selected)) {
-                                return const Icon(
+                                return  Icon(
                                   Icons.currency_rupee,
-                                  size: 16,
+                                  size: context.sWidth*0.04,
                                   color: Colors.white,
                                 );
                               }
-                              return const Icon(
+                              return  Icon(
                                 Icons.currency_rupee_outlined,
-                                size: 16,
+                                size: context.sWidth*0.04,
                                 color: Colors.white,
                               );
                             },
@@ -316,20 +322,21 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
 
                        if(_categoryController.categoryList.isNotEmpty)
-                        SizedBox(height: 16,),
+                        SizedBox(height: context.sHeight*0.012,),
 
                       if(_categoryController.categoryList.isNotEmpty)
-                        SizedBox(
-                          height: 215,
+                        Container(
+                          color: Colors.transparent,
+                          height: context.sWidth*0.54,
                           child: GridView.builder(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            padding: EdgeInsets.symmetric(horizontal: context.sWidth*0.03),
                             scrollDirection: Axis.horizontal,
                             itemCount: _categoryController.categoryList.length,
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            gridDelegate:  SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 2,
-                                mainAxisSpacing: 14,
-                                crossAxisSpacing: 14,
-                                mainAxisExtent:65
+                                mainAxisSpacing: context.sWidth*0.036,
+                                crossAxisSpacing: context.sWidth*0.02,
+                                mainAxisExtent:context.sWidth*0.16
                             ),
                             itemBuilder: (context, index) {
                               final category = _categoryController.categoryList[index];
@@ -368,6 +375,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
                SliverToBoxAdapter(
                 child: Obx(() {
+                  final _city = _locationController.city.value;
+                  final _state = _locationController.state.value;
+
                   if (_serviceListController.isLoading.value &&
                       _serviceListController.services.isEmpty) {
                     return Center(child: CircularProgressIndicator());
@@ -379,10 +389,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   }).toList();
 
                   if (nearby.isEmpty) {
-                    debugPrint("No services Near You");
                     return Padding(
-                      padding:  EdgeInsets.only(top: _categoryController.categoryList.isNotEmpty ?0:100),
-                      child: EmptyServiceWidget(),
+                      padding:  EdgeInsets.only(top: _categoryController.categoryList.isNotEmpty ?20:100),
+                      child: Column(
+                        children: [
+                          (_city.isNotEmpty || _state.isNotEmpty)?
+                          EmptyServiceWidget():LocationCard()
+                        ],
+                      ),
                     );
                   }
 
@@ -391,23 +405,19 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       GridView.builder(
                         shrinkWrap: true,
-                        padding: const EdgeInsets.symmetric(horizontal: 12,),
+                        padding:  EdgeInsets.symmetric(horizontal: context.sWidth*0.03,),
                         physics: NeverScrollableScrollPhysics(),
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                          childAspectRatio: 0.8,
+                          crossAxisSpacing: context.sWidth*0.02,
+                          mainAxisSpacing: context.sWidth*0.02,
+                          childAspectRatio: context.sWidth*0.002,
                           // crossAxisCount: nearbyServices.length,
                         ),
                         itemBuilder: (context, index) {
                           final service = nearby[index];
-                          return Container(
-                            height: 200,
-                            padding: EdgeInsets.only(bottom: 10),
-                            child: ServiceCard(
-                              service: service,
-                            ),
+                          return ServiceCard(
+                            service: service,
                           );
                         },
                         itemCount: nearby.length,
@@ -430,60 +440,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
 
-class EmptyServiceWidget extends StatelessWidget {
-  const EmptyServiceWidget({super.key,});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      child: Column(
-        children: [
-
-          /// Icon
-          Container(
-            height: 80,
-            width: 80,
-            decoration: BoxDecoration(
-              color: Colors.blueAccent.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.location_off,
-              size: 40,
-              color: Colors.green,
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          /// Title
-          const Text(
-            "No Services Nearby",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-
-          const SizedBox(height: 6),
-
-          /// Subtitle
-          Text(
-            "We couldn’t find any services within 10 km.\nTry changing location or check later.",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey.shade600,
-            ),
-          ),
-
-          const SizedBox(height: 14),
-        ],
-      ),
-    );
-  }
-}
 
 class _SliverSearchBarDelegate extends SliverPersistentHeaderDelegate {
   final Widget child;

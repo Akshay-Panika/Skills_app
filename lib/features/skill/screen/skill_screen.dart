@@ -91,6 +91,7 @@ class _AdsScreenState extends State<AdsScreen> {
           /// Top Row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -115,21 +116,17 @@ class _AdsScreenState extends State<AdsScreen> {
                   ),
                 ],
               ),
-              InkWell(
-                onTap: () => Get.to(() => NotificationScreen()),
-                child: Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(
-                    Icons.notifications_none_rounded,
-                    color: Colors.white,
-                    size: 20,
-                  ),
+              AppCard(
+                color: Colors.white.withOpacity(0.15),
+                borderRadius: context.sWidth*0.02,
+                padding: EdgeInsets.all( context.sWidth*0.018,),
+                margin: EdgeInsets.zero,
+                child:  Icon(
+                  Icons.notifications_none_rounded,
+                  color: Colors.white,
+                  size: context.sWidth*0.05,
                 ),
+                onTap: () => Get.to(() => NotificationScreen()),
               ),
             ],
           ),

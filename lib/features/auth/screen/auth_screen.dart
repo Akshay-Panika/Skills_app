@@ -6,6 +6,7 @@ import 'package:sms_autofill/sms_autofill.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/constant/app_size.dart';
 import 'package:skills_app/core/widget/app_button.dart';
+import '../../location/controller/location_controller.dart';
 import '../controller/auth_controller.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -68,6 +69,8 @@ class _AuthScreenState extends State<AuthScreen> {
     return otpControllers.map((e) => e.text).join();
   }
   void verifyOtpAuto() async {
+    final locationController = Get.find<LocationController>();
+
     String otp = getOtp();
 
     if (otp.length == 6) {
@@ -77,7 +80,13 @@ class _AuthScreenState extends State<AuthScreen> {
       );
 
       if (success) {
-        Get.offAllNamed('/dashboard');
+        if (locationController.hasLocation &&
+            locationController.city.value.isNotEmpty &&
+            locationController.state.value.isNotEmpty) {
+          Get.offAllNamed('/dashboard');
+        } else {
+          Get.offAllNamed('/location');
+        }
       }
     }
   }

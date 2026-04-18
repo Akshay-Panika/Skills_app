@@ -17,12 +17,12 @@ class CategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      spacing: 10,
+      spacing: context.sWidth*0.024,
       children: [
         AppCard(
           height: context.sHeight*0.07,
           width: double.infinity,
-          padding: EdgeInsets.all(12),
+          padding: EdgeInsets.all(context.sWidth*0.03),
           margin: EdgeInsets.zero,
           color: AppColor.surface,
           hasBorder: true,

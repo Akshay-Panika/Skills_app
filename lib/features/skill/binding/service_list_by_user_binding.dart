@@ -6,7 +6,7 @@ import '../controller/service_delete_controller.dart';
 class ServiceListByUserBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<ServiceListByUserController>(() => ServiceListByUserController(),fenix: true);
-    Get.lazyPut<ServiceDeleteController>(() => ServiceDeleteController(),fenix: true);
+    Get.lazyPut(()=> ServiceListByUserController(), fenix: true);
+    Get.lazyPut(()=> ServiceDeleteController(), fenix: true);
   }
 }

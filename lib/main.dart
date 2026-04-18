@@ -8,9 +8,7 @@ import 'features/location/controller/location_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  Get.put(LocationController(),permanent: true);
-  await Get.find<LocationController>().fetchLocation();
+  Get.put(LocationController(), permanent: true);
 
   await IntroPreferences.init();
   await AuthPreferences.init();

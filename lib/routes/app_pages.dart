@@ -13,8 +13,10 @@ import '../features/category/binding/category_binding.dart';
 import '../features/category/screen/category_screen.dart';
 import '../features/chat/binding/chat_binding.dart';
 import '../features/chat/screen/chat_screen.dart';
+import '../features/dashboard/binding/dashboard_binding.dart';
 import '../features/dashboard/screen/dashboard_screen.dart';
-import '../features/home/binding/dashboard_binding.dart';
+import '../features/location/binfing/location_binding.dart';
+import '../features/location/screen/location_permission_screen.dart';
 import '../features/service/binding/service_details_binding.dart';
 import '../features/service/screen/service_details_screen.dart';
 import '../features/wishlist/binding/wishlist_binding.dart';
@@ -30,6 +32,12 @@ class AppPages {
       name: '/auth',
       page: () => AuthScreen(),
       binding: AuthBinding()
+    ),
+
+    GetPage(
+        name: '/location',
+        page: () => LocationPermissionScreen(),
+        binding: LocationBinding()
     ),
 
     GetPage(
