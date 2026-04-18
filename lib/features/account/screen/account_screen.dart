@@ -153,9 +153,9 @@ class _AccountScreenState extends State<AccountScreen> {
         )),
         AppCard(
           color: AppColor.white,
-          padding: EdgeInsets.all(16),
+          padding: EdgeInsets.all(context.width*0.03),
           margin: EdgeInsets.only(
-            left: 16,right: 16,top: 16
+            left: context.width*0.06,right: context.width*0.06,top: context.width*0.02
           ),
           child: Obx(() {
             final loading = userProfileController.isLoading.value;
@@ -176,7 +176,7 @@ class _AccountScreenState extends State<AccountScreen> {
     return Column(
       children: [
         CircleAvatar(
-          radius: context.sHeight * 0.04,
+          radius: context.sWidth * 0.09,
           backgroundColor: AppColor.primary,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(100),
@@ -202,7 +202,7 @@ class _AccountScreenState extends State<AccountScreen> {
             ),
           ),
         ),
-        const SizedBox(height: 10),
+         SizedBox(height: context.width*0.03),
         isLoading
             ? AppCard(height: 12, width: 100, color: Colors.grey.shade300, margin: EdgeInsets.zero,padding: EdgeInsets.zero,)
             : Text(
@@ -215,7 +215,7 @@ class _AccountScreenState extends State<AccountScreen> {
             color: AppColor.title,
           ),
         ),
-        const SizedBox(height: 3),
+         SizedBox(height: context.width*0.01),
 
         isLoading
             ? AppCard(height: 10, width: 150, color: Colors.grey.shade300, margin: EdgeInsets.zero,padding: EdgeInsets.zero,)
@@ -230,7 +230,7 @@ class _AccountScreenState extends State<AccountScreen> {
           ),
         ),
 
-        const SizedBox(height: 16),
+         SizedBox(height: context.width*0.03),
 
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -248,11 +248,11 @@ class _AccountScreenState extends State<AccountScreen> {
               color: AppColor.primary,
               margin: EdgeInsets.zero,
               borderRadius: 10,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+              padding:  EdgeInsets.symmetric(horizontal: context.width*0.03, vertical: context.width*0.01),
               child: Row(
                 children: [
-                  const Icon(Icons.edit, size: 18, color: Colors.white),
-                  const SizedBox(width: 6),
+                   Icon(Icons.edit, size: context.width*0.04, color: Colors.white),
+                   SizedBox(width: context.width*0.01),
                   Text(
                     "Edit",
                     style: GoogleFonts.poppins(
@@ -272,11 +272,11 @@ class _AccountScreenState extends State<AccountScreen> {
 
   Widget _sectionLabel(BuildContext context,String text) {
     return Row(
-      spacing: 10,
+      spacing: context.width*0.02,
       children: [
         Container(
-          width: 4,
-          height: 16,
+          width: context.width*0.01,
+          height: context.width*0.03,
           decoration: BoxDecoration(
             color: AppColor.primary,
             borderRadius: BorderRadius.circular(4),
@@ -288,7 +288,7 @@ class _AccountScreenState extends State<AccountScreen> {
           style:  GoogleFonts.poppins(
             fontWeight: FontWeight.w500,
             fontSize: context.text14,
-            color: AppColor.primary,
+            color: AppColor.title,
           ),
         ),
       ],
@@ -336,19 +336,19 @@ class _MenuTile extends StatelessWidget {
 
     return AppCard(
       onTap: onTap,
-      margin: EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      margin: EdgeInsets.only(bottom: context.width*0.02),
+      padding:  EdgeInsets.symmetric(horizontal: context.width*0.02, vertical: context.width*0.02),
       child: Row(
         spacing: 10,
         children: [
           Container(
-            width: context.sHeight*0.06,
-            height: context.sHeight*0.06,
+            width: context.sWidth*0.12,
+            height: context.sWidth*0.12,
             decoration: BoxDecoration(
               color: iconBg,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(context.width*0.03),
             ),
-            child: Icon(icon, color: iconColor, size: context.sHeight*0.025),
+            child: Icon(icon, color: iconColor, size: context.sWidth*0.06),
           ),
 
           Expanded(

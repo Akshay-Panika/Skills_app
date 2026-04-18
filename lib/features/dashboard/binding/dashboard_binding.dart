@@ -18,10 +18,8 @@ class DashboardBinding extends Bindings {
   @override
   void dependencies() {
     Get.lazyPut(()=> LocationController(), fenix: true);
-    Get.lazyPut(()=> ScrollStatusController(), fenix: true);
     Get.lazyPut(()=> CategoryController(), fenix: true);
     Get.lazyPut(()=> ServiceListController(), fenix: true);
-    Get.lazyPut(()=> HomeScreenController(), fenix: true);
     Get.lazyPut(()=> ServiceDeleteController(), fenix: true);
     Get.lazyPut(()=> WishlistToggleController(), fenix: true);
     Get.lazyPut(()=> BookingController(), fenix: true);

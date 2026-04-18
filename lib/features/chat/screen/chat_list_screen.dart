@@ -122,7 +122,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
                 }
 
                 return TabBarView(
-                  children: [_ChatTabContent(
+                  children: [
+                    _ChatTabContent(
                     list: bookingController.allChats,
                     selectedIds: selectedIds,
                     toggleSelection: toggleSelection,
@@ -140,9 +141,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
                       toggleSelection: toggleSelection,
                       showActionBar: showActionBar,
                     ),
-                    // _ChatTabContent(list: bookingController.allChats),
-                    // _ChatTabContent(list: bookingController.buyerBookings),
-                    // _ChatTabContent(list: bookingController.sellerBookings),
                   ],
                 );
 
@@ -197,8 +195,8 @@ class _ChatTabContent extends StatelessWidget {
 
     return ListView.builder(
       itemCount: list.length,
-      padding: const EdgeInsets.only(
-          top: 20,bottom: 100
+      padding:  EdgeInsets.only(
+          top: context.sWidth*0.04,bottom: context.sHeight*0.1
       ),
       itemBuilder: (context, index) {
         final item = list[index];
@@ -247,8 +245,8 @@ class ChatSkillCard extends StatelessWidget {
       child: Stack(
         children: [
           AppCard(
-            margin: const EdgeInsets.only(bottom: 10, left: 12, right: 12),
-            padding: EdgeInsets.all(12),
+            margin:  EdgeInsets.only(bottom: context.sWidth*0.02, left: context.sWidth*0.03, right: context.sWidth*0.03),
+            padding: EdgeInsets.all(context.sWidth*0.02),
             color: Colors.white,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -257,7 +255,7 @@ class ChatSkillCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CircleAvatar(
-                      radius: context.sHeight*0.034,
+                      radius: context.sWidth*0.08,
                       backgroundColor: AppColor.white,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(context.sHeight*0.036,),

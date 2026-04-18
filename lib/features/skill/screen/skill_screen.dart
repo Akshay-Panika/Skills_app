@@ -161,17 +161,19 @@ class _AdsScreenState extends State<AdsScreen> {
         margin: EdgeInsets.zero,
         padding: EdgeInsets.all(12),
         color: Colors.white.withOpacity(0.07),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
+          spacing: context.sWidth*0.02,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(label,
                 style:
-                GoogleFonts.poppins(color: Colors.white, fontSize: context.text14)),
-            const SizedBox(height: 4),
+                GoogleFonts.poppins(color: Colors.white, fontSize: context.text14,fontWeight: FontWeight.w500)),
+
             Text(value,
                 style: GoogleFonts.poppins(
                     color: Colors.white,
-                    fontSize: context.text18,
+                    fontSize: context.text14,
                     fontWeight: FontWeight.w500)),
           ],
         ),
@@ -296,11 +298,10 @@ class _AdsScreenState extends State<AdsScreen> {
           return ListView.builder(
             key: PageStorageKey(pageIndex),
             controller: _scrollControllers[pageIndex],
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+            padding:  EdgeInsets.symmetric(horizontal: context.sWidth*0.03, vertical: context.sWidth*0.03,),
             itemCount: filteredList.length,
             itemBuilder: (context, index) {
               final list = filteredList[index];
-
               return Padding(
                 padding:  EdgeInsets.only(
                   bottom: index == filteredList.length - 1 ? context.sWidth*0.2 : 0,
@@ -420,14 +421,14 @@ class SkillCard extends StatelessWidget {
       child: Stack(
         children: [
           AppCard(
-            margin:  EdgeInsets.only(bottom: 10),
-            padding: const EdgeInsets.all(12),
+            margin:  EdgeInsets.only(bottom: context.sWidth*0.02,),
+            padding: EdgeInsets.all(context.sWidth*0.02, ),
             child: Row(
-              spacing: 10,
+              spacing: context.sWidth*0.03,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(context.sWidth*0.03),
                   child: CachedNetworkImage(
                     imageUrl: list.serviceImage,
                     fit: BoxFit.cover,
@@ -439,7 +440,7 @@ class SkillCard extends StatelessWidget {
                       child: FaIcon(
                         FontAwesomeIcons.chalkboardTeacher,
                         color: Colors.grey[400],
-                        size: 25,
+                        size: context.sWidth*0.06,
                       ),
                     ),
                     errorWidget: (context, url, error) => Container(

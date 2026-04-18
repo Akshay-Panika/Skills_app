@@ -5,10 +5,8 @@ import 'package:skills_app/core/constant/app_size.dart';
 import '../../../core/widget/app_dilog.dart';
 import '../../account/screen/account_screen.dart';
 import '../../chat/screen/chat_list_screen.dart';
-import '../../home/controller/home_screen_controller.dart';
 import '../../home/screen/home_screen.dart';
 import 'package:get/get.dart';
-import '../../location/controller/location_controller.dart';
 import '../../skill/screen/skill_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -20,7 +18,6 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
 
-  final _scrollStatusController = Get.put(ScrollStatusController(), permanent: true);
 
   int _currentIndex = 0;
 
@@ -29,17 +26,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final locationController = Get.find<LocationController>();
-
-      await locationController.requestLocationPermission();
-
-      print("Latitude: ${locationController.latitude.value}");
-      print("Longitude: ${locationController.longitude.value}");
-      print("City: ${locationController.city.value}");
-      print("State: ${locationController.state.value}");
-    });
-
     _screens = [
       HomeScreen(),
       ChatListScreen(),
@@ -74,68 +60,57 @@ class _DashboardScreenState extends State<DashboardScreen> {
           alignment: Alignment.bottomCenter,
           children: [
             _screens[_currentIndex],
-            Obx(() {
-              bool isScrollingDown =
-                  _scrollStatusController.status.value == "Scrolling Down";
-
-              return Container(
-                height: context.sHeight * 0.086,
-                color: Colors.transparent,
-                child: Row(
-                  spacing: context.sWidth*0.02,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: AnimatedSlide(
-                        duration: const Duration(milliseconds: 300),
-                        offset: isScrollingDown
-                            ? const Offset(0, 1.5)
-                            : Offset.zero,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius:  BorderRadius.only(
-                              topRight: Radius.circular(context.sWidth*0.03),
-                              bottomRight: Radius.circular(context.sWidth*0.03),
-                            ),
-                            color: Colors.white,
-                            border: Border.all(color: Colors.grey, width: 0.3),
-                          ),
-                          padding: EdgeInsets.symmetric(vertical: context.sWidth * 0.01),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              _navIcon(FontAwesomeIcons.home, 0),
-                              _navIcon(FontAwesomeIcons.comment, 1),
-                              _navIcon(FontAwesomeIcons.chalkboardTeacher, 2),
-                              _navIcon(FontAwesomeIcons.user, 3),
-                            ],
-                          ),
+            Container(
+              height: context.sHeight * 0.086,
+              color: Colors.transparent,
+              child: Row(
+                spacing: context.sWidth*0.02,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child:  Container(
+                      decoration: BoxDecoration(
+                        borderRadius:  BorderRadius.only(
+                          topRight: Radius.circular(context.sWidth*0.03),
+                          bottomRight: Radius.circular(context.sWidth*0.03),
                         ),
+                        color: Colors.white,
+                        border: Border.all(color: Colors.grey, width: 0.3),
+                      ),
+                      padding: EdgeInsets.symmetric(vertical: context.sWidth * 0.01),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _navIcon(FontAwesomeIcons.home, 0),
+                          _navIcon(FontAwesomeIcons.comment, 1),
+                          _navIcon(FontAwesomeIcons.chalkboardTeacher, 2),
+                          _navIcon(FontAwesomeIcons.user, 3),
+                        ],
                       ),
                     ),
-                    Container(
-                      padding: EdgeInsets.only(
-                          left: context.sWidth * 0.03,
-                          right: context.sWidth * 0.03,
-                          top: context.sWidth * 0.01,
-                          bottom: context.sWidth * 0.01),
-                      decoration:  BoxDecoration(
-                        color: AppColor.primary,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(context.sWidth*0.03),
-                          bottomLeft: Radius.circular(context.sWidth*0.03),
-                        ),
-                      ),
-                      child: IconButton(
-                        onPressed: () => Get.toNamed('/add-skill'),
-                        icon: const FaIcon(FontAwesomeIcons.plus,
-                            color: Colors.white),
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(
+                        left: context.sWidth * 0.03,
+                        right: context.sWidth * 0.03,
+                        top: context.sWidth * 0.01,
+                        bottom: context.sWidth * 0.01),
+                    decoration:  BoxDecoration(
+                      color: AppColor.primary,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(context.sWidth*0.03),
+                        bottomLeft: Radius.circular(context.sWidth*0.03),
                       ),
                     ),
-                  ],
-                ),
-              );
-            }),
+                    child: IconButton(
+                      onPressed: () => Get.toNamed('/add-skill'),
+                      icon: const FaIcon(FontAwesomeIcons.plus,
+                          color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            )
           ],
         ),
       ),
