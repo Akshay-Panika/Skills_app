@@ -1,6 +1,6 @@
 class ServiceListByUserModel {
   final int count;
-  final List<Service> services;
+  final List<ServiceModel> services;
 
   ServiceListByUserModel({
     required this.count,
@@ -11,61 +11,191 @@ class ServiceListByUserModel {
     return ServiceListByUserModel(
       count: json['count'] ?? 0,
       services: (json['services'] as List? ?? [])
-          .map((e) => Service.fromJson(e))
+          .map((e) => ServiceModel.fromJson(e))
           .toList(),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "count": count,
+      "services": services.map((e) => e.toJson()).toList(),
+    };
+  }
 }
 
-class Service {
+class ServiceModel {
   final int id;
   final String serviceImage;
   final String? serviceAmount;
+  final bool swipeStatus;
+  final bool isFavorite;
+
   final String serviceName;
   final bool serviceStatus;
   final String serviceDescription;
-  final String createdAt;
-  final String updatedAt;
-  final int category;
-  final int subcategory;
+
+  final double? latitude;
+  final double? longitude;
+
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+
+  final CategoryModel? category;
+  final SubcategoryModel? subcategory;
+
   final UserProfileModel? userProfile;
 
+  final String? distance;
 
-  Service({
+  ServiceModel({
     required this.id,
     required this.serviceImage,
-    required this.serviceAmount,
+    this.serviceAmount,
+    required this.swipeStatus,
+    required this.isFavorite,
     required this.serviceName,
     required this.serviceStatus,
     required this.serviceDescription,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.category,
-    required this.subcategory,
+    this.latitude,
+    this.longitude,
+    this.createdAt,
+    this.updatedAt,
+    this.category,
+    this.subcategory,
     this.userProfile,
-
+    this.distance,
   });
 
-  factory Service.fromJson(Map<String, dynamic> json) {
-    return Service(
+  factory ServiceModel.fromJson(Map<String, dynamic> json) {
+    return ServiceModel(
       id: json['id'] ?? 0,
       serviceImage: json['service_image'] ?? "",
-      serviceAmount: json['service_amount'] != null
-          ? json['service_amount'].toString()
-          : null,
+      serviceAmount: json['service_amount']?.toString(),
+
+      swipeStatus: json['swipe_status'] ?? false,
+      isFavorite: json['is_favorite'] ?? false,
+
       serviceName: json['service_name'] ?? "",
       serviceStatus: json['service_status'] ?? false,
       serviceDescription: json['service_description'] ?? "",
-      createdAt: json['created_at'] ?? "",
-      updatedAt: json['updated_at'] ?? "",
-      category: json['category'] ?? 0,
-      subcategory: json['subcategory'] ?? 0,
+
+      latitude: json['latitude'] != null
+          ? (json['latitude'] as num).toDouble()
+          : null,
+
+      longitude: json['longitude'] != null
+          ? (json['longitude'] as num).toDouble()
+          : null,
+
+      createdAt: json['created_at'] != null
+          ? DateTime.tryParse(json['created_at'])
+          : null,
+
+      updatedAt: json['updated_at'] != null
+          ? DateTime.tryParse(json['updated_at'])
+          : null,
+
+      category: json['category'] != null
+          ? CategoryModel.fromJson(json['category'])
+          : null,
+
+      subcategory: json['subcategory'] != null
+          ? SubcategoryModel.fromJson(json['subcategory'])
+          : null,
+
       userProfile: json['user_profile'] != null
           ? UserProfileModel.fromJson(json['user_profile'])
           : null,
+
+      distance: json['distance']?.toString(),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "service_image": serviceImage,
+      "service_amount": serviceAmount,
+      "swipe_status": swipeStatus,
+      "is_favorite": isFavorite,
+      "service_name": serviceName,
+      "service_status": serviceStatus,
+      "service_description": serviceDescription,
+      "latitude": latitude,
+      "longitude": longitude,
+      "created_at": createdAt?.toIso8601String(),
+      "updated_at": updatedAt?.toIso8601String(),
+      "category": category?.toJson(),
+      "subcategory": subcategory?.toJson(),
+      "user_profile": userProfile?.toJson(),
+      "distance": distance,
+    };
+  }
 }
+class CategoryModel {
+  final int id;
+  final String categoryName;
+  final String categoryImage;
+
+  CategoryModel({
+    required this.id,
+    required this.categoryName,
+    required this.categoryImage,
+  });
+
+  factory CategoryModel.fromJson(Map<String, dynamic> json) {
+    return CategoryModel(
+      id: json['id'] ?? 0,
+      categoryName: json['category_name'] ?? "",
+      categoryImage: json['category_image'] ?? "",
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "category_name": categoryName,
+      "category_image": categoryImage,
+    };
+  }
+}
+class SubcategoryModel {
+  final int id;
+  final int category;
+  final String subcategoryName;
+  final String subcategoryImage;
+  final String categoryName;
+
+  SubcategoryModel({
+    required this.id,
+    required this.category,
+    required this.subcategoryName,
+    required this.subcategoryImage,
+    required this.categoryName,
+  });
+
+  factory SubcategoryModel.fromJson(Map<String, dynamic> json) {
+    return SubcategoryModel(
+      id: json['id'] ?? 0,
+      category: json['category'] ?? 0,
+      subcategoryName: json['subcategory_name'] ?? "",
+      subcategoryImage: json['subcategory_image'] ?? "",
+      categoryName: json['category_name'] ?? "",
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "category": category,
+      "subcategory_name": subcategoryName,
+      "subcategory_image": subcategoryImage,
+      "category_name": categoryName,
+    };
+  }
+}
+
 class UserProfileModel {
   final int id;
   final String userPhone;

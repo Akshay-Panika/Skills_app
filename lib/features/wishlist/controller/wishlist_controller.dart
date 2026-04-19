@@ -24,7 +24,7 @@ class WishlistController extends GetxController {
     try {
       isLoading.value = true;
       final response = await repository.getWishlist();
-      services.value = response.services;
+      services.value = response.favorites;
       count.value = response.count;
     } catch (e) {
       debugPrint('Wishlist Error ${e.toString()}');

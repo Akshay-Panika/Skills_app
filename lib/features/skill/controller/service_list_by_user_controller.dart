@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:get/get.dart';
 import '../../auth/helper/auth_preferences.dart';
 import '../model/service_list_by_user_model.dart';
@@ -9,7 +8,7 @@ class ServiceListByUserController extends GetxController {
 
 
   var isLoading = false.obs;
-  var serviceList = <Service>[].obs;
+  var serviceList = <ServiceModel>[].obs;
   var count = 0.obs;
   var errorMessage = "".obs;
 

@@ -1,25 +1,26 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/constant/app_size.dart';
-import 'package:skills_app/core/widget/app_card.dart';
+
 import '../../category/controller/category_controller.dart';
 import '../../home/widget/category_card.dart';
 import '../../home/widget/section_header.dart';
-import '../../home/widget/service_card.dart';
 import '../../location/controller/location_controller.dart';
 import '../../service/controller/service_list_controller.dart';
+import '../../service/widget/no_data.dart';
+import '../../wishlist/controller/wishlist_toggle_controller.dart';
+import '../controller/service_search_controller.dart';
 
 class SearchScreen extends StatelessWidget {
   SearchScreen({super.key});
 
   final _locationController = Get.find<LocationController>();
   final _categoryController = Get.find<CategoryController>();
-  final _serviceListController = Get.find<ServiceListController>();
-
+  final _searchController = Get.find<ServiceSearchController>();
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +30,7 @@ class SearchScreen extends StatelessWidget {
         children: [
           _buildHeader(context),
           SizedBox(height: context.sHeight * 0.01),
+
           Expanded(
             child: SingleChildScrollView(
               child: Column(
@@ -36,14 +38,21 @@ class SearchScreen extends StatelessWidget {
                 children: [
                   _buildLocationBar(context),
 
+                  /// Search empty -> Categories show
                   Obx(() {
+                    final isSearchEmpty =
+                        _searchController.searchText.value.trim().isEmpty;
+
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildCategories(context),
-                        SizedBox(height: context.sHeight * 0.02),
-                        _buildNearbyDefaultSection(context),
-                        SizedBox(height: context.sHeight * 0.03),
+                        if (isSearchEmpty) ...[
+                          _buildCategories(context),
+                          SizedBox(height: context.sHeight * 0.02),
+                        ],
+
+                        /// Search Results
+                        _buildSearchResults(context),
                       ],
                     );
                   }),
@@ -61,49 +70,125 @@ class SearchScreen extends StatelessWidget {
       color: AppColor.primary,
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).padding.top + 8,
-        bottom: 14, left: 12, right: 12,
+        bottom: 14,
+        left: 12,
+        right: 12,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              FaIcon(FontAwesomeIcons.chalkboardTeacher, color: AppColor.white, size: 18,),
+              FaIcon(
+                FontAwesomeIcons.chalkboardTeacher,
+                color: AppColor.white,
+                size: 18,
+              ),
               const SizedBox(width: 8),
-              Text('Skill Daan', style: GoogleFonts.poppins(color: AppColor.white, fontSize: context.text14, fontWeight: FontWeight.w600)),
+              Text(
+                'Skill Daan',
+                style: GoogleFonts.poppins(
+                  color: AppColor.white,
+                  fontSize: context.text14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ],
           ),
+
           SizedBox(height: context.sHeight * 0.01),
+
           Row(
             children: [
-              IconButton(onPressed: () => Get.back(), icon: const Icon(Icons.arrow_back, color: AppColor.white)),
+              IconButton(
+                onPressed: () => Get.back(),
+                icon: const Icon(
+                  Icons.arrow_back,
+                  color: AppColor.white,
+                ),
+              ),
+
               Expanded(
                 child: Container(
                   height: context.sHeight * 0.04,
-                  decoration: BoxDecoration(color: AppColor.white, borderRadius: BorderRadius.circular(10)),
-                  child: Row(
-                    children: [
-                      const SizedBox(width: 10),
-                       FaIcon(FontAwesomeIcons.search, color: Colors.grey, size: 16),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: TextField(
-                          style: TextStyle(fontSize: context.text12, color: AppColor.subtitle),
-                          decoration: InputDecoration(
-                            hintText: 'Find Courses, Skills, Tutors...',
-                            hintStyle: TextStyle(fontSize: context.text12, color: AppColor.subtitle),
-                            border: InputBorder.none,
-                            isDense: true,
-                            contentPadding: EdgeInsets.zero,
+                  decoration: BoxDecoration(
+                    color: AppColor.white,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Obx(() {
+                    return Row(
+                      children: [
+                        const SizedBox(width: 10),
+
+                        FaIcon(
+                          FontAwesomeIcons.search,
+                          color: Colors.grey,
+                          size: 16,
+                        ),
+
+                        const SizedBox(width: 8),
+
+                        Expanded(
+                          child: TextField(
+                            controller:
+                            _searchController.searchController,
+
+                            /// API only when keyboard search pressed
+                            onSubmitted: (value) {
+                              _searchController.searchText.value =
+                                  value.trim();
+
+                              _searchController.searchServices();
+                            },
+
+                            textInputAction:
+                            TextInputAction.search,
+
+                            style: TextStyle(
+                              fontSize: context.text12,
+                              color: AppColor.subtitle,
+                            ),
+
+                            decoration: InputDecoration(
+                              hintText:
+                              'Find Courses, Skills, Tutors...',
+                              hintStyle: TextStyle(
+                                fontSize: context.text12,
+                                color: AppColor.subtitle,
+                              ),
+                              border: InputBorder.none,
+                              isDense: true,
+                              contentPadding: EdgeInsets.zero,
+                            ),
                           ),
                         ),
-                      ),
-                      // Icon(Icons.mic, color: Colors.grey,),
-                      const SizedBox(width: 10),
-                    ],
-                  ),
+
+                        if (_searchController
+                            .searchText.value.isNotEmpty)
+                          IconButton(
+                            onPressed: () {
+                              _searchController
+                                  .searchController
+                                  .clear();
+
+                              _searchController
+                                  .searchText
+                                  .value = '';
+
+                              _searchController
+                                  .serviceList
+                                  .clear();
+                            },
+                            icon: const Icon(Icons.close),
+                          ),
+
+                        const SizedBox(width: 10),
+                      ],
+                    );
+                  }),
                 ),
               ),
+
               const SizedBox(width: 10),
             ],
           ),
@@ -112,57 +197,148 @@ class SearchScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildSearchResults(BuildContext context) {
+    return Obx(() {
+      final controller = Get.find<WishlistToggleController>();
 
-  Widget _buildNearbyDefaultSection(BuildContext context) {
-    final lat = _locationController.latitude.value;
-    final lon = _locationController.longitude.value;
-    final services = _serviceListController.services;
+      final isSearchEmpty = _searchController.searchText.value.trim().isEmpty;
 
-    final nearby = services.where((s) {
-      if (s.latitude == null || s.longitude == null) return false;
-      return (Geolocator.distanceBetween(lat, lon, s.latitude!, s.longitude!) / 1000) <= 20;
-    }).toList();
+      if (isSearchEmpty) {
+        return const SizedBox();
+      }
 
-    if (nearby.isEmpty) return const SizedBox.shrink();
+      if (_searchController.isLoading.value) {
+        return  Padding(
+          padding:  EdgeInsets.only(top:context.sWidth*0.6),
+          child: Center(
+            child: CircularProgressIndicator(color: AppColor.primary,),
+          ),
+        );
+      }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SectionHeader(
-              title: "Resent View",
-              onTap: () {
+      if (_searchController.serviceList.isEmpty) {
+        return Padding(
+          padding:  EdgeInsets.only(top:context.sWidth*0.5),
+          child: NoData(),
+        );
+      }
 
-              },
-            ),
-            const SizedBox(height: 4),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text('Based on your learning interests',
-                  style: TextStyle(fontSize: context.text12, color: AppColor.title)),
-            ),
-          ],
+      return GridView.builder(
+        itemCount: _searchController.serviceList.length,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        gridDelegate:  SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: context.sWidth * 0.02,
+          mainAxisSpacing: context.sWidth * 0.02,
+          childAspectRatio: context.sWidth * 0.002,
         ),
-        SizedBox(height: context.sHeight * 0.014),
-
-        GridView.builder(
-          shrinkWrap: true,
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, crossAxisSpacing: 10, mainAxisSpacing: 10, childAspectRatio: 0.8),
-          itemCount: nearby.length,
-          itemBuilder: (context, index) {
-            final service = nearby[index];
-            return ServiceCard(
-              service: service,
-            );
-          },
-        ),
-      ],
-    );
+        itemBuilder: (context, index) {
+          final service = _searchController.serviceList[index];
+          return InkWell(
+            onTap: () {
+              Get.toNamed('/service-details', parameters: {
+                'id': service.id.toString(),
+              });
+            },
+            child: Container(
+              width: context.sWidth*0.48,
+              decoration: BoxDecoration(
+                color: AppColor.surface,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: Colors.grey.shade100, width: .5),
+              ),
+              child: Stack(
+                alignment: Alignment.topRight,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+                          child: CachedNetworkImage(
+                            imageUrl: service.serviceImage,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
+                            placeholder: (context, url) => Container(
+                              color: Colors.grey[100],
+                              alignment: Alignment.center,
+                              child: FaIcon(
+                                FontAwesomeIcons.chalkboardTeacher,
+                                color: Colors.grey[400],
+                                size: 40,
+                              ),
+                            ),
+                            errorWidget: (context, url, error) => Container(
+                              color: Colors.grey[200],
+                              child: const Icon(Icons.broken_image_outlined, color: Colors.grey, size: 40),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          spacing: 6,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(service.serviceName, style:  GoogleFonts.poppins(fontSize: context.text12,fontWeight: FontWeight.w500, color: AppColor.title)),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                    service.serviceAmount != null
+                                        ? "₹${double.tryParse(service.serviceAmount!)?.toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '') ?? service.serviceAmount!}"
+                                        : "Free",
+                                    style:  GoogleFonts.poppins(fontWeight: FontWeight.w600,fontSize: context.text12)),
+                                Row(
+                                  children:  [
+                                    Icon(Icons.location_on, size: 12, color: Colors.green),
+                                    Text(service.distance ?? "0 m", style: GoogleFonts.poppins(fontSize: context.text12, color: Colors.black87),),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                  Positioned(
+                    top: -2,
+                    right: -2,
+                    child: InkWell(
+                      onTap: () async {
+                        await controller.toggleWishlist(serviceId: service.id,);
+                        Get.find<ServiceListController>().toggleLocalFavorite(service.id);
+                        _searchController.toggleLocalFavorite(service.id);
+                      },
+                      child: CircleAvatar(
+                        radius: 18,
+                        backgroundColor: Colors.white,
+                        child: Icon(
+                          service.isFavorite
+                              ? Icons.bookmark
+                              : Icons.bookmark_border,
+                          color: service.isFavorite
+                              ? AppColor.primary
+                              : Colors.grey,
+                          size: 25,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    });
   }
 
   Widget _buildLocationBar(BuildContext context) {
@@ -210,7 +386,7 @@ class SearchScreen extends StatelessWidget {
                 onTap: () async {
                   if (_locationController.isLoading.value) return;
                   await _locationController.requestLocationPermission();
-                  await _serviceListController.fetchServiceList();
+                  // await _serviceListController.fetchServiceList();
                 },
                 child: isLoading
                     ? const SizedBox(
@@ -233,29 +409,47 @@ class SearchScreen extends StatelessWidget {
       }),
     );
   }
+
   Widget _buildCategories(BuildContext context) {
     return Obx(() {
-      if (_categoryController.isLoading.value || _categoryController.categoryList.isEmpty) return const SizedBox.shrink();
+      if (_categoryController.isLoading.value ||
+          _categoryController.categoryList.isEmpty) {
+        return const SizedBox.shrink();
+      }
+
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: context.sHeight * 0.02),
+          SizedBox(height: context.sHeight * 0.03),
+
           SectionHeader(
             title: "Popular Skills",
             onTap: () {
-
+              Get.toNamed('/category', parameters: {
+                'id':_categoryController.categoryList.first.id.toString(),
+                'name': _categoryController.categoryList.first.categoryName.toString(),
+              });
             },
           ),
-          SizedBox(height: context.sHeight * 0.014),
-          SizedBox(
-            height: context.sHeight * 0.25,
+          SizedBox(height: context.sHeight*0.012,),
+          Container(
+            color: Colors.transparent,
+            height: context.sWidth*0.54,
             child: GridView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
+              padding: EdgeInsets.symmetric(horizontal: context.sWidth*0.03),
               scrollDirection: Axis.horizontal,
               itemCount: _categoryController.categoryList.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, mainAxisSpacing: 14, crossAxisSpacing: 14, mainAxisExtent: 65),
-              itemBuilder: (context, index) => CategoryCard(category: _categoryController.categoryList[index]),
+              gridDelegate:  SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: context.sWidth*0.036,
+                  crossAxisSpacing: context.sWidth*0.02,
+                  mainAxisExtent:context.sWidth*0.16
+              ),
+              itemBuilder: (context, index) {
+                final category = _categoryController.categoryList[index];
+
+                return CategoryCard( category: category,);
+              },
             ),
           ),
         ],

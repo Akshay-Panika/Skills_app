@@ -183,7 +183,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Expanded(
                         child: InkWell(
-                          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SearchScreen(),)),
+                          onTap: () => Get.toNamed('/search'),
                           child: Container(
                             height:  context.sWidth*0.09,
                             padding:  EdgeInsets.symmetric(horizontal: context.sWidth*0.02),

@@ -101,17 +101,18 @@ class ServiceModel {
   final String serviceImage;
   final String serviceDescription;
 
-  final double latitude;
-  final double longitude;
+  final double? latitude;
+  final double? longitude;
 
-  final String createdAt;
-  final String updatedAt;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   final UserProfileModel? userProfile;
-  final int category;
-  final int subcategory;
 
-  final dynamic serviceAmount;
+  final CategoryModel? category;
+  final SubcategoryModel? subcategory;
+
+  final String? serviceAmount;
   final bool swipeStatus;
   final bool isFavorite;
   final bool serviceStatus;
@@ -121,14 +122,14 @@ class ServiceModel {
     required this.serviceName,
     required this.serviceImage,
     required this.serviceDescription,
-    required this.latitude,
-    required this.longitude,
-    required this.createdAt,
-    required this.updatedAt,
+    this.latitude,
+    this.longitude,
+    this.createdAt,
+    this.updatedAt,
     this.userProfile,
-    required this.category,
-    required this.subcategory,
-    required this.serviceAmount,
+    this.category,
+    this.subcategory,
+    this.serviceAmount,
     required this.swipeStatus,
     required this.isFavorite,
     required this.serviceStatus,
@@ -141,23 +142,122 @@ class ServiceModel {
       serviceImage: json["service_image"] ?? "",
       serviceDescription: json["service_description"] ?? "",
 
-      latitude: (json["latitude"] ?? 0).toDouble(),
-      longitude: (json["longitude"] ?? 0).toDouble(),
+      latitude: json["latitude"] != null
+          ? (json["latitude"] as num).toDouble()
+          : null,
 
-      createdAt: json["created_at"] ?? "",
-      updatedAt: json["updated_at"] ?? "",
+      longitude: json["longitude"] != null
+          ? (json["longitude"] as num).toDouble()
+          : null,
+
+      createdAt: json["created_at"] != null
+          ? DateTime.tryParse(json["created_at"])
+          : null,
+
+      updatedAt: json["updated_at"] != null
+          ? DateTime.tryParse(json["updated_at"])
+          : null,
 
       userProfile: json['user_profile'] != null
           ? UserProfileModel.fromJson(json['user_profile'])
           : null,
-      category: json["category"] ?? 0,
-      subcategory: json["subcategory"] ?? 0,
 
-      serviceAmount: json["service_amount"],
+      category: json['category'] != null
+          ? CategoryModel.fromJson(json['category'])
+          : null,
+
+      subcategory: json['subcategory'] != null
+          ? SubcategoryModel.fromJson(json['subcategory'])
+          : null,
+
+      serviceAmount: json["service_amount"]?.toString(),
       swipeStatus: json["swipe_status"] ?? false,
       isFavorite: json["is_favorite"] ?? false,
       serviceStatus: json["service_status"] ?? false,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "service_name": serviceName,
+      "service_image": serviceImage,
+      "service_description": serviceDescription,
+      "latitude": latitude,
+      "longitude": longitude,
+      "created_at": createdAt?.toIso8601String(),
+      "updated_at": updatedAt?.toIso8601String(),
+      "user_profile": userProfile?.toJson(),
+      "category": category?.toJson(),
+      "subcategory": subcategory?.toJson(),
+      "service_amount": serviceAmount,
+      "swipe_status": swipeStatus,
+      "is_favorite": isFavorite,
+      "service_status": serviceStatus,
+    };
+  }
+}
+
+class CategoryModel {
+  final int id;
+  final String categoryName;
+  final String categoryImage;
+
+  CategoryModel({
+    required this.id,
+    required this.categoryName,
+    required this.categoryImage,
+  });
+
+  factory CategoryModel.fromJson(Map<String, dynamic> json) {
+    return CategoryModel(
+      id: json['id'] ?? 0,
+      categoryName: json['category_name'] ?? "",
+      categoryImage: json['category_image'] ?? "",
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "category_name": categoryName,
+      "category_image": categoryImage,
+    };
+  }
+}
+class SubcategoryModel {
+  final int id;
+  final int category;
+  final String subcategoryName;
+  final String subcategoryImage;
+  final String categoryName;
+
+  SubcategoryModel({
+    required this.id,
+    required this.category,
+    required this.subcategoryName,
+    required this.subcategoryImage,
+    required this.categoryName,
+  });
+
+  factory SubcategoryModel.fromJson(Map<String, dynamic> json) {
+    return SubcategoryModel(
+      id: json['id'] ?? 0,
+      category: json['category'] ?? 0,
+      subcategoryName: json['subcategory_name'] ?? "",
+      subcategoryImage: json['subcategory_image'] ?? "",
+      categoryName: json['category_name'] ?? "",
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "category": category,
+      "subcategory_name": subcategoryName,
+      "subcategory_image": subcategoryImage,
+      "category_name": categoryName,
+    };
   }
 }
 

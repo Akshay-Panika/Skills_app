@@ -7,8 +7,8 @@ class AddServiceByUserModel {
   final bool swipeStatus;
   final String serviceDescription;
   final int user;
-  final int category;
-  final int subcategory;
+  final int categoryId;
+  final int subcategoryId;
   final double? latitude;
   final double? longitude;
   final String? createdAt;
@@ -23,8 +23,8 @@ class AddServiceByUserModel {
     required this.swipeStatus,
     required this.serviceDescription,
     required this.user,
-    required this.category,
-    required this.subcategory,
+    required this.categoryId,
+    required this.subcategoryId,
     this.latitude,
     this.longitude,
     this.createdAt,
@@ -41,8 +41,8 @@ class AddServiceByUserModel {
       swipeStatus: json['swipe_status'] ?? false,
       serviceDescription: json['service_description'] ?? "",
       user: json['user'] ?? 0, // ✅ FIX
-      category: json['category'] ?? 0, // ✅ FIX
-      subcategory: json['subcategory'] ?? 0, // ✅ FIX
+      categoryId: json['category_id'] ?? 0, // ✅ FIX
+      subcategoryId: json['subcategory_id'] ?? 0, // ✅ FIX
       latitude: json['latitude'] != null
           ? (json['latitude'] as num).toDouble()
           : null,

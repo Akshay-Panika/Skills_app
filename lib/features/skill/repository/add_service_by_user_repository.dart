@@ -21,8 +21,8 @@ class AddServiceByUserRepository {
 
       FormData formData = FormData.fromMap({
         "user": userId,
-        "category": categoryId,
-        "subcategory": subcategoryId,
+        "category_id": categoryId,
+        "subcategory_id": subcategoryId,
         "service_name": name,
         "service_description": description,
         "service_amount": status ? amount : null,
@@ -66,8 +66,8 @@ class AddServiceByUserRepository {
 
       Map<String, dynamic> map = {
         "user": userId,
-        "category": categoryId,
-        "subcategory": subcategoryId,
+        "category_id": categoryId,
+        "subcategory_id": subcategoryId,
         "service_name": name,
         "service_description": description,
         "service_amount": status ? amount : null,

@@ -350,11 +350,7 @@ class _AdsScreenState extends State<AdsScreen> {
                 cancelText: "Cancel",
               );
               if (confirm == true) {
-                final serviceData = _serviceListController.serviceList
-                    .firstWhere((s) => s.id == selectedId);
-
-                print('--------------- Selected Service Name: ${serviceData.serviceName}');
-
+                final serviceData = _serviceListController.serviceList.firstWhere((s) => s.id == selectedId);
                 Get.toNamed('/add-skill', arguments: {
                   "isEdit": true, "serviceData": serviceData,
                 });
@@ -405,7 +401,7 @@ class _AdsScreenState extends State<AdsScreen> {
   }
 }
 class SkillCard extends StatelessWidget {
-  final Service list;
+  final ServiceModel list;
   final bool isSelected;
   final VoidCallback onLongPress;
   final VoidCallback onTap;

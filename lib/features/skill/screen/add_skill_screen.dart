@@ -13,7 +13,7 @@ import '../../category/controller/category_controller.dart';
 import '../../location/controller/location_controller.dart';
 import '../../subcategory/controller/subategory_controller.dart';
 import '../controller/add_service_by_user_controller.dart';
-
+import 'package:skills_app/features/skill/model/service_list_by_user_model.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 
 class AddSkillScreen extends StatefulWidget {
@@ -56,43 +56,52 @@ class _AddSkillScreenState extends State<AddSkillScreen>
   @override
   void initState() {
     super.initState();
+
     _animController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
     );
-    _fadeAnim = CurvedAnimation(parent: _animController, curve: Curves.easeIn);
-    _slideAnim = Tween<Offset>(begin: const Offset(0, 0.06), end: Offset.zero)
-        .animate(CurvedAnimation(parent: _animController, curve: Curves.easeOut));
+
+    _fadeAnim = CurvedAnimation(
+      parent: _animController,
+      curve: Curves.easeIn,
+    );
+
+    _slideAnim = Tween<Offset>(
+      begin: const Offset(0, 0.06),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _animController,
+        curve: Curves.easeOut,
+      ),
+    );
+
     _animController.forward();
+
     categoryController.categoryList();
 
     if (widget.isEdit && widget.serviceData != null) {
-      final s = widget.serviceData;
+      final s = widget.serviceData as ServiceModel;
 
       titleController.text = s.serviceName;
       descController.text = s.serviceDescription;
       priceController.text = s.serviceAmount ?? "";
 
-      selectedCategoryId = s.category.toString();
-      selectedSubcategoryId = s.subcategory.toString();
+      /// IMPORTANT FIX
+      selectedCategoryId = s.category?.id.toString();
+      selectedSubcategoryId = s.subcategory?.id.toString();
 
       isPaid = s.serviceStatus;
+      networkImage = s.serviceImage;
 
-      if (widget.isEdit && widget.serviceData != null) {
-        final s = widget.serviceData;
-
-        titleController.text = s.serviceName;
-        descController.text = s.serviceDescription;
-        priceController.text = s.serviceAmount ?? "";
-
-        selectedCategoryId = s.category.toString();
-        selectedSubcategoryId = s.subcategory.toString();
-
-        isPaid = s.serviceStatus;
-
-        // ✅ IMPORTANT
-        networkImage = s.serviceImage;
-      }    }
+      if (s.category != null) {
+        Future.microtask(() async {
+          await subController.fetchSubCategories(s.category!.id);
+          setState(() {});
+        });
+      }
+    }
   }
 
   @override

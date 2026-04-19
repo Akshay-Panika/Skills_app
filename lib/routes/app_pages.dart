@@ -17,6 +17,8 @@ import '../features/dashboard/binding/dashboard_binding.dart';
 import '../features/dashboard/screen/dashboard_screen.dart';
 import '../features/location/binfing/location_binding.dart';
 import '../features/location/screen/location_permission_screen.dart';
+import '../features/search/binding/service_search_binding.dart';
+import '../features/search/screen/search_screen.dart';
 import '../features/service/binding/service_details_binding.dart';
 import '../features/service/screen/service_details_screen.dart';
 import '../features/wishlist/binding/wishlist_binding.dart';
@@ -65,6 +67,12 @@ class AppPages {
       name: '/service-details',
       page: () => ServiceDetailsScreen(serviceId: Get.parameters['id']!),
       binding: ServiceDetailsBinding(),
+    ),
+
+    GetPage(
+      name: '/search',
+      page: () => SearchScreen(),
+      binding: ServiceSearchBinding(),
     ),
 
     GetPage(

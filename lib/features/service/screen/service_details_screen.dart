@@ -214,16 +214,61 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              /// Service Name
                               Text(
                                 service.serviceName,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                                 style: GoogleFonts.poppins(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: context.text16),
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: context.text16,
+                                  color: AppColor.title,
+                                ),
                               ),
+
+                              SizedBox(height: context.sHeight * 0.008),
+                              AppCard(
+                                hasBorder: true,
+                                padding:  EdgeInsets.symmetric(horizontal: context.sWidth*0.03, vertical: context.sWidth*0.01),
+                                color: AppColor.primary.withOpacity(0.03),
+                                margin: EdgeInsets.zero,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      service.category?.categoryName ?? "Category",
+                                      style: GoogleFonts.poppins(
+                                        color: AppColor.primary,
+                                        fontSize: context.text12,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    Container(height: 1,width: 10,color: AppColor.primary,),
+                                    SizedBox(width: context.sWidth*0.03,),
+                                    Text(
+                                      service.subcategory?.subcategoryName ?? "Subcategory",
+                                      style: GoogleFonts.poppins(
+                                        color: AppColor.title,
+                                        fontSize: context.text12,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: context.sHeight * 0.015),
+
                               Text(
                                 service.serviceDescription,
-                                style:
-                                GoogleFonts.poppins(color: AppColor.subtitle, fontSize: context.text14),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.poppins(
+                                  color: AppColor.subtitle,
+                                  fontSize: context.text14,
+                                  height: 1.5,
+                                ),
                               ),
                             ],
                           ),
