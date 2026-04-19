@@ -21,18 +21,6 @@ class SearchScreen extends StatelessWidget {
   final _serviceListController = Get.find<ServiceListController>();
 
 
-  final RxList<String> recentSearches = [
-    'Python Developer',
-    'UI UX design',
-    'Data Science',
-    'Flutter Developer',
-    'Web Developer',
-    'React Developer',
-  ].obs;
-
-  final TextEditingController _searchController = TextEditingController();
-  final RxString _searchQuery = ''.obs;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,24 +36,17 @@ class SearchScreen extends StatelessWidget {
                 children: [
                   _buildLocationBar(context),
 
-                  _buildRecentSearches(context),
-
                   Obx(() {
-                    if (_searchQuery.value.isNotEmpty) return const SizedBox.shrink();
-
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        _buildCategories(context),
                         SizedBox(height: context.sHeight * 0.02),
                         _buildNearbyDefaultSection(context),
-                        _buildCategories(context),
                         SizedBox(height: context.sHeight * 0.03),
                       ],
                     );
                   }),
-
-                  // 3. SEARCH RESULT SECTION
-                  _buildSearchResultSection(context),
                 ],
               ),
             ),
@@ -107,11 +88,6 @@ class SearchScreen extends StatelessWidget {
                       const SizedBox(width: 8),
                       Expanded(
                         child: TextField(
-                          controller: _searchController,
-                          onSubmitted: (v) => _searchQuery.value = v.trim(),
-                          onChanged: (v) {
-                            if (v.isEmpty) _searchQuery.value = '';
-                          },
                           style: TextStyle(fontSize: context.text12, color: AppColor.subtitle),
                           decoration: InputDecoration(
                             hintText: 'Find Courses, Skills, Tutors...',
@@ -136,73 +112,6 @@ class SearchScreen extends StatelessWidget {
     );
   }
 
-  // --- RECENT SEARCHES ---
-  Widget _buildRecentSearches(BuildContext context) {
-    return Obx(() {
-      if (_searchQuery.value.isNotEmpty || recentSearches.isEmpty) {
-        return const SizedBox.shrink();
-      }
-
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: context.sHeight * 0.02),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _sectionTitle("Recent Searches", context),
-                InkWell(
-                  onTap: () {
-                    recentSearches.clear(); // List ko empty kar dega
-                  },
-                  child: Text(
-                    "Clear all",
-                    style: TextStyle(
-                      fontSize: context.text12,
-                      color: AppColor.primary,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: context.sHeight * 0.015),
-            Wrap(
-              spacing: 4,
-              runSpacing: 6,
-              children: recentSearches.map((label) => _buildTag(label, context)).toList(),
-            ),
-          ],
-        ),
-      );
-    });
-  }
-  Widget _buildTag(String label, BuildContext context) {
-    return InkWell(
-      onTap: () {
-        FocusScope.of(context).unfocus();
-        _searchController.text = label;
-        _searchQuery.value = label;
-      },
-      borderRadius: BorderRadius.circular(8),
-      child: AppCard(
-        color: AppColor.white,
-        margin: EdgeInsets.zero,
-        hasBorder: true,
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.history, size: 14, color: AppColor.subtitle),
-            const SizedBox(width: 6),
-            Text(label, style:  TextStyle(color: AppColor.title, fontSize: context.text12)),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buildNearbyDefaultSection(BuildContext context) {
     final lat = _locationController.latitude.value;
@@ -256,76 +165,6 @@ class SearchScreen extends StatelessWidget {
     );
   }
 
-  // --- SEARCH RESULT SECTION ---
-  Widget _buildSearchResultSection(BuildContext context) {
-    return Obx(() {
-      final query = _searchQuery.value.trim();
-      if (query.isEmpty) return const SizedBox.shrink();
-
-      final lat = _locationController.latitude.value;
-      final lon = _locationController.longitude.value;
-      final services = _serviceListController.services;
-
-      final filtered = services.where((s) {
-        if (s.latitude == null || s.longitude == null) return false;
-        final d = Geolocator.distanceBetween(lat, lon, s.latitude!, s.longitude!) / 1000;
-        final matches = s.serviceName.toLowerCase().contains(query.toLowerCase());
-        return d <= 20 && matches;
-      }).toList();
-
-      if (filtered.isEmpty) {
-        return Column(
-          children: [
-            SizedBox(height: context.sHeight * 0.25),
-            Center(
-              child: Column(
-                children: [
-                  Icon(Icons.search_off, size: 80, color: AppColor.subtitle.withOpacity(0.4)),
-                  const SizedBox(height: 16),
-                  Text("No Search Available",
-                      style: TextStyle(fontSize: context.text14, fontWeight: FontWeight.bold, color: AppColor.title)),
-                  const SizedBox(height: 8),
-                  Text(
-                    "We couldn't find anything for '$query'.\nPlease try a different keyword.",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: context.text12,
-                      color: AppColor.subtitle,
-                    ),
-                  ),                ],
-              ),
-            ),
-          ],
-        );
-      }
-
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: context.sHeight * 0.02),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: _sectionTitle("Search Results for '$query'", context),
-          ),
-          const SizedBox(height: 10),
-          GridView.builder(
-            shrinkWrap: true,
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2, crossAxisSpacing: 10, mainAxisSpacing: 10, childAspectRatio: 0.8),
-            itemCount: filtered.length,
-            itemBuilder: (context, index) {
-              final s = filtered[index];
-              return ServiceCard(service: s);
-            },
-          ),
-        ],
-      );
-    });
-  }
-
-  // --- HELPERS ---
   Widget _buildLocationBar(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12),
@@ -422,15 +261,5 @@ class SearchScreen extends StatelessWidget {
         ],
       );
     });
-  }
-
-  Widget _sectionTitle(String title, BuildContext context) {
-    return Row(
-      children: [
-        Container(width: 5, height: 16, decoration: BoxDecoration(color: AppColor.primary, borderRadius: BorderRadius.circular(5))),
-        const SizedBox(width: 8),
-        Text(title, style: GoogleFonts.poppins(fontSize: context.text14, fontWeight: FontWeight.w500, color: AppColor.title)),
-      ],
-    );
   }
 }
