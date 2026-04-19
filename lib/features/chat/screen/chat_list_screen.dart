@@ -123,20 +123,25 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
                 return TabBarView(
                   children: [
+                    // ALL
                     _ChatTabContent(
-                    list: bookingController.allChats,
-                    selectedIds: selectedIds,
-                    toggleSelection: toggleSelection,
-                    showActionBar: showActionBar,
-                  ),
-                    _ChatTabContent(
-                      list: bookingController.allChats,
+                      list: bookingController.all,
                       selectedIds: selectedIds,
                       toggleSelection: toggleSelection,
                       showActionBar: showActionBar,
                     ),
+
+                    // BUYING
                     _ChatTabContent(
-                      list: bookingController.allChats,
+                      list: bookingController.buyingChats,
+                      selectedIds: selectedIds,
+                      toggleSelection: toggleSelection,
+                      showActionBar: showActionBar,
+                    ),
+
+                    // SELLING
+                    _ChatTabContent(
+                      list: bookingController.sellingChats,
                       selectedIds: selectedIds,
                       toggleSelection: toggleSelection,
                       showActionBar: showActionBar,
@@ -209,8 +214,14 @@ class _ChatTabContent extends StatelessWidget {
             if (showActionBar) {
               toggleSelection(item.id);
             } else {
-              Get.toNamed('/chat', arguments: {"serviceId": item.service.id});
-            }
+              Get.toNamed(
+                '/chat',
+                arguments: {
+                  "chatItem": item,   // 👈 FULL OBJECT PASS
+                  "index": index,
+                },
+              );
+                 }
           },
           showActionBar: showActionBar,
         );

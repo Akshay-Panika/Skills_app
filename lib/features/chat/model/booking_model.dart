@@ -63,8 +63,8 @@ class BookingItem {
   final int id;
   final String message;
   final String status;
-  final String createdAt;
-  final String updatedAt;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
   final int buyer;
   final int seller;
 
@@ -86,8 +86,8 @@ class BookingItem {
       id: json["id"] ?? 0,
       message: json["message"] ?? "",
       status: json["status"] ?? "",
-      createdAt: json["created_at"] ?? "",
-      updatedAt: json["updated_at"] ?? "",
+      createdAt: DateTime.tryParse(json["created_at"] ?? ""),
+      updatedAt: DateTime.tryParse(json["updated_at"] ?? ""),
       buyer: json["buyer"] ?? 0,
       seller: json["seller"] ?? 0,
       service: ServiceModel.fromJson(json["service"] ?? {}),
@@ -108,7 +108,6 @@ class ServiceModel {
   final DateTime? updatedAt;
 
   final UserProfileModel? userProfile;
-
   final CategoryModel? category;
   final SubcategoryModel? subcategory;
 
@@ -142,59 +141,30 @@ class ServiceModel {
       serviceImage: json["service_image"] ?? "",
       serviceDescription: json["service_description"] ?? "",
 
-      latitude: json["latitude"] != null
-          ? (json["latitude"] as num).toDouble()
+      latitude: (json["latitude"] as num?)?.toDouble(),
+      longitude: (json["longitude"] as num?)?.toDouble(),
+
+      createdAt: DateTime.tryParse(json["created_at"] ?? ""),
+      updatedAt: DateTime.tryParse(json["updated_at"] ?? ""),
+
+      userProfile: json["user_profile"] != null
+          ? UserProfileModel.fromJson(json["user_profile"])
           : null,
 
-      longitude: json["longitude"] != null
-          ? (json["longitude"] as num).toDouble()
+      category: json["category"] != null
+          ? CategoryModel.fromJson(json["category"])
           : null,
 
-      createdAt: json["created_at"] != null
-          ? DateTime.tryParse(json["created_at"])
-          : null,
-
-      updatedAt: json["updated_at"] != null
-          ? DateTime.tryParse(json["updated_at"])
-          : null,
-
-      userProfile: json['user_profile'] != null
-          ? UserProfileModel.fromJson(json['user_profile'])
-          : null,
-
-      category: json['category'] != null
-          ? CategoryModel.fromJson(json['category'])
-          : null,
-
-      subcategory: json['subcategory'] != null
-          ? SubcategoryModel.fromJson(json['subcategory'])
+      subcategory: json["subcategory"] != null
+          ? SubcategoryModel.fromJson(json["subcategory"])
           : null,
 
       serviceAmount: json["service_amount"]?.toString(),
+
       swipeStatus: json["swipe_status"] ?? false,
       isFavorite: json["is_favorite"] ?? false,
       serviceStatus: json["service_status"] ?? false,
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      "id": id,
-      "service_name": serviceName,
-      "service_image": serviceImage,
-      "service_description": serviceDescription,
-      "latitude": latitude,
-      "longitude": longitude,
-      "created_at": createdAt?.toIso8601String(),
-      "updated_at": updatedAt?.toIso8601String(),
-      "user_profile": userProfile?.toJson(),
-      "category": category?.toJson(),
-      "subcategory": subcategory?.toJson(),
-      "service_amount": serviceAmount,
-      "swipe_status": swipeStatus,
-      "is_favorite": isFavorite,
-      "service_status": serviceStatus,
-    };
   }
 }
 
@@ -211,20 +181,13 @@ class CategoryModel {
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
     return CategoryModel(
-      id: json['id'] ?? 0,
-      categoryName: json['category_name'] ?? "",
-      categoryImage: json['category_image'] ?? "",
+      id: json["id"] ?? 0,
+      categoryName: json["category_name"] ?? "",
+      categoryImage: json["category_image"] ?? "",
     );
   }
-
-  Map<String, dynamic> toJson() {
-    return {
-      "id": id,
-      "category_name": categoryName,
-      "category_image": categoryImage,
-    };
-  }
 }
+
 class SubcategoryModel {
   final int id;
   final int category;
@@ -242,22 +205,12 @@ class SubcategoryModel {
 
   factory SubcategoryModel.fromJson(Map<String, dynamic> json) {
     return SubcategoryModel(
-      id: json['id'] ?? 0,
-      category: json['category'] ?? 0,
-      subcategoryName: json['subcategory_name'] ?? "",
-      subcategoryImage: json['subcategory_image'] ?? "",
-      categoryName: json['category_name'] ?? "",
+      id: json["id"] ?? 0,
+      category: json["category"] ?? 0,
+      subcategoryName: json["subcategory_name"] ?? "",
+      subcategoryImage: json["subcategory_image"] ?? "",
+      categoryName: json["category_name"] ?? "",
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      "id": id,
-      "category": category,
-      "subcategory_name": subcategoryName,
-      "subcategory_image": subcategoryImage,
-      "category_name": categoryName,
-    };
   }
 }
 
@@ -269,7 +222,7 @@ class UserProfileModel {
   final String userGender;
   final String userBio;
   final String? userImage;
-  final String createdAt;
+  final DateTime? createdAt;
   final int user;
 
   UserProfileModel({
@@ -280,35 +233,21 @@ class UserProfileModel {
     required this.userGender,
     required this.userBio,
     this.userImage,
-    required this.createdAt,
+    this.createdAt,
     required this.user,
   });
 
   factory UserProfileModel.fromJson(Map<String, dynamic> json) {
     return UserProfileModel(
-      id: json['id'] ?? 0,
-      userPhone: json['user_phone'] ?? "",
-      userName: json['user_name'] ?? "",
-      userEmail: json['user_email'] ?? "",
-      userGender: json['user_gender'] ?? "",
-      userBio: json['user_bio'] ?? "",
-      userImage: json['user_image'],
-      createdAt: json['created_at'] ?? "",
-      user: json['user'] ?? 0,
+      id: json["id"] ?? 0,
+      userPhone: json["user_phone"] ?? "",
+      userName: json["user_name"] ?? "",
+      userEmail: json["user_email"] ?? "",
+      userGender: json["user_gender"] ?? "",
+      userBio: json["user_bio"] ?? "",
+      userImage: json["user_image"],
+      createdAt: DateTime.tryParse(json["created_at"] ?? ""),
+      user: json["user"] ?? 0,
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      "id": id,
-      "user_phone": userPhone,
-      "user_name": userName,
-      "user_email": userEmail,
-      "user_gender": userGender,
-      "user_bio": userBio,
-      "user_image": userImage,
-      "created_at": createdAt,
-      "user": user,
-    };
   }
 }

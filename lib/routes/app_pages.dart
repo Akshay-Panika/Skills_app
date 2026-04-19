@@ -6,12 +6,10 @@ import 'package:skills_app/features/service/screen/service_screen.dart';
 import 'package:skills_app/features/skill/binding/add_skill_binding.dart';
 import 'package:skills_app/features/skill/screen/add_skill_screen.dart';
 import 'package:skills_app/features/wishlist/screen/wishlist_screen.dart';
-
 import '../features/auth/screen/auth_screen.dart';
 import '../features/auth/screen/intro_screen.dart';
 import '../features/category/binding/category_binding.dart';
 import '../features/category/screen/category_screen.dart';
-import '../features/chat/binding/chat_binding.dart';
 import '../features/chat/screen/chat_screen.dart';
 import '../features/dashboard/binding/dashboard_binding.dart';
 import '../features/dashboard/screen/dashboard_screen.dart';
@@ -97,9 +95,7 @@ class AppPages {
 
     GetPage(
       name: '/chat',
-      page: () => ChatScreen(),
-      binding: ChatBinding(),
+      page: () => ChatScreen(chatList: [],),
     ),
-
   ];
 }

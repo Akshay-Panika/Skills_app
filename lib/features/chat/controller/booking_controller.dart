@@ -7,17 +7,17 @@ class BookingController extends GetxController {
   final BookingRepository repository = BookingRepository();
 
   var isLoading = false.obs;
-  var errorMessage = "".obs; // ✅ ADD THIS
+  var errorMessage = "".obs;
 
   var allChats = <BookingItem>[].obs;
-  var buyerBookings = <BookingItem>[].obs;
-  var sellerBookings = <BookingItem>[].obs;
 
   var counts = BookingCounts(
     buyerTotal: 0,
     sellerTotal: 0,
     total: 0,
   ).obs;
+
+  int currentUserId = 0;
 
   @override
   void onInit() {
@@ -28,7 +28,7 @@ class BookingController extends GetxController {
   Future<void> fetchBookings() async {
     try {
       isLoading(true);
-      errorMessage(""); // ✅ reset
+      errorMessage("");
 
       final userId = await AuthPreferences.getUserId();
       if (userId == null) {
@@ -36,10 +36,9 @@ class BookingController extends GetxController {
         return;
       }
 
-      final result = await repository.getUserBookings(userId);
+      currentUserId = userId;
 
-      buyerBookings.value = result.data.buyerBookings;
-      sellerBookings.value = result.data.sellerBookings;
+      final result = await repository.getUserBookings(userId);
 
       allChats.value = [
         ...result.data.buyerBookings,
@@ -49,14 +48,21 @@ class BookingController extends GetxController {
       counts.value = result.counts;
 
     } catch (e) {
-      errorMessage("Something went wrong"); // ✅ set error
+      errorMessage("Something went wrong");
       print("Booking Error: $e");
     } finally {
       isLoading(false);
     }
   }
 
-  Future<void> refreshBookings() async {
-    await fetchBookings();
-  }
+  // ✅ BUYING
+  List<BookingItem> get buyingChats =>
+      allChats.where((e) => e.buyer == currentUserId).toList();
+
+  // ✅ SELLING
+  List<BookingItem> get sellingChats =>
+      allChats.where((e) => e.seller == currentUserId).toList();
+
+  // ✅ ALL
+  List<BookingItem> get all => allChats;
 }
