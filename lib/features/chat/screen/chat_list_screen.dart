@@ -414,7 +414,7 @@ class _EmptyState extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children:  [
-          Icon(Icons.chat_bubble_outline,
+          FaIcon(FontAwesomeIcons.comment,
               size: context.sWidth*0.14, color: AppColor.primary),
           SizedBox(height: 10),
           Text("No chats found",

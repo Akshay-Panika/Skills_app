@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/constant/app_size.dart';
 import '../../../core/widget/app_dilog.dart';
 import '../../account/screen/account_screen.dart';
 import '../../chat/screen/chat_list_screen.dart';
+import '../../home/controller/home_scroll_controller.dart';
 import '../../home/screen/home_screen.dart';
 import 'package:get/get.dart';
 import '../../skill/screen/skill_screen.dart';
@@ -17,6 +19,7 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  final ctrl = Get.find<HomeScrollController>();
 
 
   int _currentIndex = 0;
@@ -52,6 +55,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
@@ -60,6 +64,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           alignment: Alignment.bottomCenter,
           children: [
             _screens[_currentIndex],
+
             Container(
               height: context.sHeight * 0.086,
               color: Colors.transparent,
@@ -68,27 +73,42 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child:  Container(
-                      decoration: BoxDecoration(
-                        borderRadius:  BorderRadius.only(
-                          topRight: Radius.circular(context.sWidth*0.03),
-                          bottomRight: Radius.circular(context.sWidth*0.03),
+                    child: Obx(() {
+                      final direction = ctrl.scrollDirection.value;
+                      final isHidden = direction == ScrollDirection.down;
+                    
+                      return AnimatedSlide(
+                        offset: isHidden ? Offset(0, 1.5) : Offset.zero,
+                        duration: Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                        child: AnimatedOpacity(
+                          opacity: isHidden ? 0.0 : 1.0,
+                          duration: Duration(milliseconds: 300),
+                          child:  Container(
+                            decoration: BoxDecoration(
+                              borderRadius:  BorderRadius.only(
+                                topRight: Radius.circular(context.sWidth*0.03),
+                                bottomRight: Radius.circular(context.sWidth*0.03),
+                              ),
+                              color: Colors.white,
+                              border: Border.all(color: Colors.grey, width: 0.3),
+                            ),
+                            padding: EdgeInsets.symmetric(vertical: context.sWidth * 0.01),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                _navIcon(FontAwesomeIcons.home, 0),
+                                _navIcon(FontAwesomeIcons.comment, 1),
+                                _navIcon(FontAwesomeIcons.chalkboardTeacher, 2),
+                                _navIcon(FontAwesomeIcons.user, 3),
+                              ],
+                            ),
+                          ),
                         ),
-                        color: Colors.white,
-                        border: Border.all(color: Colors.grey, width: 0.3),
-                      ),
-                      padding: EdgeInsets.symmetric(vertical: context.sWidth * 0.01),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          _navIcon(FontAwesomeIcons.home, 0),
-                          _navIcon(FontAwesomeIcons.comment, 1),
-                          _navIcon(FontAwesomeIcons.chalkboardTeacher, 2),
-                          _navIcon(FontAwesomeIcons.user, 3),
-                        ],
-                      ),
-                    ),
+                      );
+                    }),
                   ),
+
                   Container(
                     padding: EdgeInsets.only(
                         left: context.sWidth * 0.03,

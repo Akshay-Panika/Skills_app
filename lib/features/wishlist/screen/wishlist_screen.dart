@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/widget/my_appbar.dart';
 import '../../../core/constant/app_size.dart';
@@ -38,35 +39,7 @@ class WishlistScreen extends StatelessWidget {
         }
 
         if (wishlistController.services.isEmpty) {
-          return const Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.bookmark_remove_outlined,
-                  size: 70,
-                  color: Colors.grey,
-                ),
-                SizedBox(height: 12),
-                Text(
-                  "Your wishlist is empty",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black54,
-                  ),
-                ),
-                SizedBox(height: 6),
-                Text(
-                  "Start adding services you love",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
-                  ),
-                ),
-              ],
-            ),
-          );
+          return _EmptyState();
         }
         return  GridView.builder(
           shrinkWrap: true,
@@ -214,6 +187,28 @@ class _ServiceCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+
+class _EmptyState extends StatelessWidget {
+  const _EmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children:  [
+          FaIcon(FontAwesomeIcons.bookmark,
+              size: context.sWidth*0.14, color: AppColor.primary),
+          SizedBox(height: 10),
+          Text("Your wishlist is empty",
+              style: GoogleFonts.poppins(fontWeight: FontWeight.w500)),
+          Text("Start adding services you love",style: GoogleFonts.poppins(fontWeight: FontWeight.w500,fontSize: context.text12,color: Colors.grey)),
+        ],
       ),
     );
   }

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get_utils/src/extensions/context_extensions.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import '../../../core/constant/app_color.dart';
+import '../../../core/constant/app_size.dart';
 
 class SectionHeader extends StatelessWidget {
   final String title;
@@ -21,24 +25,23 @@ class SectionHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          /// LEFT SIDE
           Row(
+            spacing: context.width*0.02,
             children: [
               Container(
-                width: 5,
-                height: 16,
+                width: context.width*0.01,
+                height: context.width*0.03,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF0D6E6E),
-                  borderRadius: BorderRadius.circular(5),
+                  color: AppColor.primary,
+                  borderRadius: BorderRadius.circular(4),
                 ),
               ),
-              const SizedBox(width: 10),
-              Text(
-                title,
-                style: GoogleFonts.roboto(
-                  fontSize: 14,
-                  color: Colors.black87,
-                  fontWeight: FontWeight.w600,
+
+              Text(title,
+                style:  GoogleFonts.poppins(
+                  fontWeight: FontWeight.w500,
+                  fontSize: context.text14,
+                  color: AppColor.title,
                 ),
               ),
             ],
@@ -51,16 +54,16 @@ class SectionHeader extends StatelessWidget {
               children: [
                 Text(
                   actionText,
-                  style: GoogleFonts.roboto(
-                    fontSize: 12,
-                    color: Colors.black87,
-                    fontWeight: FontWeight.w600,
+                  style:  GoogleFonts.poppins(
+                    fontWeight: FontWeight.w400,
+                    fontSize: context.text14,
+                    color: AppColor.title,
                   ),
                 ),
                 const SizedBox(width: 6),
-                const FaIcon(
+                 FaIcon(
                   FontAwesomeIcons.arrowRightLong,
-                  size: 12,
+                  size: context.sWidth*0.03,
                 ),
               ],
             ),
