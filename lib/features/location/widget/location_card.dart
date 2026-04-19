@@ -138,7 +138,7 @@ class EmptyServiceWidget extends StatelessWidget {
 
             /// Subtitle
             Text(
-              "We couldn’t find any services within 10 km.\nTry changing location or check later.",
+              "We couldn’t find any services within 20 km.\nTry changing location or check later.",
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                 fontSize: context.text12,

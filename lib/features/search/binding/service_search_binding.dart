@@ -2,6 +2,7 @@
 
 import 'package:get/get.dart';
 
+import '../../service/controller/recent_view_controller.dart';
 import '../../wishlist/controller/wishlist_toggle_controller.dart';
 import '../controller/service_search_controller.dart';
 import '../repository/service_search_repository.dart';
@@ -18,5 +19,6 @@ class ServiceSearchBinding extends Bindings {
     );
 
     Get.lazyPut(() => WishlistToggleController(), fenix: true);
+    Get.lazyPut(() => RecentViewController(), fenix: true);
   }
 }

@@ -5,11 +5,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/constant/app_size.dart';
 import 'package:skills_app/features/home/widget/category_card.dart';
+import '../../../core/widget/app_error_card.dart';
 import '../../category/controller/category_controller.dart';
 import '../../location/controller/location_controller.dart';
 import '../../location/widget/location_card.dart';
 import '../../notification/screen/notification_screen.dart';
-import '../../search/screen/search_screen.dart';
 import '../../service/controller/service_list_controller.dart';
 import '../controller/home_scroll_controller.dart';
 import '../widget/home_shimer_card.dart';
@@ -255,7 +255,7 @@ class _HomeScreenState extends State<HomeScreen> {
               SliverToBoxAdapter(
                 child: Obx((){
                   if (_categoryController.categoryList.isEmpty) return const SizedBox();
-          
+
                   return  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -289,14 +289,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             },
                           ),
                         ),
-                      if(_categoryController.categoryList.isNotEmpty)
-                      SizedBox(height: context.sHeight*0.02,),
-          
-                      InviteFriendCard(),
                     ],
                   );
                 }),
               ),
+
+              SliverToBoxAdapter(child: InviteFriendCard(),),
               SliverToBoxAdapter(child: SizedBox(height: context.sHeight*0.01,),),
           
               if(_serviceListController.services.isNotEmpty)
@@ -377,20 +375,40 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
           
               Obx(() {
+                if (_serviceListController.errorMessage.value.isNotEmpty) {
+                  return  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        top: _categoryController.categoryList.isNotEmpty
+                            ? context.sWidth * 0.1
+                            : context.sWidth * 0.4,
+                      ),
+                      child: AppErrorCard(
+                        message: _serviceListController.errorMessage.value,
+                        title: "Connection Problem",
+                        onRetry: () {
+                          _categoryController.getCategories();
+                          _serviceListController.fetchServiceList();
+                        },
+                      ),
+                    ),
+                  );
+                }
+
                 final hasLocation = _locationController.city.value.isNotEmpty ||
                     _locationController.state.value.isNotEmpty;
           
                 final nearby = _serviceListController.services.where((s) {
                   return _isFree ? s.serviceStatus == false : true;
                 }).toList();
-          
+
                 if (nearby.isEmpty) {
                   return SliverToBoxAdapter(
                     child: Padding(
                       padding: EdgeInsets.only(
                         top: _categoryController.categoryList.isNotEmpty
                             ? context.sWidth * 0.1
-                            : context.sWidth * 0.6,
+                            : context.sWidth * 0.4,
                       ),
                       child: hasLocation ? EmptyServiceWidget() : LocationCard(),
                     ),

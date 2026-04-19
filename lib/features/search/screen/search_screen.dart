@@ -9,7 +9,9 @@ import 'package:skills_app/core/constant/app_size.dart';
 import '../../category/controller/category_controller.dart';
 import '../../home/widget/category_card.dart';
 import '../../home/widget/section_header.dart';
+import '../../home/widget/service_card.dart';
 import '../../location/controller/location_controller.dart';
+import '../../service/controller/recent_view_controller.dart';
 import '../../service/controller/service_list_controller.dart';
 import '../../service/widget/no_data.dart';
 import '../../wishlist/controller/wishlist_toggle_controller.dart';
@@ -21,6 +23,9 @@ class SearchScreen extends StatelessWidget {
   final _locationController = Get.find<LocationController>();
   final _categoryController = Get.find<CategoryController>();
   final _searchController = Get.find<ServiceSearchController>();
+  final _recentController = Get.find<RecentViewController>();
+  final _serviceListController = Get.find<ServiceListController>();
+
 
   @override
   Widget build(BuildContext context) {
@@ -40,15 +45,101 @@ class SearchScreen extends StatelessWidget {
 
                   /// Search empty -> Categories show
                   Obx(() {
-                    final isSearchEmpty =
-                        _searchController.searchText.value.trim().isEmpty;
-
+                    final isSearchEmpty = _searchController.searchText.value.trim().isEmpty;
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         if (isSearchEmpty) ...[
                           _buildCategories(context),
                           SizedBox(height: context.sHeight * 0.02),
+
+                          Obx(() {
+                            if (_recentController.recentIds.isEmpty) return const SizedBox();
+
+                            final recentList = _serviceListController.services
+                                .where((s) => _recentController.recentIds.contains(s.id.toString()))
+                                .toList();
+
+                            if (recentList.isEmpty) return const SizedBox();
+
+                            return Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        spacing: context.width*0.02,
+                                        children: [
+                                          Container(
+                                            width: context.width*0.01,
+                                            height: context.width*0.03,
+                                            decoration: BoxDecoration(
+                                              color: AppColor.primary,
+                                              borderRadius: BorderRadius.circular(4),
+                                            ),
+                                          ),
+
+                                          Text("Recent View Skills",
+                                            style:  GoogleFonts.poppins(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: context.text14,
+                                              color: AppColor.title,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+
+                                      /// RIGHT SIDE (ACTION)
+                                      InkWell(
+                                        onTap: () {
+                                          _recentController.clearAll();
+                                        },
+                                        child: Row(
+                                          children: [
+                                            Text("Clear",
+                                              style:  GoogleFonts.poppins(
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: context.text14,
+                                                color: AppColor.title,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 6),
+                                            FaIcon(
+                                              color: Colors.red,
+                                              FontAwesomeIcons.close,
+                                              size: context.sWidth*0.03,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(height: context.sHeight*0.012,),
+                                Center(
+                                  child: GridView.builder(
+                                    shrinkWrap: true,
+                                    physics: const NeverScrollableScrollPhysics(),
+                                    padding: EdgeInsets.symmetric(horizontal: context.sWidth * 0.03),
+                                    itemCount: recentList.length,
+                                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      crossAxisSpacing: context.sWidth * 0.02,
+                                      mainAxisSpacing: context.sWidth * 0.02,
+                                      childAspectRatio: context.sWidth * 0.002,
+                                    ),
+                                    itemBuilder: (context, index) {
+                                      final service = recentList[index];
+                                      return ServiceCard(service: service);
+                                    },
+                                  ),
+                                ),
+                              ],
+                            );
+                          }),
+                          SizedBox(height: context.sHeight * 0.1),
                         ],
 
                         /// Search Results

@@ -7,7 +7,7 @@ class ServiceListController extends GetxController {
   var isLoading = true.obs;
   var services = <ServiceListModel>[].obs;
   var count = 0.obs;
-
+  var errorMessage = ''.obs;
   final ServiceListRepository repository;
 
   ServiceListController([ServiceListRepository? repo])
@@ -22,7 +22,7 @@ class ServiceListController extends GetxController {
   Future<void> fetchServiceList() async {
     try {
       isLoading.value = true;
-
+      errorMessage.value = '';
       final response = await repository.getServiceList();
 
       services.assignAll(response.services);
@@ -30,6 +30,7 @@ class ServiceListController extends GetxController {
       count.value = response.count;
 
     } catch (e) {
+      errorMessage.value = "Failed to load services";
       debugPrint('Service Error ${e.toString()}');
     } finally {
       isLoading.value = false;

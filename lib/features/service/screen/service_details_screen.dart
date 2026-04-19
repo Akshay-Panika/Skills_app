@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:skills_app/core/widget/app_card.dart';
 import 'package:skills_app/core/widget/my_appbar.dart';
 import '../../../core/constant/app_color.dart';
@@ -12,6 +13,7 @@ import '../../../core/widget/app_error_card.dart';
 import '../../auth/helper/auth_preferences.dart';
 import '../controller/booking_check_controller.dart';
 import '../controller/booking_create_controller.dart';
+import '../controller/recent_view_controller.dart';
 import '../controller/service_details_controller.dart';
 import '../widget/service_details_shimmer.dart';
 
@@ -32,6 +34,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
   final serviceController = Get.find<ServiceDetailsController>();
   final checkBookingController = Get.find<BookingCheckController>();
   final bookingCreateController = Get.find<BookingCreateController>();
+  final recentController = Get.find<RecentViewController>();
 
   bool _bookmark = false;
   bool _isMSG = false;
@@ -41,6 +44,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
   @override
   void initState() {
     super.initState();
+    recentController.startTracking(widget.serviceId);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       checkBookingController.checkServiceBooking(
@@ -138,7 +142,11 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: InkWell(
-                        // onTap: () => Get.back(),
+                        onTap: () {
+                          final textToShare =
+                              "Check out this skill:";
+                          Share.share(textToShare);
+                        },
                         child: const CircleAvatar(
                           backgroundColor: Colors.black38,
                           child: Padding(
