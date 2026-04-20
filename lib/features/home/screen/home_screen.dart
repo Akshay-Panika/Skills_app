@@ -289,6 +289,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             },
                           ),
                         ),
+                      SizedBox(height: context.sHeight*0.012,),
+
                     ],
                   );
                 }),

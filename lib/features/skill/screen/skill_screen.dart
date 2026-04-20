@@ -472,15 +472,42 @@ class SkillCard extends StatelessWidget {
                               Container(width: context.sWidth*0.12,height: context.sWidth*0.05,color: Colors.transparent,)
                             ],
                           ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                list.category?.categoryName ?? "Category",
+                                style: GoogleFonts.poppins(
+                                  color: AppColor.primary,
+                                  fontSize: context.text12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              Container(height: 1,width: 10,color: AppColor.primary,),
+                              SizedBox(width: context.sWidth*0.03,),
+                              Text(
+                                list.subcategory?.subcategoryName ?? "Subcategory",
+                                style: GoogleFonts.poppins(
+                                  color: AppColor.title,
+                                  fontSize: context.text12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              )
+                            ],
+                          ),
+                          SizedBox(height: context.sWidth*0.01,),
                           Text(
                             list.serviceDescription,
-                            maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.poppins(
-                              fontSize: context.text12,
-                              color: AppColor.subtitle,
-                              height: 1.4,
+                            style: TextStyle(
+                            fontSize: context.text12,
+                            color: AppColor.subtitle,
+                            height: 1.45,
+                            overflow: TextOverflow.ellipsis,
                             ),
+                            maxLines: 2,
                           ),
                         ],
                       ),

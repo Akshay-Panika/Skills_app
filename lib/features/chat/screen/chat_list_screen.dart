@@ -265,33 +265,34 @@ class ChatSkillCard extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CircleAvatar(
-                      radius: context.sWidth*0.08,
-                      backgroundColor: AppColor.white,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(context.sHeight*0.036,),
-                        child: CachedNetworkImage(
-                          imageUrl: service.userProfile!.userImage.toString(),
-                          fit: BoxFit.cover,
-                          width: context.sHeight*0.068,
-                          height: context.sHeight*0.068,
-                          placeholder: (context, url) => Container(
-                            color: Colors.grey[100],
-                            alignment: Alignment.center,
-                            child: FaIcon(
-                              FontAwesomeIcons.image,
-                              color: Colors.grey[400],
-                              size: 25,
+                     Stack(
+                       children: [
+                         ClipRRect(
+                          borderRadius: BorderRadius.circular(context.sWidth*0.03),
+                          child: CachedNetworkImage(
+                            imageUrl: service.serviceImage,
+                            fit: BoxFit.cover,
+                            width: context.sHeight*0.1,
+                            height: context.sHeight*0.1,
+                            placeholder: (context, url) => Container(
+                              color: Colors.grey[100],
+                              alignment: Alignment.center,
+                              child: FaIcon(
+                                FontAwesomeIcons.chalkboardTeacher,
+                                color: Colors.grey[400],
+                                size: context.sWidth*0.06,
+                              ),
+                            ),
+                            errorWidget: (context, url, error) => Container(
+                              color: Colors.grey[200],
+                              child: const Icon(Icons.broken_image_outlined, color: Colors.grey, size: 25),
                             ),
                           ),
-                          errorWidget: (context, url, error) => Container(
-                            color: Colors.grey[200],
-                            child: const Icon(Icons.broken_image_outlined, color: Colors.grey, size: 25),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 11),
+                                             ),
+
+                       ],
+                     ),
+                     SizedBox(width: context.sWidth*0.03),
 
                     Expanded(
                       child: Column(
@@ -320,7 +321,7 @@ class ChatSkillCard extends StatelessWidget {
                               const SizedBox(width: 3),
                               Expanded(
                                 child: Text(
-                                  "${service.userProfile!.userBio.toString()}",
+                                  service.userProfile!.userBio.toString(),
                                   style: GoogleFonts.poppins(
                                       fontSize: context.text12,
                                       color: AppColor.subtitle),
@@ -334,14 +335,8 @@ class ChatSkillCard extends StatelessWidget {
                           const SizedBox(height: 6),
                           Row(
                             spacing: 10,
+                            crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              Icon(
-                                Icons.done_all,
-                                size: 16,
-                                color: item.status == "seen"
-                                    ? Colors.blue
-                                    : Colors.grey,
-                              ),
                               Expanded(
                                 child: Text(
                                   "${item.message}",
@@ -350,9 +345,18 @@ class ChatSkillCard extends StatelessWidget {
                                     color: AppColor.subtitle,
                                     height: 1.45,
                                   ),
-                                  maxLines: 1,
+                                  maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                 ),
+                              ),
+
+                              if(item.message != '')
+                              Icon(
+                                Icons.done_all,
+                                size: 16,
+                                color: item.status == "seen"
+                                    ? Colors.blue
+                                    : Colors.grey,
                               ),
 
                             ],

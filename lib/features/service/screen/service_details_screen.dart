@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -16,6 +17,7 @@ import '../controller/booking_create_controller.dart';
 import '../controller/recent_view_controller.dart';
 import '../controller/service_details_controller.dart';
 import '../widget/service_details_shimmer.dart';
+import 'package:path_provider/path_provider.dart';
 
 class ServiceDetailsScreen extends StatefulWidget {
   final String serviceId;
@@ -143,9 +145,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                       padding: const EdgeInsets.all(8.0),
                       child: InkWell(
                         onTap: () {
-                          final textToShare =
-                              "Check out this skill:";
-                          Share.share(textToShare);
+                          shareServiceWithImage();
                         },
                         child: const CircleAvatar(
                           backgroundColor: Colors.black38,
@@ -614,6 +614,48 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
 
     });
   }
+
+  Future<void> shareServiceWithImage() async {
+    final service = serviceController.serviceDetails.value;
+
+    if (service == null) return;
+
+    try {
+      /// 1. Download image
+      final dir = await getTemporaryDirectory();
+      final filePath = '${dir.path}/service.jpg';
+
+      await Dio().download(service.serviceImage.toString(), filePath);
+
+      /// 2. Share text (clean & professional)
+      final text = '''
+🚀 Skills Daan App – Discover Amazing Skills & Services!
+
+🔥 ${service.serviceName ?? "Amazing Skill"}
+
+📌 ${service.serviceDescription ?? "Learn real skills from experts."}
+
+💰 Price: ${service.serviceAmount != null ? "₹${service.serviceAmount}" : "Free"}
+
+📍 Distance: ${service.distance ?? "Nearby"}
+
+👨‍💻 Book & Learn Skills Easily
+
+👉 Download App: https://your-app-link.com
+
+#SkillsDaan #SkillSharing #EarnAndLearn
+''';
+
+      /// 3. Share image + text
+      await Share.shareXFiles(
+        [XFile(filePath)],
+        text: text,
+      );
+    } catch (e) {
+      debugPrint("Share Error: $e");
+    }
+  }
+
   Widget _fieldLabel(BuildContext context, String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),

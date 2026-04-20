@@ -59,8 +59,21 @@ class InviteFriendCard extends StatelessWidget {
 
           InkWell(
             onTap: () {
-              final textToShare =
-                  "Check out this skill:";
+              final textToShare = '''
+🚀 Skills Daan App – Apni Skills Share Karo, Seekho aur Earn Karo!
+
+Main ab Skills Daan App use kar raha hoon jahan log apni skills (coding, design, cooking, teaching, etc.) share karte hain aur naye skills seekhte hain.
+
+👨‍💻 Apni talent dikhao  
+📚 Nayi skills seekho  
+💰 Aur rewards bhi kamao  
+
+Abhi join karo aur apni skills ko duniya tak pahunchao 👇  
+👉 Download Now: https://your-app-link.com
+
+#SkillsDaan #LearnAndEarn #SkillSharing
+''';
+
               Share.share(textToShare);
             },
             child: Container(
