@@ -114,7 +114,7 @@ class _AddSkillScreenState extends State<AddSkillScreen>
   }
 
   Future<void> pickImage() async {
-    final result = await FilePicker.platform.pickFiles(type: FileType.image);
+    final result = await FilePicker.pickFiles(type: FileType.image);
     if (result != null && result.files.single.path != null) {
       setState(() => selectedImage = File(result.files.single.path!));
     }

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -13,6 +14,7 @@ import '../../auth/helper/auth_preferences.dart';
 import '../controller/user_profile_controller.dart';
 import '../model/user_profile_model.dart';
 import '../widget/basic_info_shimmer.dart';
+
 
 class BasicInfoScreen extends StatefulWidget {
   const BasicInfoScreen({super.key});
@@ -113,7 +115,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
     FlutterToast.success("Profile updated successfully");
   }
   Future<void> _pickImage() async {
-    final result = await FilePicker.platform.pickFiles(type: FileType.image);
+    final result = await FilePicker.pickFiles(type: FileType.image);
     if (result != null && result.files.single.path != null) {
       setState(() => selectedImage = File(result.files.single.path!));
     }

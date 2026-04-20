@@ -107,7 +107,11 @@ import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../service/controller/service_list_controller.dart';
+import '../../skill/controller/service_list_by_user_controller.dart';
 
 class LocationController extends GetxController {
   var latitude = 0.0.obs;
@@ -211,6 +215,28 @@ class LocationController extends GetxController {
       }
     } catch (e) {
       debugPrint('[LocationController] Reverse geocoding failed: $e');
+    }
+  }
+
+  /// Map se manually selected spot update karna
+  Future<void> updateFromMapSelection(double lat, double lng) async {
+    latitude.value  = lat;
+    longitude.value = lng;
+    await _getAddressFromCoordinates(lat, lng);
+  }
+
+  /// Current GPS location fetch karo (map ke liye)
+  Future<LatLng?> getCurrentLatLng() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      Get.find<ServiceListController>().fetchServiceList();
+      return LatLng(position.latitude, position.longitude);
+
+    } catch (e) {
+      debugPrint('[LocationController] getCurrentLatLng failed: $e');
+      return null;
     }
   }
 

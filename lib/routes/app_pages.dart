@@ -15,6 +15,7 @@ import '../features/dashboard/binding/dashboard_binding.dart';
 import '../features/dashboard/screen/dashboard_screen.dart';
 import '../features/location/binfing/location_binding.dart';
 import '../features/location/screen/location_permission_screen.dart';
+import '../features/location/screen/spot_picker_screen.dart';
 import '../features/search/binding/service_search_binding.dart';
 import '../features/search/screen/search_screen.dart';
 import '../features/service/binding/service_details_binding.dart';
@@ -96,6 +97,11 @@ class AppPages {
     GetPage(
       name: '/chat',
       page: () => ChatScreen(chatList: [],),
+    ),
+
+    GetPage(
+      name: '/spot-picker',
+      page: () => const SpotPickerScreen(),
     ),
   ];
 }

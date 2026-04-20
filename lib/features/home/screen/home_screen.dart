@@ -8,6 +8,7 @@ import 'package:skills_app/features/home/widget/category_card.dart';
 import '../../../core/widget/app_error_card.dart';
 import '../../category/controller/category_controller.dart';
 import '../../location/controller/location_controller.dart';
+import '../../location/screen/spot_picker_screen.dart';
 import '../../location/widget/location_card.dart';
 import '../../notification/screen/notification_screen.dart';
 import '../../service/controller/service_list_controller.dart';
@@ -83,46 +84,51 @@ class _HomeScreenState extends State<HomeScreen> {
                                 padding:EdgeInsets.symmetric(horizontal: context.sWidth*0.02),
                                 child: FaIcon(FontAwesomeIcons.chalkboardTeacher, color: AppColor.white, size: context.sWidth*0.08),
                               ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Row(
-                                    children: [
-                                      FaIcon(
-                                        FontAwesomeIcons.locationDot,
-                                        size: context.sWidth*0.02,
-                                        color: AppColor.white,
-                                      ),
-                                      SizedBox(width: context.sWidth*0.01),
-                                      Text(
-                                        "Location",
-                                        style: GoogleFonts.poppins(
-                                          fontSize: context.text10,
-                                          color: AppColor.white,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    spacing: 2,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      (_city.isNotEmpty || _state.isNotEmpty)?
-                                      Text(
-                                        "$_city, $_state",
-                                        style: GoogleFonts.poppins(
-                                          fontSize: context.text12,
-                                          fontWeight: FontWeight.w500,
+                              InkWell(
+                                onTap: () {
+                                  Get.toNamed('/spot-picker');
+                                },
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        FaIcon(
+                                          FontAwesomeIcons.locationDot,
+                                          size: context.sWidth*0.02,
                                           color: AppColor.white,
                                         ),
-                                      ):Text('')
-                                    ],
-                                  )
-          
-                                ],
+                                        SizedBox(width: context.sWidth*0.01),
+                                        Text(
+                                          "Location",
+                                          style: GoogleFonts.poppins(
+                                            fontSize: context.text10,
+                                            color: AppColor.white,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      spacing: 2,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        (_city.isNotEmpty || _state.isNotEmpty)?
+                                        Text(
+                                          "$_city, $_state",
+                                          style: GoogleFonts.poppins(
+                                            fontSize: context.text12,
+                                            fontWeight: FontWeight.w500,
+                                            color: AppColor.white,
+                                          ),
+                                        ):Text('')
+                                      ],
+                                    )
+
+                                  ],
+                                ),
                               ),
                             ],
                           ),

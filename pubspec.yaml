@@ -18,9 +18,13 @@ dependencies:
   dio: ^5.9.2
   font_awesome_flutter: ^11.0.0
   google_fonts: ^6.3.2
-  file_picker: ^10.3.10
+  file_picker: ^11.0.2
+
   geolocator: ^14.0.2
-  geocoding: ^2.1.0
+  geocoding: ^4.0.0
+  flutter_map: ^8.3.0
+  latlong2: ^0.9.1
+
   shimmer: ^3.0.0
   google_maps_flutter: ^2.5.0
   web_socket_channel: ^3.0.3
@@ -28,12 +32,13 @@ dependencies:
   sms_autofill: ^2.4.1
   transparent_image: ^2.0.0
   cached_network_image: ^3.4.1
-  intl: ^0.19.0
+  intl: ^0.20.2
+
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.4
   flutter_native_splash: ^2.4.7
 
