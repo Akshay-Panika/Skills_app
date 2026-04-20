@@ -11,6 +11,7 @@ import '../../../core/widget/app_dilog.dart';
 import '../controller/booking_controller.dart';
 import '../../notification/screen/notification_screen.dart';
 import '../controller/booking_delete_controller.dart';
+import '../widget/chat_list_shimmer.dart';
 
 class ChatListScreen extends StatefulWidget {
   const ChatListScreen({super.key});
@@ -110,7 +111,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
             Expanded(
               child: Obx(() {
                 if (bookingController.isLoading.value) {
-                  return  Center(child: CircularProgressIndicator(color: AppColor.primary,));
+                  return  ChatListShimmer();
                 }
 
                 if (bookingController.errorMessage.isNotEmpty) {

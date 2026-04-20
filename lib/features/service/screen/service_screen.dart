@@ -62,7 +62,7 @@ class _ServiceScreenState extends State<ServiceScreen> {
 
         final filteredServices = _serviceListController.services.where((service) {
           final matchesSubcategory =
-              service.subcategory?.toString() == widget.subcategoryId;
+              service.subcategory?.id.toString() == widget.subcategoryId;
 
           final matchesFree =
           _isFree ? service.serviceStatus == false : true;

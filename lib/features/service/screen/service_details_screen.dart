@@ -10,6 +10,7 @@ import 'package:skills_app/core/widget/app_card.dart';
 import 'package:skills_app/core/widget/my_appbar.dart';
 import '../../../core/constant/app_color.dart';
 import '../../../core/constant/app_size.dart';
+import '../../../core/widget/app_dilog.dart';
 import '../../../core/widget/app_error_card.dart';
 import '../../auth/helper/auth_preferences.dart';
 import '../controller/booking_check_controller.dart';
@@ -434,16 +435,30 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
 
                         SizedBox(height: context.sHeight * 0.03),
 
-                        Center(
-                          child: Text(
-                            "Report this skill",
-                            style: GoogleFonts.poppins(
-                              color: Colors.red.withOpacity(0.7),
-                              fontSize: context.text12,
-                              fontWeight: FontWeight.w500,
+                        InkWell(
+                          onTap: () async {
+                            final message = await AppDialog.showWithInput(
+                              context,
+                              title: "Report Skill",
+                              hintText: "Write your issue here...",
+                              confirmText: "Report",
+                            );
+
+                            if (message != null && message.isNotEmpty) {
+                              print("User message: $message");
+                            }
+                          },
+                          child: Center(
+                            child: Text(
+                              "Report this skill",
+                              style: GoogleFonts.poppins(
+                                color: Colors.red.withOpacity(0.7),
+                                fontSize: context.text12,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
-                        ),
+                        )
                       ],
                     ),
                   ),
