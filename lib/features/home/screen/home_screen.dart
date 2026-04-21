@@ -48,8 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
         // systemOverlayStyle: SystemUiOverlayStyle.dark,
       ),
       body: Obx(() {
-        final isLoading = !_locationController.isLocationLoaded.value
-        || _categoryController.isLoading.value;
+        final isLoading =  _categoryController.isLoading.value;
 
         if (isLoading) {
           return HomeShimmerCard();
@@ -70,8 +69,8 @@ class _HomeScreenState extends State<HomeScreen> {
           
               SliverToBoxAdapter(
                 child: Obx((){
+                  final _area = _locationController.area.value;
                     final _city = _locationController.city.value;
-                    final _state = _locationController.state.value;
                     return Container(
                       color: AppColor.primary,
                       padding: EdgeInsets.only(left: context.sWidth*0.02,right: context.sWidth*0.02,bottom: context.sWidth*0.026,top: context.sWidth*0.02),
@@ -115,9 +114,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       mainAxisAlignment: MainAxisAlignment.start,
                                       children: [
-                                        (_city.isNotEmpty || _state.isNotEmpty)?
+                                        (_city.isNotEmpty || _area.isNotEmpty)?
                                         Text(
-                                          "$_city, $_state",
+                                          "$_area, $_city",
                                           style: GoogleFonts.poppins(
                                             fontSize: context.text12,
                                             fontWeight: FontWeight.w500,

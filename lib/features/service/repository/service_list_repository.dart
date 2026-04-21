@@ -8,27 +8,22 @@ import '../model/service_list_model.dart';
 
 class ServiceListRepository {
   final Dio _dio = ApiClient.dio;
-
-  final  _locationController = Get.find<LocationController>();
+  final _locationController = Get.find<LocationController>();
 
   Future<ServiceListResponse> getServiceList() async {
     try {
-
       final userId = await AuthPreferences.getUserId();
-
-      if (userId == null) {
-        throw Exception("User not logged in");
-      }
+      if (userId == null) throw Exception("User not logged in");
 
       final double lat = _locationController.latitude.value;
-      final double log = _locationController.longitude.value;
+      final double lng = _locationController.longitude.value;
 
       final response = await _dio.get(
         'service/list/',
         queryParameters: {
           'user': userId,
           'lat': lat,
-          'lon': log,
+          'lon': lng,
         },
       );
 

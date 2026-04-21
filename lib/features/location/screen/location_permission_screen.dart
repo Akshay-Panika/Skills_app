@@ -27,8 +27,8 @@ class LocationPermissionScreen extends StatelessWidget {
             Container(
               width: double.infinity,
               height: h * 0.32,
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.only(
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(32),
                   bottomRight: Radius.circular(32),
                 ),
@@ -36,7 +36,6 @@ class LocationPermissionScreen extends StatelessWidget {
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-
                   Container(
                     width: w * 0.62,
                     height: w * 0.62,
@@ -48,7 +47,6 @@ class LocationPermissionScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-
                   Container(
                     width: w * 0.46,
                     height: w * 0.46,
@@ -60,7 +58,6 @@ class LocationPermissionScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-
                   Container(
                     width: w * 0.30,
                     height: w * 0.30,
@@ -69,7 +66,6 @@ class LocationPermissionScreen extends StatelessWidget {
                       color: AppColor.primary.withOpacity(0.10),
                     ),
                   ),
-
                   Container(
                     width: w * 0.20,
                     height: w * 0.20,
@@ -83,7 +79,6 @@ class LocationPermissionScreen extends StatelessWidget {
                       size: w * 0.09,
                     ),
                   ),
-
                   Positioned(
                     top: h * 0.03,
                     left: w * 0.05,
@@ -112,10 +107,10 @@ class LocationPermissionScreen extends StatelessWidget {
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: w * 0.03),
                 child: Column(
-                  spacing: h*0.02,
+                  spacing: h * 0.02,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                   SizedBox(height: h*0.02,),
+                    SizedBox(height: h * 0.02),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -136,7 +131,6 @@ class LocationPermissionScreen extends StatelessWidget {
                           ),
                         ),
                         SizedBox(height: h * 0.0),
-
                         Text(
                           "Share & Grow\nYour Skills Locally",
                           style: GoogleFonts.poppins(
@@ -147,7 +141,6 @@ class LocationPermissionScreen extends StatelessWidget {
                           ),
                         ),
                         SizedBox(height: h * 0.01),
-
                         Text(
                           "Connect with people around you — teach what you know, learn what you don't.",
                           style: GoogleFonts.poppins(
@@ -160,30 +153,28 @@ class LocationPermissionScreen extends StatelessWidget {
                     ),
 
                     Column(
-                     spacing: h * 0.012,
-                     children: [
-                       _FeatureTile(
-                         icon: Icons.groups_2_rounded,
-                         title: "Find nearby skill sharers",
-                         subtitle: "Discover people teaching around you",
-                         color: const Color(0xFF0891B2),
-                       ),
-
-                       _FeatureTile(
-                         icon: Icons.auto_awesome_rounded,
-                         title: "Personalised for your area",
-                         subtitle: "See trending skills in your city",
-                         color: const Color(0xFF7C3AED),
-                       ),
-
-                       _FeatureTile(
-                         icon: Icons.shield_outlined,
-                         title: "Your privacy is safe",
-                         subtitle: "Exact location is never shared",
-                         color: AppColor.primary,
-                       ),
-                     ],
-                   ),
+                      spacing: h * 0.012,
+                      children: [
+                        _FeatureTile(
+                          icon: Icons.groups_2_rounded,
+                          title: "Find nearby skill sharers",
+                          subtitle: "Discover people teaching around you",
+                          color: const Color(0xFF0891B2),
+                        ),
+                        _FeatureTile(
+                          icon: Icons.auto_awesome_rounded,
+                          title: "Personalised for your area",
+                          subtitle: "See trending skills in your city",
+                          color: const Color(0xFF7C3AED),
+                        ),
+                        _FeatureTile(
+                          icon: Icons.shield_outlined,
+                          title: "Your privacy is safe",
+                          subtitle: "Exact location is never shared",
+                          color: AppColor.primary,
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -191,35 +182,44 @@ class LocationPermissionScreen extends StatelessWidget {
 
             Padding(
               padding: EdgeInsets.symmetric(horizontal: w * 0.03),
-
               child: Column(
                 children: [
                   AppButton(
                     isOutline: false,
                     text: "Allow Location Access",
                     isLoading: _locationController.isLoading.value,
-                    onPressed: () {
+                    onPressed: () async {
                       if (_locationController.isLoading.value) return;
-                      _locationController.requestLocationPermission().then((_) {
-                        if (_locationController.permissionGranted.value) {
-                          Get.offAllNamed('/dashboard');
-                        }
-                      });
+
+                      await _locationController.requestLocationPermission();
+
+                      // ✅ IMPORTANT FIX: ensure location is set (not empty)
+                      if (_locationController.hasLocation) {
+
+                        // optional: go to map screen first OR dashboard
+                        Get.offAllNamed('/spot-picker');
+
+                        // OR direct dashboard (agar map screen nahi chahiye)
+                        // Get.offAllNamed('/dashboard');
+                      } else {
+                        Get.snackbar(
+                          "Location Required",
+                          "Please allow location to continue",
+                          snackPosition: SnackPosition.BOTTOM,
+                        );
+                      }
                     },
                   ),
-
                   SizedBox(height: h * 0.012),
-
                   AppButton(
                     isOutline: true,
                     text: "Skip for now",
                     onPressed: () => Get.offAllNamed('/dashboard'),
                   ),
-
                   SizedBox(height: h * 0.02),
                 ],
               ),
-            )
+            ),
           ],
         )),
       ),

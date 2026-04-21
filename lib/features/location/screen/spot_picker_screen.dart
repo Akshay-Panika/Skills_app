@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:skills_app/core/constant/app_size.dart';
+import 'package:skills_app/core/widget/app_button.dart';
+import 'package:skills_app/core/widget/app_card.dart';
 import '../../../core/constant/app_color.dart';
 import '../../../core/widget/my_appbar.dart';
 import '../../service/controller/service_list_controller.dart';
@@ -15,364 +19,210 @@ class SpotPickerScreen extends StatefulWidget {
 }
 
 class _SpotPickerScreenState extends State<SpotPickerScreen> {
-  final LocationController _locationController = Get.find<LocationController>();
+  final LocationController c = Get.find<LocationController>();
+  late final MapController mapController;
 
-  late MapController _mapController;
-  LatLng? selectedLocation;
-  LatLng? currentLocation;
-  bool _isLocating = false; // my location button loading
+  LatLng? selected;
+  LatLng? current;
+  bool loading = false;
 
   @override
   void initState() {
     super.initState();
-    _mapController = MapController();
-
-    if (_locationController.hasLocation) {
-      selectedLocation = LatLng(
-        _locationController.latitude.value,
-        _locationController.longitude.value,
-      );
-    } else {
-      selectedLocation = const LatLng(20.5937, 78.9629);
-    }
-
-    _loadCurrentLocation();
+    mapController = MapController();
+    c.resetTemp();
+    selected = _initialLocation();
+    _loadCurrent();
   }
 
-  Future<void> _loadCurrentLocation() async {
-    final latLng = await _locationController.getCurrentLatLng();
-    if (latLng != null && mounted) {
-      setState(() => currentLocation = latLng);
+  LatLng _initialLocation() {
+    if (c.tempLat.value != 0 && c.tempLng.value != 0) {
+      return LatLng(c.tempLat.value, c.tempLng.value);
     }
+    return const LatLng(20.5937, 78.9629);
   }
 
-  Future<void> _goToCurrentLocation() async {
-    setState(() => _isLocating = true);
-    final latLng = await _locationController.getCurrentLatLng();
-    if (latLng != null && mounted) {
-      setState(() {
-        currentLocation = latLng;
-        selectedLocation = latLng;
-        _isLocating = false;
-      });
-      _mapController.move(latLng, 16);
-      await _locationController.updateFromMapSelection(
-        latLng.latitude,
-        latLng.longitude,
-      );
-    } else {
-      setState(() => _isLocating = false);
+  Future<void> _loadCurrent() async {
+    final pos = await c.getCurrentLatLng();
+    if (pos != null && mounted) {
+      setState(() => current = pos);
     }
   }
 
-  Future<void> _confirmLocation() async {
-    if (selectedLocation == null) return;
-    await _locationController.updateFromMapSelection(
-      selectedLocation!.latitude,
-      selectedLocation!.longitude,
-    );
-    Get.find<ServiceListController>().fetchServiceList();
+  // Instant move without animation
+  Future<void> goCurrent() async {
+    setState(() => loading = true);
+    final pos = await c.getCurrentLatLng();
 
-    Get.back();
+    if (pos != null) {
+      current = pos;
+      mapController.move(pos, 16); // Instant jump
+      await c.setTempLocation(pos.latitude, pos.longitude);
+      setState(() => selected = pos);
+    }
+
+    if (mounted) setState(() => loading = false);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColor.white,
       appBar: myAppBar(
-        backgroundColor: AppColor.primary,
-        title: "Select Location",
-        buttonColor: Colors.white,
+        title: "Set Delivery Location",
         showBackButton: true,
-        titleColor: Colors.white
+        backgroundColor: AppColor.primary,
+        titleColor: Colors.white,
+        buttonColor: Colors.white,
       ),
       body: Stack(
         children: [
-          /// MAP
+          // 1. Map
           FlutterMap(
-            mapController: _mapController,
+            mapController: mapController,
             options: MapOptions(
-              initialCenter: selectedLocation!,
+              initialCenter: selected!,
               initialZoom: 15,
-              minZoom: 5,
-              maxZoom: 20,
-              onTap: (tapPosition, point) async {
-                setState(() => selectedLocation = point);
-                await _locationController.updateFromMapSelection(
-                  point.latitude,
-                  point.longitude,
-                );
+              onPositionChanged: (position, hasGesture) {
+                if (hasGesture) {
+                  // Instant update on drag
+                  selected = position.center;
+                }
+              },
+              onMapEvent: (event) {
+                if (event is MapEventMoveEnd) {
+                  // Fetch address only when map stops
+                  c.setTempLocation(selected!.latitude, selected!.longitude);
+                }
               },
             ),
             children: [
               TileLayer(
-                urlTemplate:
-                'https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
-                userAgentPackageName: 'com.example.skills_app',
-                maxZoom: 20,
+                urlTemplate: "https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png",
               ),
-              MarkerLayer(
-                markers: [
-                  /// Current GPS — blue pulsing dot
-                  if (currentLocation != null)
+              if (current != null)
+                MarkerLayer(
+                  markers: [
                     Marker(
-                      point: currentLocation!,
-                      width: 44,
-                      height: 44,
-                      child: _BluePulse(),
-                    ),
-
-                  /// Selected spot — red pin
-                  Marker(
-                    point: selectedLocation!,
-                    width: 50,
-                    height: 60,
-                    child: Column(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: AppColor.primary,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Text(
-                            "Spot",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold),
-                          ),
+                      point: current!,
+                      width: 40,
+                      height: 40,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withOpacity(0.2),
+                          shape: BoxShape.circle,
                         ),
-                        Icon(Icons.location_on,
-                            size: 36, color: AppColor.primary),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+                        child: Icon(Icons.my_location,color: Colors.blue,),
+                      ),
 
-          /// Top hint banner
-          Positioned(
-            top: 12,
-            left: 20,
-            right: 20,
-            child: Container(
-              padding:
-              const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.6),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.touch_app, color: Colors.white, size: 16),
-                  SizedBox(width: 6),
-                  Text(
-                    "Map pe tap karke spot select karo",
-                    style: TextStyle(color: Colors.white, fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          /// My Location FAB
-          Positioned(
-            right: 16,
-            bottom: 120,
-            child: GestureDetector(
-              onTap: _isLocating ? null : _goToCurrentLocation,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                width: 46,
-                height: 46,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
                     ),
                   ],
                 ),
-                child: _isLocating
-                    ? const Padding(
-                  padding: EdgeInsets.all(12),
-                  child: CircularProgressIndicator(
-                      strokeWidth: 2, color: Colors.blue),
-                )
-                    : const Icon(Icons.my_location,
-                    color: Colors.blue, size: 22),
+            ],
+          ),
+
+          // 2. Fixed Center Marker (Static)
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 35),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      // color: Colors.black.withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child:  Text("Location is here",
+                        style: GoogleFonts.poppins(color: AppColor.primary, fontSize: 10,fontWeight: FontWeight.w600)),
+                  ),
+                  Icon(Icons.location_on, size: 45, color: AppColor.primary),
+                ],
               ),
             ),
           ),
 
-          /// Bottom Sheet style card
           Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius:
-                BorderRadius.vertical(top: Radius.circular(20)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 12,
-                    offset: Offset(0, -3),
+            right: 16,
+            bottom: 140,
+            child: FloatingActionButton(
+              mini: true,
+              backgroundColor: Colors.white,
+              elevation: 4,
+              onPressed: loading ? null : goCurrent,
+              child: loading
+                  ? const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(strokeWidth: 2, color: AppColor.primary),
+              )
+                  : Icon(Icons.my_location, color: AppColor.primary),
+            ),
+          ),
+
+          Positioned(
+            left: 20,
+            right: 20,
+            bottom: 20,
+            child: SafeArea(
+              top: false,
+              child: Column(
+                spacing: 20,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Address Display Section
+                  Row(
+                    spacing: 12,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColor.primary.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(Icons.location_on, color: AppColor.primary, size: 24),
+                      ),
+
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Select Location",
+                              style: GoogleFonts.poppins(color: AppColor.title, fontSize: context.text10),
+                            ),
+                            const SizedBox(height: 2),
+                            Obx(() {
+                              final address = c.tempCity.value.isEmpty ? "Fetching location..."
+                                  : "${c.tempArea.value} ${c.tempCity.value}";
+                              return Text(
+                                address,
+                                style: GoogleFonts.poppins(color: AppColor.title, fontSize: context.text16,fontWeight: FontWeight.w500),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              );
+                            }),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  AppButton(
+                    isLoading: false,
+                    onPressed: () async {
+                      await c.confirmLocation();
+                      Get.find<ServiceListController>().fetchServiceList();
+                      Get.back();
+                    },
+                    text: "Confirm",
                   ),
                 ],
               ),
-              child: Obx(() => Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  /// Location icon circle
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: AppColor.primary.withOpacity(0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(Icons.location_on,
-                        color: AppColor.primary, size: 22),
-                  ),
-                  const SizedBox(width: 12),
-
-                  /// Address text
-                  Expanded(
-                    child: _locationController.isLoading.value
-                        ? Row(
-                      children: [
-                        const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                              strokeWidth: 2),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          "Address fetch ho raha hai...",
-                          style: TextStyle(
-                              color: Colors.grey[500],
-                              fontSize: 13),
-                        ),
-                      ],
-                    )
-                        : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Selected Location",
-                          style: TextStyle(
-                              fontSize: 11,
-                              color: Colors.grey,
-                              fontWeight: FontWeight.w500),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          _locationController.city.value.isEmpty
-                              ? "Location select karo"
-                              : '${_locationController.city.value}, ${_locationController.state.value}',
-                          style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black87),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-
-                  /// Confirm button
-                  GestureDetector(
-                    onTap: _confirmLocation,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: AppColor.primary,
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: const Row(
-                        children: [
-                          Icon(Icons.check, color: Colors.white, size: 18),
-                          SizedBox(width: 6),
-                          Text(
-                            "Confirm",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              )),
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// Blue pulsing dot for current location
-class _BluePulse extends StatefulWidget {
-  @override
-  State<_BluePulse> createState() => _BluePulseState();
-}
-
-class _BluePulseState extends State<_BluePulse>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _animation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 1),
-    )..repeat(reverse: true);
-    _animation = Tween<double>(begin: 0.4, end: 1.0).animate(_controller);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _animation,
-      builder: (_, __) => Container(
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: Colors.blue.withOpacity(_animation.value * 0.25),
-          border: Border.all(
-              color: Colors.blue.withOpacity(_animation.value), width: 2),
-        ),
-        child: const Center(
-          child: CircleAvatar(radius: 6, backgroundColor: Colors.blue),
-        ),
       ),
     );
   }
