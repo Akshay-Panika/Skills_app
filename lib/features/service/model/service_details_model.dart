@@ -10,6 +10,9 @@ class ServiceDetailsModel {
   final double? latitude;
   final double? longitude;
 
+  final bool isFavorite;
+  final bool isBooked;
+
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -17,6 +20,7 @@ class ServiceDetailsModel {
   final SubcategoryModel? subcategory;
 
   final UserProfileModel? userProfile;
+
   final String? distance;
 
   ServiceDetailsModel({
@@ -29,6 +33,8 @@ class ServiceDetailsModel {
     required this.serviceDescription,
     this.latitude,
     this.longitude,
+    required this.isFavorite,
+    required this.isBooked,
     this.createdAt,
     this.updatedAt,
     this.category,
@@ -54,6 +60,9 @@ class ServiceDetailsModel {
       longitude: json['longitude'] != null
           ? (json['longitude'] as num).toDouble()
           : null,
+
+      isFavorite: json['is_favorite'] ?? false,
+      isBooked: json['is_booked'] ?? false,
 
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'])
@@ -90,6 +99,8 @@ class ServiceDetailsModel {
       "service_description": serviceDescription,
       "latitude": latitude,
       "longitude": longitude,
+      "is_favorite": isFavorite,
+      "is_booked": isBooked,
       "created_at": createdAt?.toIso8601String(),
       "updated_at": updatedAt?.toIso8601String(),
       "category": category?.toJson(),

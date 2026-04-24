@@ -13,8 +13,7 @@ import '../../../core/constant/app_size.dart';
 import '../../../core/widget/app_dilog.dart';
 import '../../../core/widget/app_error_card.dart';
 import '../../auth/helper/auth_preferences.dart';
-import '../controller/booking_check_controller.dart';
-import '../controller/booking_create_controller.dart';
+import '../../chat/controller/chat_controller.dart';
 import '../controller/recent_view_controller.dart';
 import '../controller/service_details_controller.dart';
 import '../widget/service_details_shimmer.dart';
@@ -35,9 +34,8 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
   final userId = AuthPreferences.getUserId();
 
   final serviceController = Get.find<ServiceDetailsController>();
-  final checkBookingController = Get.find<BookingCheckController>();
-  final bookingCreateController = Get.find<BookingCreateController>();
   final recentController = Get.find<RecentViewController>();
+  final chatController  = Get.find<ChatController>();
 
   bool _bookmark = false;
   bool _isMSG = false;
@@ -50,10 +48,6 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
     recentController.startTracking(widget.serviceId);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      checkBookingController.checkServiceBooking(
-        int.parse(widget.serviceId),
-      );
-
       await serviceController.fetchServiceDetails(
         int.parse(widget.serviceId),
       );
@@ -468,100 +462,123 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
               ],
             ),
             if(userId != service.userProfile!.id)
-            Positioned(
-              bottom: context.sWidth * 0.06,
-              left: 0,
-              right: 0,
-              child: Obx(() {
+              Positioned(
+                bottom: context.sWidth * 0.06,
+                left: 0,
+                right: 0,
+                child: Obx(() {
+                  final service = serviceController.serviceDetails.value;
 
-                final alreadyBooked = checkBookingController.alreadyBooked.value;
+                  if (service == null) {
+                    return const SizedBox();
+                  }
 
-                if (alreadyBooked) {
-                  return _actionButton(
-                    context,
-                    loading: checkBookingController.isLoading.value,
-                    text: "Skill Booked",
-                    onChatTap: () {
-                      Get.toNamed(
-                        '/chat',
-                        arguments: {
-                          "serviceId": service.id,
-                        },
-                      );
-                    },
-                    // onChatTap: () => Get.to(() => ChatScreen()),
-                    bookmark: _bookmark,
-                    onBookmarkTap: () {
-                      setState(() {
-                        _bookmark = !_bookmark;
-                      });
-                    },
-                  );
-                }
-
-                return Column(
-                  children: [
-
-                    if (_isMSG)
-                      Stack(
-                        children: [
-                          AppCard(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _fieldLabel(context, "Chat With Mentor"),
-                                _mxgBox(controller: descController),
-                              ],
-                            ),
-                          ),
-
-                          Positioned(
-                            top: 0,
-                            right: 16,
-                            child: IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  _isMSG = false;
-                                  descController.text =
-                                  "Hi, I came across your \"${service.serviceName}\" skill and would like to connect with you.";
-                                });
-                              },
-                              icon: const Icon(Icons.close, color: Colors.red),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                    _actionButton(
+                  if (service.isBooked == true) {
+                    return _actionButton(
                       context,
-                      loading: checkBookingController.isLoading.value,
-                      text: _isMSG ? "Send Message" : "Chat With Mentor",
+                      loading: false,
+                      text: "Skill Booked",
                       onChatTap: () {
-                        if (!_isMSG) {
-                          setState(() {
-                            _isMSG = true;
-                          });
-                          return;
-                        }
-
-                        bookingCreateController.createBooking(
-                          serviceId: service.id,
-                          message: descController.text,
+                        Get.toNamed(
+                          '/chat',
+                          arguments: {
+                            "serviceId": service.id,
+                          },
                         );
                       },
-
                       bookmark: _bookmark,
                       onBookmarkTap: () {
                         setState(() {
                           _bookmark = !_bookmark;
                         });
                       },
-                    ),
-                  ],
-                );
-              }),
-            ),
+                    );
+                  }
+
+                  return Column(
+                    children: [
+
+                      if (_isMSG)
+                        Stack(
+                          children: [
+                            AppCard(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _fieldLabel(context, "Chat With Mentor"),
+                                  _mxgBox(controller: descController),
+                                ],
+                              ),
+                            ),
+
+                            Positioned(
+                              top: 0,
+                              right: 16,
+                              child: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _isMSG = false;
+                                    descController.text =
+                                    "Hi, I came across your \"${service.serviceName}\" skill and would like to connect with you.";
+                                  });
+                                },
+                                icon: const Icon(Icons.close, color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                      _actionButton(
+                        context,
+                        loading: false,
+                        text: _isMSG ? "Send Message" : "Chat With Mentor",
+                        onChatTap: () async {
+                          if (!_isMSG) {
+                            setState(() {
+                              _isMSG = true;
+                            });
+                            return;
+                          }
+
+                          final service = serviceController.serviceDetails.value;
+
+                          if (service == null) return;
+
+                          final message = descController.text.trim();
+
+                          if (message.isEmpty) return;
+
+                          try {
+                            chatController.isLoading.value = true;
+
+                            await chatController.repository.createRoom(
+                              serviceId: service.id,
+                              buyerId: userId!,
+                              message: message,
+                            );
+
+                            await chatController.fetchRooms();
+
+                            Get.toNamed('/chat');
+
+                          } catch (e) {
+                            debugPrint("CHAT ERROR: $e");
+                          } finally {
+                            chatController.isLoading.value = false;
+                          }
+                        },
+                        bookmark: _bookmark,
+                        onBookmarkTap: () {
+                          setState(() {
+                            _bookmark = !_bookmark;
+                          });
+                        },
+                      ),
+                    ],
+                  );
+                }),
+              ),
 
             if(userId == service.userProfile!.id)
               Positioned(

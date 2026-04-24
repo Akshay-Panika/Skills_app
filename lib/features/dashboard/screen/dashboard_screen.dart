@@ -5,7 +5,7 @@ import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/constant/app_size.dart';
 import '../../../core/widget/app_dilog.dart';
 import '../../account/screen/account_screen.dart';
-import '../../chat/screen/chat_list_screen.dart';
+import '../../chat/screen/room_list_screen.dart';
 import '../../home/controller/home_scroll_controller.dart';
 import '../../home/screen/home_screen.dart';
 import 'package:get/get.dart';

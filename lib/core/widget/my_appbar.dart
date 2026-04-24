@@ -15,6 +15,8 @@ PreferredSizeWidget myAppBar({
   Color titleColor = Colors.black,
   Color buttonColor = Colors.black,
   VoidCallback? onBackPressed,
+  PreferredSizeWidget? bottom,
+
 }) {
   return AppBar(
     automaticallyImplyLeading: false,
@@ -38,5 +40,6 @@ PreferredSizeWidget myAppBar({
     scrolledUnderElevation: 0,
     shadowColor: Colors.transparent,
     actions: actions,
+    bottom: bottom,
   );
 }
