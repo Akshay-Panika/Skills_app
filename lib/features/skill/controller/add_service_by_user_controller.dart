@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:skills_app/core/widget/flutter_toast.dart';
 import 'package:skills_app/features/skill/controller/service_list_by_user_controller.dart';
 import '../../auth/helper/auth_preferences.dart';
-import '../../chat/controller/booking_controller.dart';
 import '../../service/controller/service_list_controller.dart';
 import '../repository/add_service_by_user_repository.dart';
 
@@ -54,7 +53,6 @@ class AddServiceByUserController extends GetxController {
       FlutterToast.success("Your skill has been created Successfully");
       Get.find<ServiceListController>().fetchServiceList();
       Get.find<ServiceListByUserController>().fetchMyServices();
-      Get.find<BookingController>().fetchBookings();
 
     } on DioException catch (e) {
       FlutterToast.error(e.response?.data.toString() ?? "Server Error");
@@ -107,7 +105,6 @@ class AddServiceByUserController extends GetxController {
       FlutterToast.success("Your skill has been updated successfully");
       Get.find<ServiceListController>().fetchServiceList();
       Get.find<ServiceListByUserController>().fetchMyServices();
-      Get.find<BookingController>().fetchBookings();
 
     }  on DioException catch (e) {
       FlutterToast.error(e.response?.data.toString() ?? "Server Error");

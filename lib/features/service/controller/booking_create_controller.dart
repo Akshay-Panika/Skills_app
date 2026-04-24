@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:skills_app/features/service/controller/booking_check_controller.dart';
 import '../../auth/helper/auth_preferences.dart';
-import '../../chat/controller/booking_controller.dart';
 import '../model/booking_create_model.dart';
 import '../repository/booking_create_repository.dart';
 
@@ -34,7 +33,6 @@ class BookingCreateController extends GetxController {
 
       bookingResponse.value = result;
       Get.find<BookingCheckController>().checkServiceBooking(serviceId);
-      Get.find<BookingController>().fetchBookings();
       debugPrint("Success : ${result.message}");
 
     } catch (e) {

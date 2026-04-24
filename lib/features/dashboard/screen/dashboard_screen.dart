@@ -31,7 +31,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     super.initState();
     _screens = [
       HomeScreen(),
-      ChatListScreen(),
+      RoomListScreen(),
       AdsScreen(),
       AccountScreen(),
     ];

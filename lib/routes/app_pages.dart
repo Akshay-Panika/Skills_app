@@ -1,4 +1,6 @@
 import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/bindings_interface.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:skills_app/features/auth/binding/binding.dart';
@@ -10,6 +12,9 @@ import '../features/auth/screen/auth_screen.dart';
 import '../features/auth/screen/intro_screen.dart';
 import '../features/category/binding/category_binding.dart';
 import '../features/category/screen/category_screen.dart';
+import '../features/chat/controller/chat_controller.dart';
+import '../features/chat/screen/ChatPage.dart';
+import '../features/chat/screen/chat_list_screen.dart';
 import '../features/chat/screen/chat_screen.dart';
 import '../features/dashboard/binding/dashboard_binding.dart';
 import '../features/dashboard/screen/dashboard_screen.dart';
@@ -94,9 +99,16 @@ class AppPages {
       binding: AddSkillBinding(),
     ),
 
+    // GetPage(
+    //   name: '/chat',
+    //   page: () => ChatPage(),
+    // ),
     GetPage(
       name: '/chat',
-      page: () => ChatScreen(chatList: [],),
+      page: () =>  RoomListScreen(),
+      binding: BindingsBuilder(() {
+        Get.put(ChatController());
+      }),
     ),
 
     GetPage(
