@@ -5,6 +5,8 @@ import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../service/controller/service_list_controller.dart';
+
 class LocationData {
   final double latitude;
   final double longitude;
@@ -51,7 +53,7 @@ class LocationController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _loadSaved();
+    loadSaved();
   }
 
   void resetTemp() {
@@ -134,9 +136,12 @@ class LocationController extends GetxController {
     await prefs.setString(_kArea, area.value);
     await prefs.setString(_kCity, city.value);
     await prefs.setString(_kState, state.value);
+
+    Get.find<ServiceListController>().fetchServiceList();
+
   }
 
-  Future<void> _loadSaved() async {
+  Future<void> loadSaved() async {
     final prefs = await SharedPreferences.getInstance();
 
     latitude.value = prefs.getDouble(_kLat) ?? 0.0;

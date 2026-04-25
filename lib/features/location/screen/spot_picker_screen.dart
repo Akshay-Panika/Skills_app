@@ -5,10 +5,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:skills_app/core/constant/app_size.dart';
 import 'package:skills_app/core/widget/app_button.dart';
-import 'package:skills_app/core/widget/app_card.dart';
 import '../../../core/constant/app_color.dart';
 import '../../../core/widget/my_appbar.dart';
-import '../../service/controller/service_list_controller.dart';
+import '../../home/controller/home_scroll_controller.dart';
 import '../controller/location_controller.dart';
 
 class SpotPickerScreen extends StatefulWidget {
@@ -19,7 +18,7 @@ class SpotPickerScreen extends StatefulWidget {
 }
 
 class _SpotPickerScreenState extends State<SpotPickerScreen> {
-  final LocationController c = Get.find<LocationController>();
+  final LocationController locationController = Get.find<LocationController>();
   late final MapController mapController;
 
   LatLng? selected;
@@ -30,20 +29,20 @@ class _SpotPickerScreenState extends State<SpotPickerScreen> {
   void initState() {
     super.initState();
     mapController = MapController();
-    c.resetTemp();
+    locationController.resetTemp();
     selected = _initialLocation();
     _loadCurrent();
   }
 
   LatLng _initialLocation() {
-    if (c.tempLat.value != 0 && c.tempLng.value != 0) {
-      return LatLng(c.tempLat.value, c.tempLng.value);
+    if (locationController.tempLat.value != 0 && locationController.tempLng.value != 0) {
+      return LatLng(locationController.tempLat.value, locationController.tempLng.value);
     }
     return const LatLng(20.5937, 78.9629);
   }
 
   Future<void> _loadCurrent() async {
-    final pos = await c.getCurrentLatLng();
+    final pos = await locationController.getCurrentLatLng();
     if (pos != null && mounted) {
       setState(() => current = pos);
     }
@@ -52,12 +51,12 @@ class _SpotPickerScreenState extends State<SpotPickerScreen> {
   // Instant move without animation
   Future<void> goCurrent() async {
     setState(() => loading = true);
-    final pos = await c.getCurrentLatLng();
+    final pos = await locationController.getCurrentLatLng();
 
     if (pos != null) {
       current = pos;
       mapController.move(pos, 16); // Instant jump
-      await c.setTempLocation(pos.latitude, pos.longitude);
+      await locationController.setTempLocation(pos.latitude, pos.longitude);
       setState(() => selected = pos);
     }
 
@@ -91,7 +90,7 @@ class _SpotPickerScreenState extends State<SpotPickerScreen> {
               onMapEvent: (event) {
                 if (event is MapEventMoveEnd) {
                   // Fetch address only when map stops
-                  c.setTempLocation(selected!.latitude, selected!.longitude);
+                  locationController.setTempLocation(selected!.latitude, selected!.longitude);
                 }
               },
             ),
@@ -194,8 +193,8 @@ class _SpotPickerScreenState extends State<SpotPickerScreen> {
                             ),
                             const SizedBox(height: 2),
                             Obx(() {
-                              final address = c.tempCity.value.isEmpty ? "Fetching location..."
-                                  : "${c.tempArea.value} ${c.tempCity.value}";
+                              final address = locationController.tempCity.value.isEmpty ? "Fetching location..."
+                                  : "${locationController.tempArea.value} ${locationController.tempCity.value}";
                               return Text(
                                 address,
                                 style: GoogleFonts.poppins(color: AppColor.title, fontSize: context.text16,fontWeight: FontWeight.w500),
@@ -212,9 +211,9 @@ class _SpotPickerScreenState extends State<SpotPickerScreen> {
                   AppButton(
                     isLoading: false,
                     onPressed: () async {
-                      await c.confirmLocation();
-                      Get.find<ServiceListController>().fetchServiceList();
-                      Get.back();
+                      await locationController.confirmLocation();
+                      // Get.offAllNamed('/dashboard');
+                      Get.until((route) => route.settings.name == '/dashboard');
                     },
                     text: "Confirm",
                   ),

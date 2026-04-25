@@ -69,8 +69,6 @@ class _AuthScreenState extends State<AuthScreen> {
     return otpControllers.map((e) => e.text).join();
   }
   void verifyOtpAuto() async {
-    final locationController = Get.find<LocationController>();
-
     String otp = getOtp();
 
     if (otp.length == 6) {
@@ -80,9 +78,9 @@ class _AuthScreenState extends State<AuthScreen> {
       );
 
       if (success) {
-        if (locationController.hasLocation &&
-            locationController.city.value.isNotEmpty &&
-            locationController.state.value.isNotEmpty) {
+        final locationController = Get.find<LocationController>();
+        await locationController.loadSaved();
+        if (locationController.hasLocation) {
           Get.offAllNamed('/dashboard');
         } else {
           Get.offAllNamed('/location');

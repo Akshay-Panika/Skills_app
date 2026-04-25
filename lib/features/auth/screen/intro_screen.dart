@@ -5,6 +5,7 @@ import 'package:lottie/lottie.dart';
 import 'package:skills_app/core/constant/app_color.dart';
 import '../../../core/constant/app_size.dart';
 import '../../../core/widget/app_button.dart';
+import '../helper/auth_preferences.dart';
 import '../helper/intro_preferences.dart';
 
 class IntroScreen extends StatefulWidget {
@@ -39,11 +40,19 @@ class _IntroScreenState extends State<IntroScreen> {
     },
   ];
 
-  void _goToDashboard() async {
+  Future<void> _goNext() async {
     await IntroPreferences.setIntroSeen();
+
     if (!mounted) return;
-    Get.offAllNamed('/auth');
+
+    if (AuthPreferences.isLoggedIn()) {
+      Get.offAllNamed('/dashboard');
+    } else {
+      Get.offAllNamed('/auth');
+    }
   }
+
+
 
   @override
   void dispose() {
@@ -133,7 +142,7 @@ class _IntroScreenState extends State<IntroScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     TextButton(
-                      onPressed: _goToDashboard,
+                      onPressed: _goNext,
                       child:  Text(
                         "Skip",
                         style: TextStyle(color: AppColor.primary,fontWeight: FontWeight.bold,fontSize: context.text14),
@@ -149,7 +158,7 @@ class _IntroScreenState extends State<IntroScreen> {
 
                         onPressed: () {
                           if (currentIndex == pages.length - 1) {
-                            _goToDashboard();
+                            _goNext();
                           } else {
                             _controller.nextPage(
                               duration: const Duration(milliseconds: 300),

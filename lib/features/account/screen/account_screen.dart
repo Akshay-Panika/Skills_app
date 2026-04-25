@@ -304,9 +304,7 @@ class _AccountScreenState extends State<AccountScreen> {
       confirmText: "Sign Out",
     );
     if (confirmed) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.clear();
-      Get.deleteAll();
+      AuthPreferences.logout();
       Get.offAllNamed('/auth');
       FlutterToast.success("Signed out successfully");
     }

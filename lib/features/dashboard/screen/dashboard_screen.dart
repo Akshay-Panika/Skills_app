@@ -72,36 +72,53 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 spacing: context.sWidth*0.02,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+
                   Expanded(
                     child: Obx(() {
                       final direction = ctrl.scrollDirection.value;
-                      final isHidden = direction == ScrollDirection.down;
-                    
-                      return AnimatedSlide(
-                        offset: isHidden ? Offset(0, 1.5) : Offset.zero,
-                        duration: Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                        child: AnimatedOpacity(
-                          opacity: isHidden ? 0.0 : 1.0,
-                          duration: Duration(milliseconds: 300),
-                          child:  Container(
-                            decoration: BoxDecoration(
-                              borderRadius:  BorderRadius.only(
-                                topRight: Radius.circular(context.sWidth*0.03),
-                                bottomRight: Radius.circular(context.sWidth*0.03),
+
+                      /// only hide on Home tab
+                      final shouldHide =
+                          _currentIndex == 0 &&
+                              direction == ScrollDirection.down;
+
+                      return IgnorePointer(
+                        ignoring: shouldHide,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          transform: Matrix4.translationValues(
+                            0,
+                            shouldHide ? 120 : 0,
+                            0,
+                          ),
+                          child: AnimatedOpacity(
+                            duration: const Duration(milliseconds: 250),
+                            opacity: shouldHide ? 0 : 1,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(context.sWidth * 0.03),
+                                  bottomRight: Radius.circular(context.sWidth * 0.03),
+                                ),
+                                color: Colors.white,
+                                border: Border.all(
+                                  color: Colors.grey,
+                                  width: 0.3,
+                                ),
                               ),
-                              color: Colors.white,
-                              border: Border.all(color: Colors.grey, width: 0.3),
-                            ),
-                            padding: EdgeInsets.symmetric(vertical: context.sWidth * 0.01),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                _navIcon(FontAwesomeIcons.home, 0),
-                                _navIcon(FontAwesomeIcons.comment, 1),
-                                _navIcon(FontAwesomeIcons.chalkboardTeacher, 2),
-                                _navIcon(FontAwesomeIcons.user, 3),
-                              ],
+                              padding: EdgeInsets.symmetric(
+                                vertical: context.sWidth * 0.01,
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                children: [
+                                  _navIcon(FontAwesomeIcons.home, 0),
+                                  _navIcon(FontAwesomeIcons.comment, 1),
+                                  _navIcon(FontAwesomeIcons.chalkboardTeacher, 2),
+                                  _navIcon(FontAwesomeIcons.user, 3),
+                                ],
+                              ),
                             ),
                           ),
                         ),

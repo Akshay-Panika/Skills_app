@@ -330,12 +330,9 @@ class _RoomListScreenState extends State<RoomListScreen>
                                   )
                                 ],
                               )
-
-
                             ],
                           ),
                         ),
-
                       ],
                     ),
                     Row(

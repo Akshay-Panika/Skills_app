@@ -5,6 +5,7 @@ import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/constant/app_size.dart';
 import 'package:skills_app/core/widget/app_button.dart';
 import 'package:skills_app/core/widget/app_card.dart';
+import 'package:skills_app/core/widget/flutter_toast.dart';
 import 'package:skills_app/features/location/controller/location_controller.dart';
 
 class LocationPermissionScreen extends StatelessWidget {
@@ -193,20 +194,14 @@ class LocationPermissionScreen extends StatelessWidget {
 
                       await _locationController.requestLocationPermission();
 
-                      // ✅ IMPORTANT FIX: ensure location is set (not empty)
-                      if (_locationController.hasLocation) {
+                      if (_locationController.tempLat.value != 0.0 &&
+                          _locationController.tempLng.value != 0.0) {
 
-                        // optional: go to map screen first OR dashboard
+                        await _locationController.confirmLocation();
+
                         Get.offAllNamed('/spot-picker');
-
-                        // OR direct dashboard (agar map screen nahi chahiye)
-                        // Get.offAllNamed('/dashboard');
                       } else {
-                        Get.snackbar(
-                          "Location Required",
-                          "Please allow location to continue",
-                          snackPosition: SnackPosition.BOTTOM,
-                        );
+                        FlutterToast.error("Please allow location to continue");
                       }
                     },
                   ),

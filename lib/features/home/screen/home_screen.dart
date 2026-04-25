@@ -33,7 +33,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final _serviceListController = Get.find<ServiceListController>();
   bool  _isFree = false;
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -116,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       children: [
                                         (_city.isNotEmpty || _area.isNotEmpty)?
                                         Text(
-                                          "$_area, $_city",
+                                          "$_area $_city",
                                           style: GoogleFonts.poppins(
                                             fontSize: context.text12,
                                             fontWeight: FontWeight.w500,

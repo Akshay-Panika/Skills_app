@@ -21,6 +21,7 @@ class AuthPreferences {
   }
 
   static Future<void> logout() async {
-    await _prefs?.clear();
+    await _prefs?.remove("user_id");
+    await _prefs?.remove("is_logged_in");
   }
 }
