@@ -238,7 +238,7 @@ class _AccountScreenState extends State<AccountScreen> {
             isLoading
                 ? AppCard(height: 10, width: 80, color: Colors.grey.shade300, margin: EdgeInsets.zero,padding: EdgeInsets.zero,)
                 : Text(
-              AppDateFormat.format(profile?.createdAt),
+              AppDateFormat.dateFormat(profile?.createdAt),
               style: GoogleFonts.poppins(fontSize: context.text12,),
             ),
 

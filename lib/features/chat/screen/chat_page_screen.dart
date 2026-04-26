@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:skills_app/core/widget/app_card.dart';
-import 'package:skills_app/core/widget/app_date_format.dart';
-import '../../../core/constant/app_size.dart';
-import '../controller/chat_controller.dart';
-import 'package:intl/intl.dart';
+import 'package:skills_app/core/constant/app_size.dart';
 import '../../../core/constant/app_color.dart';
+import '../../../core/widget/app_date_format.dart';
+import '../controller/chat_controller.dart';
+import '../model/chat_message_model.dart';
+import '../service/chat_socket_service.dart';
 
 class ChatPageScreen extends StatefulWidget {
   final int roomId;
   final String title;
+  final String profile;
 
   const ChatPageScreen({
     super.key,
     required this.roomId,
     required this.title,
+    required this.profile,
   });
 
   @override
@@ -23,30 +25,107 @@ class ChatPageScreen extends StatefulWidget {
 }
 
 class _ChatPageScreenState extends State<ChatPageScreen> {
-  final ChatController controller = Get.find<ChatController>();
-  final ScrollController scrollController = ScrollController();
+
+  final _chatController = Get.find<ChatController>();
+  final _messageController = TextEditingController();
+  final _scrollController = ScrollController();
+
+  final ChatSocketService socket = ChatSocketService();
+
+  bool isTyping = false;
+  bool isOnline = false;
 
   @override
   void initState() {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.fetchMessages(widget.roomId);
+      _chatController.fetchMessages(widget.roomId);
+      socket.connectChat(
+        roomId: widget.roomId,
+        userId: _chatController.currentUserId!,
+        onEvent: (data) {
+          final type = data["type"];
+          if (type == "chat_message") {
+            final msg = ChatMessageModel(
+              id: data["id"] ?? 0,
+              room: data["room"] ?? widget.roomId,
+              sender: data["sender"] ?? 0,
+              senderPhone: "",
+              message: data["message"] ?? "",
+              isSeen: data["is_seen"] ?? false,
+              createdAt:
+              data["created_at"] ??
+                  DateTime.now().toString(),
+            );
+
+            final alreadyExists = _chatController.messageList.any(
+                  (e) => e.id == msg.id && msg.id != 0,
+            );
+
+            if (!alreadyExists) {
+              _chatController.messageList.add(msg);
+              _chatController.fetchRooms();
+              scrollToBottom();
+            }
+          }
+
+          if (type == "typing") {
+            if (data["user_id"] != _chatController.currentUserId) {
+              setState(() {
+                isTyping = data["is_typing"] ?? false;
+              });
+            }
+          }
+
+          if (type == "online_status") {
+            if (data["user_id"] !=
+                _chatController.currentUserId) {
+              setState(() {
+                isOnline =
+                    data["is_online"] ?? false;
+              });
+            }
+          }
+        },
+      );
+
+      /// user online
+      socket.sendOnlineStatus(
+        isOnline: true,
+        userId: _chatController.currentUserId!,
+      );
     });
   }
 
   void scrollToBottom() {
-    if (scrollController.hasClients) {
-      scrollController.animateTo(
-        scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.easeOut,
-      );
-    }
+    Future.delayed(
+      const Duration(milliseconds: 150),
+          () {
+        if (_scrollController.hasClients) {
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: const Duration(
+              milliseconds: 250,
+            ),
+            curve: Curves.easeOut,
+          );
+        }
+      },
+    );
   }
 
-  String formatTime(DateTime time) {
-    return DateFormat('hh:mm a').format(time);
+  @override
+  void dispose() {
+    socket.sendOnlineStatus(
+      isOnline: false,
+      userId: _chatController.currentUserId!,
+    );
+
+    socket.close();
+    _messageController.dispose();
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -54,80 +133,136 @@ class _ChatPageScreenState extends State<ChatPageScreen> {
     return Scaffold(
       backgroundColor: AppColor.surface,
 
-      // ================= APP BAR =================
       appBar: AppBar(
         backgroundColor: AppColor.primary,
-        elevation: 0,
-        title: Text(
-          widget.title,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+        titleSpacing: 0,
+        leading: IconButton(onPressed: () {
+           Get.back();
+        }, icon: Icon(Icons.arrow_back_ios, color: AppColor.white)),
+        title: Row(
+          spacing: context.sWidth*0.02,
+          children: [
+             CircleAvatar(
+               backgroundImage: NetworkImage(widget.profile),
+             ),
+            Column(
+              crossAxisAlignment:
+              CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.title,
+                  style: GoogleFonts.poppins(
+                    fontSize: context.text14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColor.white
+                  ),
+                ),
+            
+                if (isTyping)
+                  Text(
+                    "typing...",
+                    style: GoogleFonts.poppins(
+                      fontSize: 11,
+                        color: AppColor.white
+                    ),
+                  )
+                else
+                  Text(
+                    isOnline
+                        ? "online"
+                        : "offline",
+                    style: GoogleFonts.poppins(
+                      fontSize: 11,
+                        color: AppColor.white
+                    ),
+                  ),
+              ],
+            ),
+          ],
         ),
-        iconTheme: const IconThemeData(color: Colors.white),
       ),
 
-      // ================= BODY =================
       body: Column(
         children: [
-          // ================= CHAT LIST =================
+
           Expanded(
             child: Obx(() {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                scrollToBottom();
-              });
+              final messages =
+                  _chatController.messageList;
 
               return ListView.builder(
-                controller: scrollController,
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                itemCount: controller.messageList.length,
+                controller:
+                _scrollController,
+                padding: EdgeInsets.all(context.sWidth*0.02),
+                itemCount: messages.length,
+
                 itemBuilder: (context, index) {
-                  final msg = controller.messageList[index];
-                  final isMe = msg.senderId == controller.currentUserId;
+                  final msg = messages[index];
+                  final isMe = msg.sender == _chatController.currentUserId;
 
                   return Align(
-                    alignment:
-                    isMe ? Alignment.centerRight : Alignment.centerLeft,
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 4),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
+                    alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
 
-                      // ================= BUBBLE =================
-                      decoration: BoxDecoration(
-                        color: isMe
-                            ? AppColor.primary
-                            : Colors.white,
+                    child: Container(
+                      margin: EdgeInsets.only(
+                      bottom: context.sWidth*0.02,
+                      left: isMe ? context.sWidth*0.1 : context.sWidth*0.02,
+                      right: isMe ? context.sWidth*0.02 : context.sWidth*0.1
+                    ),
+
+                      padding: EdgeInsets.all(context.sWidth*0.04),
+
+                      decoration:
+                      BoxDecoration(
+                        color:
+                        isMe ? AppColor.white
+                            : AppColor.primary.withOpacity(0.06,),
+
                         borderRadius: BorderRadius.only(
-                          topLeft: const Radius.circular(14),
-                          topRight: const Radius.circular(14),
-                          bottomLeft: Radius.circular(isMe ? 14 : 0),
-                          bottomRight: Radius.circular(isMe ? 0 : 14),
+                          topLeft: Radius.circular(isMe ? context.sWidth*0.04:0),
+                          bottomRight: Radius.circular(isMe ? 0: context.sWidth*0.04),
+                          bottomLeft: Radius.circular(context.sWidth*0.04),
+                          topRight: Radius.circular(context.sWidth*0.04)
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 3,
-                          )
-                        ],
+                        border: Border.all(color: AppColor.primary.withOpacity(0.1)),
                       ),
 
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                        crossAxisAlignment:
+                        isMe
+                            ? CrossAxisAlignment
+                            .end
+                            : CrossAxisAlignment
+                            .start,
+
                         children: [
                           Text(
                             msg.message,
-                            style: TextStyle(
-                              color: isMe ? Colors.white : AppColor.title,
-                              fontSize: 14,
+                            style:
+                            GoogleFonts.poppins(
+                              fontSize:
+                              context.text14,
+                              color:
+                              AppColor
+                                  .title,
                             ),
                           ),
-                          const SizedBox(height: 4),
 
-                          Text('${AppDateFormat.format(msg.createdAt)}',
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: isMe
-                                  ? Colors.white70
-                                  : AppColor.subtitle,
+                           SizedBox(
+                            height: context.sWidth*0.02,
+                          ),
+
+                          Text(
+                            AppDateFormat.timeDateFormat(
+                              msg.createdAt,
+                            ),
+                            style:
+                            GoogleFonts.poppins(
+                              fontSize:
+                              context.text10,
+                              color:
+                              AppColor
+                                  .subtitle,
                             ),
                           ),
                         ],
@@ -139,41 +274,79 @@ class _ChatPageScreenState extends State<ChatPageScreen> {
             }),
           ),
 
-          // ================= INPUT BAR =================
           SafeArea(
-            child: AppCard(
-              hasBorder: true,
-              borderRadius: 0,
-              margin: EdgeInsets.zero,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Padding(
+              padding: EdgeInsets.only(
+                left: context.sWidth*0.04,
+                right: context.sWidth*0.04,
+                bottom: context.sWidth*0.04
+              ),
               child: Row(
+                spacing: context.sWidth*0.06,
                 crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Expanded(
-                    child: _mxgBox(controller: controller.messageController),
+                    child: _msgBox(
+                      context: context,
+                      controller: _messageController,
+                      onChanged: (value) {
+                        socket.sendTyping(
+                          typing: value.trim().isNotEmpty,
+                          userId: _chatController.currentUserId!,
+                        );
+                      },
+                    ),
                   ),
-            
-                  const SizedBox(width: 8),
-            
-                  // ================= SEND BUTTON =================
+
                   GestureDetector(
                     onTap: () {
-                      controller.sendMessage();
+                      final text =
+                      _messageController.text
+                          .trim();
+
+                      if (text.isEmpty) {
+                        return;
+                      }
+                      socket.sendTyping(
+                        typing: false,
+                        userId:
+                        _chatController
+                            .currentUserId!,
+                      );
+                      socket.sendMessage(
+                        message: text,
+                        senderId:
+                        _chatController
+                            .currentUserId!,
+                      );
+
+                      _messageController
+                          .clear();
+
+                      scrollToBottom();
                     },
+
                     child: Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: const BoxDecoration(
-                        color: AppColor.primary,
-                        shape: BoxShape.circle,
+                      padding:
+                      const EdgeInsets.all(12,),
+                      decoration:
+                      const BoxDecoration(
+                        color:
+                        AppColor
+                            .primary,
+                        shape:
+                        BoxShape.circle,
                       ),
-                      child: const Icon(
+
+                      child:
+                      const Icon(
                         Icons.send,
-                        color: Colors.white,
+                        color:
+                        Colors.white,
                         size: 18,
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -182,31 +355,45 @@ class _ChatPageScreenState extends State<ChatPageScreen> {
       ),
     );
   }
-  Widget _mxgBox({
-    required TextEditingController controller,
-  }){
-    final border = OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: BorderSide(color: AppColor.primary.withOpacity(.1), width: 1.2),
-    );
-
-    return TextField(
-      maxLines: 4,
-      minLines: 1,
-      keyboardType: TextInputType.multiline,
-      controller: controller,
-      style: GoogleFonts.poppins(color: AppColor.title, fontSize: context.text14),
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: AppColor.surface,
-        hintText: "Type message...",
-        alignLabelWithHint: true,
-        contentPadding: const EdgeInsets.all(12),
-        border: border,
-        enabledBorder: border,
-        focusedBorder: border,
-        hintStyle: GoogleFonts.poppins(color: AppColor.subtitle, fontSize: context.text14),
-      ),
-    );
-  }
 }
+
+Widget _msgBox({
+  required BuildContext context,
+  TextEditingController? controller,
+  Function(String)? onChanged,
+}) {
+  final border = OutlineInputBorder(
+    borderRadius: BorderRadius.circular(12),
+    borderSide: BorderSide(
+      color: AppColor.primary.withOpacity(.1),
+      width: 1.2,
+    ),
+  );
+
+  return TextField(
+    controller: controller,
+    minLines: 2,
+    maxLines: 4,
+    keyboardType: TextInputType.multiline,
+    onChanged: onChanged,
+    style: GoogleFonts.poppins(
+      color: AppColor.title,
+      fontSize: context.text14,
+    ),
+    decoration: InputDecoration(
+      filled: true,
+      fillColor: AppColor.white,
+      hintText: "Type message...",
+      alignLabelWithHint: true,
+      contentPadding: const EdgeInsets.all(12),
+      border: border,
+      enabledBorder: border,
+      focusedBorder: border,
+      hintStyle: GoogleFonts.poppins(
+        color: AppColor.subtitle,
+        fontSize: context.text14,
+      ),
+    ),
+  );
+}
+

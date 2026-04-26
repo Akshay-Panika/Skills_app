@@ -2,45 +2,107 @@ import 'dart:convert';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ChatSocketService {
-  WebSocketChannel? _channel;
+  WebSocketChannel? chatSocket;
+  WebSocketChannel? roomSocket;
 
-  void connect({
+  void connectChat({
     required int roomId,
     required int userId,
+    required Function(Map<String, dynamic>) onEvent,
   }) {
-    disconnect();
+    final url =
+        "wss://skills-app-service.onrender.com/ws/chat/$roomId/?user_id=$userId";
 
-    final uri = Uri(
-      scheme: "wss",
-      host: "skills-app-service.onrender.com",
-      path: "/ws/chat/$roomId/",
-      queryParameters: {
-        "user_id": "$userId",
+    chatSocket = WebSocketChannel.connect(Uri.parse(url),);
+
+    chatSocket!.stream.listen(
+          (event) {
+        try {
+          final data = jsonDecode(event);
+          onEvent(data);
+        } catch (e) {
+          print("Chat parse error: $e");
+        }
+      },
+      onError: (e) {
+        print("Chat socket error: $e");
+      },
+      onDone: () {
+        print("Chat socket closed");
       },
     );
+  }
 
-    print("🔥 SOCKET CONNECT => $uri");
+  void connectRooms({
+    required int userId,
+    required Function(Map<String, dynamic>) onEvent,
+  }) {
+    final url =
+        "wss://skills-app-service.onrender.com/ws/user/$userId/rooms/";
 
-    _channel = WebSocketChannel.connect(uri);
+    roomSocket = WebSocketChannel.connect(
+      Uri.parse(url),
+    );
+
+    roomSocket!.stream.listen(
+          (event) {
+        try {
+          final data = jsonDecode(event);
+          onEvent(data);
+        } catch (e) {
+          print("Room parse error: $e");
+        }
+      },
+      onError: (e) {
+        print("Room socket error: $e");
+      },
+      onDone: () {
+        print("Room socket closed");
+      },
+    );
   }
 
   void sendMessage({
-    required int senderId,
     required String message,
+    required int senderId,
   }) {
-    _channel?.sink.add(jsonEncode({
-      "type": "message",
-      "sender_id": senderId,
-      "message": message,
-    }));
+    chatSocket?.sink.add(
+      jsonEncode({
+        "type": "chat_message",
+        "message": message,
+        "sender": senderId,
+      }),
+    );
   }
 
-  Stream get stream => _channel!.stream;
+  void sendTyping({
+    required bool typing,
+    required int userId,
+  }) {
+    chatSocket?.sink.add(
+      jsonEncode({
+        "type": "typing",
+        "typing": typing,
+        "user_id": userId,
+      }),
+    );
+  }
 
-  void disconnect() {
-    try {
-      _channel?.sink.close();
-    } catch (_) {}
-    _channel = null;
+  void sendOnlineStatus({
+    required bool isOnline,
+    required int userId,
+  }) {
+    chatSocket?.sink.add(
+      jsonEncode({
+        "type": "online_status",
+        "is_online": isOnline,
+        "user_id": userId,
+      }),
+    );
+  }
+
+  void close() {
+    chatSocket?.sink.close();
+    roomSocket?.sink.close();
   }
 }

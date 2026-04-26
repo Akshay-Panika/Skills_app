@@ -13,6 +13,7 @@ import '../features/auth/screen/intro_screen.dart';
 import '../features/category/binding/category_binding.dart';
 import '../features/category/screen/category_screen.dart';
 import '../features/chat/controller/chat_controller.dart';
+import '../features/chat/screen/chat_page_screen.dart';
 import '../features/chat/screen/room_list_screen.dart';
 import '../features/dashboard/binding/dashboard_binding.dart';
 import '../features/dashboard/screen/dashboard_screen.dart';
@@ -97,16 +98,25 @@ class AppPages {
       binding: AddSkillBinding(),
     ),
 
-    // GetPage(
-    //   name: '/chat',
-    //   page: () => ChatPage(),
-    // ),
     GetPage(
       name: '/chat',
       page: () =>  RoomListScreen(),
       binding: BindingsBuilder(() {
         Get.put(ChatController());
       }),
+    ),
+
+    GetPage(
+      name: '/chat-page',
+      page: () {
+        final args = Get.arguments ?? {};
+
+        return ChatPageScreen(
+          roomId: args["roomId"] ?? 0,
+          title: args["title"] ?? "Chat",
+          profile: args["profile"] ?? "",
+        );
+      },
     ),
 
     GetPage(

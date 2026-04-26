@@ -1,152 +1,89 @@
-import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import '../../auth/helper/auth_preferences.dart';
 import '../model/chat_message_model.dart';
-import '../model/chat_room_model.dart';
+import '../model/chat_room_list_model.dart';
 import '../repository/chat_repository.dart';
-import '../service/chat_socket_service.dart';
+import '../../auth/helper/auth_preferences.dart';
 
 class ChatController extends GetxController {
-  final ChatRepository repository = ChatRepository();
-  final ChatSocketService socketService = ChatSocketService();
 
-  RxList<ChatRoomModel> roomList = <ChatRoomModel>[].obs;
-  RxList<ChatMessageModel> messageList = <ChatMessageModel>[].obs;
+  var isLoading = false.obs;
+  var isMessageLoading = false.obs;
+  var isCreateRoomLoading = false.obs;
 
-  RxBool isLoading = false.obs;
+  var roomList = <ChatRoomListModel>[].obs;
+  var messageList = <ChatMessageModel>[].obs;
 
-  TextEditingController messageController = TextEditingController();
-
-  int currentUserId = 0;
-  int? currentRoomId;
+  int? currentUserId;
 
   @override
   void onInit() {
     super.onInit();
-    currentUserId = AuthPreferences.getUserId() ?? 0;
+    currentUserId = AuthPreferences.getUserId();
     fetchRooms();
   }
 
   Future<void> fetchRooms() async {
-    try {
-      isLoading.value = true;
+    isLoading.value = true;
 
-      final data = await repository.getRooms(currentUserId);
-      roomList.assignAll(data);
+    final result = await ChatRepository.getRooms();
+    roomList.assignAll(result);
 
-    } finally {
-      isLoading.value = false;
-    }
+    isLoading.value = false;
   }
-
 
   Future<void> fetchMessages(int roomId) async {
+    messageList.clear();
+    isMessageLoading.value = true;
+
+    final result = await ChatRepository.getHistory(roomId);
+
+    if (result != null) {
+      messageList.assignAll(result.messages);
+    } else {
+      messageList.clear();
+    }
+
+    isMessageLoading.value = false;
+  }
+
+  Future<void> createRoom({
+    required int serviceId,
+    required int buyerId,
+    String? message,
+  }) async {
+    isCreateRoomLoading.value = true;
+
     try {
-      isLoading.value = true;
-
-      currentRoomId = roomId;
-
-      final data = await repository.getMessages(roomId);
-      messageList.assignAll(data);
-
-      _connectSocket(roomId);
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  void _connectSocket(int roomId) {
-    socketService.disconnect();
-
-    socketService.connect(
-      roomId: roomId,
-      userId: currentUserId,
-    );
-
-    socketService.stream.listen((event) {
-      try {
-        final data = jsonDecode(event);
-
-        if (data["type"] == "message") {
-          messageList.insert(
-            0,
-            ChatMessageModel(
-              id: data["id"] ?? 0,
-              senderId: data["sender_id"] ?? 0,
-              senderPhone: "",
-              message: data["message"] ?? "",
-              isSeen: false,
-              isDelivered: true,
-              createdAt: DateTime.now().toString(),
-            ),
-          );
-
-          _updateRoom(data["message"] ?? "");
-        }
-      } catch (e) {
-        print("Socket error: $e");
-      }
-    });
-  }
-
-  void _updateRoom(String msg) {
-    if (currentRoomId == null) return;
-
-    final index =
-    roomList.indexWhere((r) => r.roomId == currentRoomId);
-
-    if (index != -1) {
-      final old = roomList[index];
-
-      roomList[index] = ChatRoomModel(
-        roomId: old.roomId,
-        buyerId: old.buyerId,
-        sellerId: old.sellerId,
-        serviceName: old.serviceName,
-        serviceImage: old.serviceImage,
-        sellerName: old.sellerName,
-        sellerImage: old.sellerImage,
-        lastMessage: msg,
-        updatedAt: DateTime.now().toString(),
+      final result = await ChatRepository.createRoom(
+        serviceId: serviceId,
+        buyerId: buyerId,
+        message: message,
       );
+
+      if (result != null) {
+        await fetchRooms();
+      }
+    } catch (e) {
+      print("Create Room Error: $e");
+    } finally {
+      isCreateRoomLoading.value = false;
     }
   }
 
-  void sendMessage() {
-    final text = messageController.text.trim();
-    if (text.isEmpty) return;
-    final now = DateTime.now().toString();
 
+  Future<void> deleteRooms(List<int> roomIds) async {
+    try {
+      roomList.removeWhere((e) => roomIds.contains(e.roomId));
+      roomList.refresh();
 
-    // UI instant
-    messageList.add(
-      ChatMessageModel(
-        id: 0,
-        senderId: currentUserId,
-        senderPhone: "",
-        message: text,
-        isSeen: false,
-        isDelivered: true,
-        createdAt: now,
-      ),
-    );
-    socketService.sendMessage(
-      senderId: currentUserId,
-      message: text,
-    );
+      final result = await ChatRepository.bulkDelete(roomIds);
 
-    messageController.clear();
-    // fetchRooms();
-    _updateRoom(text);
+      if (result != "deleted") {
+        await fetchRooms();
+      }
 
-  }
-
-  @override
-  void onClose() {
-    socketService.disconnect();
-    messageController.dispose();
-    super.onClose();
-  }
-}
+    } catch (e) {
+      print("Delete Error: $e");
+      await fetchRooms();
+    }
+  }}

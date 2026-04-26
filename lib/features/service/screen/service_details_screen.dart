@@ -531,7 +531,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
 
                       _actionButton(
                         context,
-                        loading: false,
+                        loading: chatController.isCreateRoomLoading.value,
                         text: _isMSG ? "Send Message" : "Chat With Mentor",
                         onChatTap: () async {
                           if (!_isMSG) {
@@ -552,15 +552,15 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                           try {
                             chatController.isLoading.value = true;
 
-                            await chatController.repository.createRoom(
+                            await chatController.createRoom(
                               serviceId: service.id,
                               buyerId: userId!,
                               message: message,
                             );
 
                             await chatController.fetchRooms();
-
-                            Get.toNamed('/chat');
+                            Get.find<ServiceDetailsController>().fetchServiceDetails(service.id);
+                            // Get.toNamed('/chat');
 
                           } catch (e) {
                             debugPrint("CHAT ERROR: $e");
