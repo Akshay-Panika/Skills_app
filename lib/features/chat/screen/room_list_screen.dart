@@ -58,7 +58,41 @@ class _RoomListScreenState extends State<RoomListScreen> with SingleTickerProvid
           );
           controller.roomList.refresh();
         }
-      },
+
+        if (type == "seen") {
+          final currentUserId = controller.currentUserId;
+
+          for (int i = 0; i < controller.roomList.length; i++) {
+            final room = controller.roomList[i];
+
+            // ✅ agar last message tumne bheja tha
+            if (room.lastMessageSender == currentUserId) {
+
+              controller.roomList[i] = ChatRoomListModel(
+                roomId: room.roomId,
+                service: room.service,
+
+                buyerId: room.buyerId,
+                buyerName: room.buyerName,
+                buyerImage: room.buyerImage,
+
+                sellerId: room.sellerId,
+                sellerName: room.sellerName,
+                sellerImage: room.sellerImage,
+
+                lastMessage: room.lastMessage,
+                lastMessageSender: room.lastMessageSender,
+
+                isSeen: true, // ✅ FINAL MAGIC
+
+                updatedAt: room.updatedAt,
+              );
+            }
+          }
+
+          controller.roomList.refresh();
+        }
+        },
     );
   }
 
@@ -362,7 +396,9 @@ class _RoomListScreenState extends State<RoomListScreen> with SingleTickerProvid
                                         Icon(
                                           Icons.done_all,
                                           size: 16,
-                                          color: Colors.blue,
+                                          color: room.lastMessageSender == currentUserId
+                                              ? (room.isSeen ? Colors.blue : Colors.grey)
+                                              : Colors.transparent,
                                         ),
                                         Expanded(
                                           child: Text(

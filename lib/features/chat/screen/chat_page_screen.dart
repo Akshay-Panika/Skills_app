@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -34,6 +37,7 @@ class _ChatPageScreenState extends State<ChatPageScreen> {
 
   bool isTyping = false;
   bool isOnline = false;
+  Timer? typingTimer;
 
   @override
   void initState() {
@@ -46,6 +50,7 @@ class _ChatPageScreenState extends State<ChatPageScreen> {
         userId: _chatController.currentUserId!,
         onEvent: (data) {
           final type = data["type"];
+
           if (type == "chat_message") {
             final msg = ChatMessageModel(
               id: data["id"] ?? 0,
@@ -54,9 +59,7 @@ class _ChatPageScreenState extends State<ChatPageScreen> {
               senderPhone: "",
               message: data["message"] ?? "",
               isSeen: data["is_seen"] ?? false,
-              createdAt:
-              data["created_at"] ??
-                  DateTime.now().toString(),
+              createdAt: data["created_at"] ?? DateTime.now().toString(),
             );
 
             final alreadyExists = _chatController.messageList.any(
@@ -87,6 +90,27 @@ class _ChatPageScreenState extends State<ChatPageScreen> {
               });
             }
           }
+
+          if (type == "seen") {
+            if (data["user_id"] != _chatController.currentUserId) {
+              for (int i = 0; i < _chatController.messageList.length; i++) {
+                final msg = _chatController.messageList[i];
+
+                if (msg.sender == _chatController.currentUserId) {
+                  _chatController.messageList[i] = ChatMessageModel(
+                    id: msg.id,
+                    room: msg.room,
+                    sender: msg.sender,
+                    senderPhone: msg.senderPhone,
+                    message: msg.message,
+                    isSeen: true,
+                    createdAt: msg.createdAt,
+                  );
+                }
+              }
+              _chatController.messageList.refresh();
+            }
+          }
         },
       );
 
@@ -95,6 +119,10 @@ class _ChatPageScreenState extends State<ChatPageScreen> {
         isOnline: true,
         userId: _chatController.currentUserId!,
       );
+      socket.chatSocket?.sink.add(jsonEncode({"type": "seen"}));
+      Future.delayed(const Duration(milliseconds: 500), () {
+        socket.chatSocket?.sink.add(jsonEncode({"type": "seen"}));
+      });
     });
   }
 
@@ -117,6 +145,8 @@ class _ChatPageScreenState extends State<ChatPageScreen> {
 
   @override
   void dispose() {
+    typingTimer?.cancel();
+
     socket.sendOnlineStatus(
       isOnline: false,
       userId: _chatController.currentUserId!,
@@ -126,6 +156,21 @@ class _ChatPageScreenState extends State<ChatPageScreen> {
     _messageController.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void onTyping(String value) {
+    final userId = _chatController.currentUserId!;
+
+    if (value.trim().isNotEmpty) {
+      socket.sendTyping(typing: true, userId: userId);
+
+      typingTimer?.cancel();
+      typingTimer = Timer(const Duration(seconds: 2), () {
+        socket.sendTyping(typing: false, userId: userId);
+      });
+    } else {
+      socket.sendTyping(typing: false, userId: userId);
+    }
   }
 
   @override
@@ -157,25 +202,15 @@ class _ChatPageScreenState extends State<ChatPageScreen> {
                     color: AppColor.white
                   ),
                 ),
-            
-                if (isTyping)
-                  Text(
-                    "typing...",
-                    style: GoogleFonts.poppins(
-                      fontSize: 11,
-                        color: AppColor.white
-                    ),
-                  )
-                else
-                  Text(
-                    isOnline
-                        ? "online"
-                        : "offline",
-                    style: GoogleFonts.poppins(
-                      fontSize: 11,
-                        color: AppColor.white
-                    ),
-                  ),
+
+                Text(
+                  isTyping
+                      ? "typing..."
+                      : isOnline
+                      ? "online"
+                      : "offline",
+                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                ),
               ],
             ),
           ],
@@ -252,18 +287,30 @@ class _ChatPageScreenState extends State<ChatPageScreen> {
                             height: context.sWidth*0.02,
                           ),
 
-                          Text(
-                            AppDateFormat.timeDateFormat(
-                              msg.createdAt,
-                            ),
-                            style:
-                            GoogleFonts.poppins(
-                              fontSize:
-                              context.text10,
-                              color:
-                              AppColor
-                                  .subtitle,
-                            ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                AppDateFormat.timeDateFormat(
+                                  msg.createdAt,
+                                ),
+                                style: GoogleFonts.poppins(
+                                  fontSize: context.text10,
+                                  color: AppColor.subtitle,
+                                ),
+                              ),
+
+                              if (isMe) ...[
+                                SizedBox(width: 4),
+
+                                Icon(
+                                  Icons.done_all,
+                                  // msg.isSeen ? Icons.done_all : Icons.done,
+                                  size: 16,
+                                  color: msg.isSeen ? Colors.blue : Colors.grey,
+                                ),
+                              ],
+                            ],
                           ),
                         ],
                       ),
@@ -289,41 +336,61 @@ class _ChatPageScreenState extends State<ChatPageScreen> {
                     child: _msgBox(
                       context: context,
                       controller: _messageController,
-                      onChanged: (value) {
-                        socket.sendTyping(
-                          typing: value.trim().isNotEmpty,
-                          userId: _chatController.currentUserId!,
-                        );
-                      },
+                      onChanged: onTyping,
+                      // onChanged: (value) {
+                      //   socket.sendTyping(
+                      //     typing: value.trim().isNotEmpty,
+                      //     userId: _chatController.currentUserId!,
+                      //   );
+                      // },
                     ),
                   ),
 
                   GestureDetector(
+                    // onTap: () {
+                    //   final text =
+                    //   _messageController.text
+                    //       .trim();
+                    //
+                    //   if (text.isEmpty) {
+                    //     return;
+                    //   }
+                    //   socket.sendTyping(
+                    //     typing: false,
+                    //     userId:
+                    //     _chatController
+                    //         .currentUserId!,
+                    //   );
+                    //   socket.sendMessage(
+                    //     message: text,
+                    //     senderId:
+                    //     _chatController
+                    //         .currentUserId!,
+                    //   );
+                    //
+                    //   _messageController
+                    //       .clear();
+                    //
+                    //   scrollToBottom();
+                    // },
                     onTap: () {
-                      final text =
-                      _messageController.text
-                          .trim();
+                      final text = _messageController.text.trim();
 
-                      if (text.isEmpty) {
-                        return;
-                      }
+                      if (text.isEmpty) return;
+
+                      typingTimer?.cancel();
+
                       socket.sendTyping(
                         typing: false,
-                        userId:
-                        _chatController
-                            .currentUserId!,
+                        userId: _chatController.currentUserId!,
                       );
+
                       socket.sendMessage(
                         message: text,
-                        senderId:
-                        _chatController
-                            .currentUserId!,
+                        senderId: _chatController.currentUserId!,
                       );
 
-                      _messageController
-                          .clear();
-
-                      scrollToBottom();
+                      _messageController.clear();
                     },
 
                     child: Container(

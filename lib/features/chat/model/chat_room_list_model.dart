@@ -11,6 +11,9 @@ class ChatRoomListModel {
   final String sellerImage;
 
   final String lastMessage;
+  final int lastMessageSender; // ✅ ADD
+  final bool isSeen; // ✅ ADD
+
   final String updatedAt;
 
   ChatRoomListModel({
@@ -26,6 +29,8 @@ class ChatRoomListModel {
     required this.sellerImage,
 
     required this.lastMessage,
+    required this.lastMessageSender, // ✅ ADD
+    required this.isSeen,
     required this.updatedAt,
   });
 
@@ -48,6 +53,8 @@ class ChatRoomListModel {
       sellerImage: json["seller_image"] ?? "",
 
       lastMessage: json["last_message"] ?? "",
+      lastMessageSender: json["last_message_sender"] ?? 0,
+      isSeen: json["is_seen"] ?? false,
       updatedAt: json["updated_at"] ?? "",
     );
   }

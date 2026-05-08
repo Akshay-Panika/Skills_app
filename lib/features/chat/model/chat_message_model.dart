@@ -1,7 +1,3 @@
-/// ============================================================
-/// chat_message_model.dart
-/// ============================================================
-
 class ChatHistoryResponse {
   final int roomId;
   final List<ChatMessageModel> messages;
