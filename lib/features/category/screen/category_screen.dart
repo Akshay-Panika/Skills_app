@@ -4,7 +4,6 @@ import 'package:skills_app/core/constant/app_color.dart';
 import 'package:skills_app/core/widget/app_card.dart';
 import '../../../core/constant/app_size.dart';
 import '../../../core/widget/my_appbar.dart';
-import '../../service/screen/service_screen.dart';
 import '../../subcategory/controller/subategory_controller.dart';
 import '../../subcategory/model/subcategory_model.dart';
 import '../controller/category_controller.dart';
@@ -297,7 +296,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                         crossAxisCount: 3,
                         mainAxisSpacing: 18,
                         crossAxisSpacing: 18,
-                        childAspectRatio: 0.8,
+                        childAspectRatio: 0.7,
                       ),
                       itemBuilder: (_, index) {
                         final sub = subcategories[index];
@@ -315,24 +314,22 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                 height:context.sHeight*0.08,
                                 width: context.sHeight*0.08,
                                 margin: EdgeInsets.zero,
-                                padding: const EdgeInsets.all(12),
+                                padding:  EdgeInsets.all(context.sWidth*0.04),
                                 hasBorder: true,
                                 child: (sub.subcategoryImage != null &&
                                     sub.subcategoryImage!.isNotEmpty)
-                                    ? ClipOval(
-                                  child: Image.network(
-                                    sub.subcategoryImage!,
-                                    fit: BoxFit.fill,
-                                    errorBuilder:
-                                        (context, error, stackTrace) {
-                                      return const Icon(
-                                        Icons
-                                            .image_not_supported_outlined,
-                                        color: Colors.grey,
-                                      );
-                                    },
-                                  ),
-                                )
+                                    ? Image.network(
+                                      sub.subcategoryImage!,
+                                      fit: BoxFit.fill,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return const Icon(
+                                          Icons
+                                              .image_not_supported_outlined,
+                                          color: Colors.grey,
+                                        );
+                                      },
+                                    )
                                     : const Icon(
                                   Icons.image_not_supported_outlined,
                                   color: Colors.grey,
